@@ -14,8 +14,8 @@ class PharmaceuticalFormModelFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->unique()->word(),
-            'consumption_type' => fake()->randomElement(['discrete', 'continuous']),
+            'name' => $this->faker->unique()->word(),
+            'consumption_type' => $this->faker->randomElement(['discrete', 'continuous']),
         ];
     }
 }

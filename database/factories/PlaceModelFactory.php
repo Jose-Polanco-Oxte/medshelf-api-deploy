@@ -19,9 +19,9 @@ class PlaceModelFactory extends Factory
     public function definition(): array
     {
         return [
-            'public_id' => fake()->unique()->uuid(),
+            'public_id' => $this->faker->unique()->uuid(),
             'house_id' => HouseModel::factory(),
-            'name' => fake()->word(),
+            'name' => $this->faker->word(),
         ];
     }
 }

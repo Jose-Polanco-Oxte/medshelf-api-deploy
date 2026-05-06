@@ -19,9 +19,9 @@ class StorageModelFactory extends Factory
     public function definition(): array
     {
         return [
-            'public_id' => fake()->unique()->uuid(),
+            'public_id' => $this->faker->unique()->uuid(),
             'place_id' => PlaceModel::factory(),
-            'name' => fake()->word(),
+            'name' => $this->faker->word(),
         ];
     }
 }
