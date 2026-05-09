@@ -26,10 +26,11 @@ final class PaginationService
         ?callable   $itemFormatter = null
     ): JsonResponse
     {
-        if ($request->has('cursor') || !($request->has('page') && $request->has('size'))) {
+        if ($request->has('cursor') || !$request->has('page')) {
             $cursorRequest = new CursorRequest(
                 cursor: $request->string('cursor')->toString() ?: null,
-                size: $request->integer('size', 10)
+                size: $request->integer('size', 10),
+                filters: $request->query('filter') ?? [],
             );
             $result = $dataFetcherByCursor($cursorRequest);
             if (!$result instanceof CursorResponse) {
@@ -49,6 +50,7 @@ final class PaginationService
             $offsetRequest = new OffsetRequest(
                 page: $page,
                 size: $size,
+                filters: $request->query('filter') ?? [],
             );
             $result = $dataFetcherByOffset($offsetRequest);
             if (!$result instanceof OffsetResponse) {
@@ -70,12 +72,14 @@ final class PaginationService
 
     public static function buildCursorQuery(
         Builder  $query,
-        ?Cursor  $cursor,
+        string   $cursorName,
+        ?string  $cursor,
         int      $size,
         callable $mapper
     ): CursorResponse
     {
-        $result = $query->cursorPaginate(perPage: $size, cursor: $cursor);
+        $laravelCursor = $cursor ? new Cursor([$cursorName => $cursor]) : null;
+        $result = $query->cursorPaginate(perPage: $size, cursor: $laravelCursor);
 
         $data = $result->items();
         /** @var PaginableByCursor[] $items */

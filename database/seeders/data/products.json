@@ -1,0 +1,703 @@
+[
+    {
+        "name": "Medley-Paracetamol 500mg",
+        "netContent": null,
+        "totalQuantity": 20,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Paracetamol",
+                    "strength": { "value": 500, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Tempra-Paracetamol Infantil",
+        "netContent": { "value": 120, "unit": "ml" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Syrup",
+            "consumptionType": "Continuous"
+        },
+        "composition": {
+            "referenceAmount": 5,
+            "activeIngredients": [
+                {
+                    "name": "Paracetamol",
+                    "strength": { "value": 160, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Aspirina 500mg",
+        "netContent": null,
+        "totalQuantity": 20,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Ácido acetilsalicílico",
+                    "strength": { "value": 500, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Voltaren Emulgel",
+        "netContent": { "value": 60, "unit": "g" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Gel",
+            "consumptionType": "Applicable"
+        },
+        "composition": {
+            "referenceAmount": 100,
+            "activeIngredients": [
+                {
+                    "name": "Diclofenaco dietilamonio",
+                    "strength": { "value": 1.16, "unit": "g" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Buscapina Compositum N",
+        "netContent": null,
+        "totalQuantity": 20,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Butilescopolamina",
+                    "strength": { "value": 10, "unit": "mg" }
+                },
+                {
+                    "name": "Paracetamol",
+                    "strength": { "value": 500, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Losec-Omeprazol 20mg",
+        "netContent": null,
+        "totalQuantity": 14,
+        "pharmaceuticalForm": {
+            "name": "Capsule",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Omeprazol",
+                    "strength": { "value": 20, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Nexium-Esomeprazol 40mg",
+        "netContent": null,
+        "totalQuantity": 14,
+        "pharmaceuticalForm": {
+            "name": "Capsule",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Esomeprazol magnésico",
+                    "strength": { "value": 40, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Pepto-Bismol Suspensión",
+        "netContent": { "value": 236, "unit": "ml" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Suspension",
+            "consumptionType": "Continuous"
+        },
+        "composition": {
+            "referenceAmount": 15,
+            "activeIngredients": [
+                {
+                    "name": "Subsalicilato de bismuto",
+                    "strength": { "value": 262, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Gravol Adulto",
+        "netContent": null,
+        "totalQuantity": 10,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Dimenhidrinato",
+                    "strength": { "value": 50, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Amoxil-Amoxicilina 500mg",
+        "netContent": null,
+        "totalQuantity": 12,
+        "pharmaceuticalForm": {
+            "name": "Capsule",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Amoxicilina",
+                    "strength": { "value": 500, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Azitrocin-Azitromicina 500mg",
+        "netContent": null,
+        "totalQuantity": 3,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Azitromicina",
+                    "strength": { "value": 500, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Ciproflox-Ciprofloxacino 500mg",
+        "netContent": null,
+        "totalQuantity": 10,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Ciprofloxacino",
+                    "strength": { "value": 500, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Loratadina 10mg",
+        "netContent": null,
+        "totalQuantity": 10,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Loratadina",
+                    "strength": { "value": 10, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Claritin-D",
+        "netContent": null,
+        "totalQuantity": 10,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Loratadina",
+                    "strength": { "value": 5, "unit": "mg" }
+                },
+                {
+                    "name": "Pseudoefedrina sulfato",
+                    "strength": { "value": 120, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Ventolin-Salbutamol Inhalador",
+        "netContent": { "value": 200, "unit": "ml" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Solution",
+            "consumptionType": "Continuous"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Salbutamol sulfato",
+                    "strength": { "value": 100, "unit": "mcg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Glucophage-Metformina 850mg",
+        "netContent": null,
+        "totalQuantity": 30,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Clorhidrato de metformina",
+                    "strength": { "value": 850, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Crestor-Rosuvastatina 10mg",
+        "netContent": null,
+        "totalQuantity": 30,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Rosuvastatina cálcica",
+                    "strength": { "value": 10, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Atorlip-Atorvastatina 20mg",
+        "netContent": null,
+        "totalQuantity": 30,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Atorvastatina cálcica",
+                    "strength": { "value": 20, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Enalapril 10mg",
+        "netContent": null,
+        "totalQuantity": 30,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Maleato de enalapril",
+                    "strength": { "value": 10, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Diovan-Valsartán 80mg",
+        "netContent": null,
+        "totalQuantity": 28,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Valsartán",
+                    "strength": { "value": 80, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Concor-Bisoprolol 5mg",
+        "netContent": null,
+        "totalQuantity": 30,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Fumarato de bisoprolol",
+                    "strength": { "value": 5, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Lexapro-Escitalopram 10mg",
+        "netContent": null,
+        "totalQuantity": 28,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Oxalato de escitalopram",
+                    "strength": { "value": 10, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Tafil-Alprazolam 0.5mg",
+        "netContent": null,
+        "totalQuantity": 30,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Alprazolam",
+                    "strength": { "value": 0.5, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Revenox-Melatonina 5mg",
+        "netContent": null,
+        "totalQuantity": 30,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Melatonina",
+                    "strength": { "value": 5, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Voltaren-Diclofenaco 75mg Inyectable",
+        "netContent": { "value": 3, "unit": "ml" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Injectable",
+            "consumptionType": "Continuous"
+        },
+        "composition": {
+            "referenceAmount": 3,
+            "activeIngredients": [
+                {
+                    "name": "Diclofenaco sódico",
+                    "strength": { "value": 75, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Ketorolaco 30mg Inyectable",
+        "netContent": { "value": 1, "unit": "ml" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Injectable",
+            "consumptionType": "Continuous"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Ketorolaco trometamina",
+                    "strength": { "value": 30, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Zovirax-Aciclovir Crema 5%",
+        "netContent": { "value": 10, "unit": "g" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Cream",
+            "consumptionType": "Applicable"
+        },
+        "composition": {
+            "referenceAmount": 100,
+            "activeIngredients": [
+                { "name": "Aciclovir", "strength": { "value": 5, "unit": "g" } }
+            ]
+        }
+    },
+    {
+        "name": "Canesten-Clotrimazol Crema 1%",
+        "netContent": { "value": 20, "unit": "g" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Cream",
+            "consumptionType": "Applicable"
+        },
+        "composition": {
+            "referenceAmount": 100,
+            "activeIngredients": [
+                {
+                    "name": "Clotrimazol",
+                    "strength": { "value": 1, "unit": "g" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Ginatrifil-Best",
+        "netContent": { "value": 40, "unit": "g" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Cream",
+            "consumptionType": "Applicable"
+        },
+        "composition": {
+            "referenceAmount": 100,
+            "activeIngredients": [
+                {
+                    "name": "Betametasona",
+                    "strength": { "value": 0.05, "unit": "g" }
+                },
+                {
+                    "name": "Clotrimazol",
+                    "strength": { "value": 1, "unit": "g" }
+                },
+                {
+                    "name": "Gentamicina",
+                    "strength": { "value": 0.1, "unit": "g" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Alpharma-Albendazol Suspensión",
+        "netContent": { "value": 20, "unit": "ml" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Suspension",
+            "consumptionType": "Continuous"
+        },
+        "composition": {
+            "referenceAmount": 5,
+            "activeIngredients": [
+                {
+                    "name": "Albendazol",
+                    "strength": { "value": 200, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Ivermectina 6mg",
+        "netContent": null,
+        "totalQuantity": 4,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Ivermectina",
+                    "strength": { "value": 6, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Operil-Oximetazolina Gotas Nasales",
+        "netContent": { "value": 15, "unit": "ml" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Drops",
+            "consumptionType": "Continuous"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Clorhidrato de oximetazolina",
+                    "strength": { "value": 0.5, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Daktarin-Miconazol Gel Oral 2%",
+        "netContent": { "value": 40, "unit": "g" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Gel",
+            "consumptionType": "Applicable"
+        },
+        "composition": {
+            "referenceAmount": 100,
+            "activeIngredients": [
+                {
+                    "name": "Nitrato de miconazol",
+                    "strength": { "value": 2, "unit": "g" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Terramicina-Oxitetraciclina Ungüento Oftálmico",
+        "netContent": { "value": 3.5, "unit": "g" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Ointment",
+            "consumptionType": "Applicable"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Clorhidrato de oxitetraciclina",
+                    "strength": { "value": 5, "unit": "mg" }
+                },
+                {
+                    "name": "Polimixina B sulfato",
+                    "strength": { "value": 10000, "unit": "UI" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Mucosolvan-Ambroxol Jarabe",
+        "netContent": { "value": 120, "unit": "ml" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Syrup",
+            "consumptionType": "Continuous"
+        },
+        "composition": {
+            "referenceAmount": 5,
+            "activeIngredients": [
+                {
+                    "name": "Clorhidrato de ambroxol",
+                    "strength": { "value": 15, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Bisolvon-Bromhexina 8mg",
+        "netContent": null,
+        "totalQuantity": 20,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Clorhidrato de bromhexina",
+                    "strength": { "value": 8, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Ranitidina 150mg",
+        "netContent": null,
+        "totalQuantity": 20,
+        "pharmaceuticalForm": {
+            "name": "Tablet",
+            "consumptionType": "Discrete"
+        },
+        "composition": {
+            "referenceAmount": 1,
+            "activeIngredients": [
+                {
+                    "name": "Clorhidrato de ranitidina",
+                    "strength": { "value": 150, "unit": "mg" }
+                }
+            ]
+        }
+    },
+    {
+        "name": "Kenacort-A Crema",
+        "netContent": { "value": 15, "unit": "g" },
+        "totalQuantity": null,
+        "pharmaceuticalForm": {
+            "name": "Cream",
+            "consumptionType": "Applicable"
+        },
+        "composition": {
+            "referenceAmount": 100,
+            "activeIngredients": [
+                {
+                    "name": "Triamcinolona acetonida",
+                    "strength": { "value": 0.1, "unit": "g" }
+                }
+            ]
+        }
+    }
+]

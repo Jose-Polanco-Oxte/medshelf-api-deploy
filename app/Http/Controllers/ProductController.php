@@ -11,7 +11,7 @@ use App\Core\Catalog\Product\Application\Dto\Response\ProductResponse;
 use App\Core\Catalog\Product\Application\UseCase\AddProduct;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
-use App\Http\Requests\ListRequest;
+use App\Http\Requests\UuidListRequest;
 use App\Providers\Core\Catalog\Product\Detail\ProductDetail;
 use App\Providers\Core\Catalog\Product\Service\ProductFinder;
 use App\Services\PaginationService;
@@ -27,7 +27,7 @@ class ProductController extends Controller
     {
     }
 
-    public function index(ListRequest $request): JsonResponse
+    public function index(UuidListRequest $request): JsonResponse
     {
         return PaginationService::paginate(
             $request,

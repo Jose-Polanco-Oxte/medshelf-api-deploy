@@ -14,7 +14,7 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         $products = json_decode(
-            file_get_contents(storage_path('/app/data/products.json')),
+            file_get_contents(database_path('seeders/data/products.json')),
             associative: true
         );
 

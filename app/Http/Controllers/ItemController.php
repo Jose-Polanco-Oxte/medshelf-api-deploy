@@ -9,7 +9,7 @@ use App\Core\Home\Item\Application\UseCase\AddItem;
 use App\Core\Home\Item\Application\UseCase\RemoveItem;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
-use App\Http\Requests\ListRequest;
+use App\Http\Requests\UuidListRequest;
 use App\Providers\Core\Home\Item\Detail\ItemDetail;
 use App\Providers\Core\Home\Item\Service\ItemFinder;
 use App\Services\PaginationService;
@@ -27,7 +27,7 @@ class ItemController extends Controller
     {
     }
 
-    public function index(ListRequest $request, string $placeId): JsonResponse
+    public function index(UuidListRequest $request, string $placeId): JsonResponse
     {
         return PaginationService::paginate(
             $request,

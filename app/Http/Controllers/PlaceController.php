@@ -13,7 +13,7 @@ use App\Core\Home\House\Application\UseCase\RemovePlaces;
 use App\Core\Home\House\Application\UseCase\UpdatePlace;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
-use App\Http\Requests\ListRequest;
+use App\Http\Requests\UuidListRequest;
 use App\Providers\Core\Home\House\Detail\PlaceDetail;
 use App\Providers\Core\Home\House\Service\PlaceFinder;
 use App\Services\PaginationService;
@@ -32,7 +32,7 @@ class PlaceController extends Controller
     {
     }
 
-    public function index(ListRequest $request, string $houseId): JsonResponse
+    public function index(UuidListRequest $request, string $houseId): JsonResponse
     {
         return PaginationService::paginate(
             $request,
