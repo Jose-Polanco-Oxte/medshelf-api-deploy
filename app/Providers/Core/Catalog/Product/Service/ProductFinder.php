@@ -15,8 +15,8 @@ use App\Providers\Core\Catalog\Product\Wrapper\Composition;
 use App\Providers\Core\Catalog\Product\Wrapper\NetContent;
 use App\Providers\Core\Catalog\Product\Wrapper\PharmaceuticalForm;
 use App\Providers\Core\Catalog\Product\Wrapper\Strength;
+use App\Providers\Core\InvalidCursor;
 use App\Services\PaginationService;
-use Illuminate\Pagination\Cursor;
 
 class ProductFinder
 {
@@ -67,6 +67,7 @@ class ProductFinder
     function listByOffset(OffsetRequest $request): OffsetResponse
     {
         $result = ProductModel::with(['pharmaceuticalForm'])
+            ->when($request->filters['name'] ?? null, fn($q, $v) => $q->whereLike('name', "%$v%"))
             ->orderBy('id')
             ->paginate(perPage: $request->size, page: $request->page);
 
@@ -99,14 +100,18 @@ class ProductFinder
 
     function listByCursor(CursorRequest $request): CursorResponse
     {
-        $id = $request->cursor
-            ? ProductModel::where('public_id', $request->cursor)->value('id')
-            : null;
+        $id = match ($request->cursor) {
+            null => null,
+            default => ProductModel::where('public_id', $request->cursor)->value('id')
+                ?? throw new InvalidCursor('Invalid cursor provided for Product listing.')
+        };
 
         return PaginationService::buildCursorQuery(
             query: ProductModel::with(['pharmaceuticalForm'])
+                ->when($request->filters['name'] ?? null, fn($q, $v) => $q->whereLike('name', "%$v%"))
                 ->orderBy('id'),
-            cursor: $id ? new Cursor(['id' => $id]) : null,
+            cursorName: 'id',
+            cursor: $id,
             size: $request->size,
             mapper: fn($item) => $this->toView($item)
         );

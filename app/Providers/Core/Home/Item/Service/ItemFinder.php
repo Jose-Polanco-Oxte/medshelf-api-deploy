@@ -14,8 +14,8 @@ use App\Providers\Core\Home\Item\View\ItemView;
 use App\Providers\Core\Home\Item\Wrapper\NetContent;
 use App\Providers\Core\Home\Item\Wrapper\PharmaceuticalForm;
 use App\Providers\Core\Home\Item\Wrapper\Product;
+use App\Providers\Core\InvalidCursor;
 use App\Services\PaginationService;
-use Illuminate\Pagination\Cursor;
 
 class ItemFinder
 {
@@ -72,6 +72,10 @@ class ItemFinder
             'product',
         ])
             ->whereHas('storage.place', fn($q) => $q->where('public_id', $placeId))
+            ->when(
+                $request->filters['name'] ?? null,
+                fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
+            )
             ->orderBy('id')
             ->paginate(perPage: $request->size, page: $request->cursor);
         return new OffsetResponse(
@@ -100,18 +104,23 @@ class ItemFinder
 
     function listByPlaceIdByCursor(string $placeId, CursorRequest $request): CursorResponse
     {
-        $id = $request->cursor
-            ? ItemModel::where('public_id', $request->cursor)->value('id')
-            : null;
-        $laravelCursor = $id ? new Cursor(['id' => $id])
-            : null;
+        $id = match ($request->cursor) {
+            null => null,
+            default => ItemModel::where('public_id', $request->cursor)->value('id')
+                ?? throw new InvalidCursor('Invalid cursor provided for Item listing.')
+        };
         return PaginationService::buildCursorQuery(
             query: ItemModel::with([
                 'product',
             ])
                 ->whereHas('storage.place', fn($q) => $q->where('public_id', $placeId))
+                ->when(
+                    $request->filters['name'] ?? null,
+                    fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
+                )
                 ->orderBy('id'),
-            cursor: $laravelCursor,
+            cursorName: 'id',
+            cursor: $id,
             size: $request->size,
             mapper: fn($item) => $this->toView($item)
         );

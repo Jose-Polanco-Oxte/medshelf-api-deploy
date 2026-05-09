@@ -9,7 +9,7 @@ class ActiveIngredientsSeeder extends Seeder
 {
     public function run(): void
     {
-        $path = database_path('/seeders/data/active_ingredients.json');
+        $path = database_path('seeders/data/active_ingredients.json');
 
         if (!file_exists($path)) {
             $this->command->error("Archivo no encontrado: $path");

@@ -11,8 +11,8 @@ use App\Providers\Core\Home\Item\Detail\ConsumptionDetail;
 use App\Providers\Core\Home\Item\Resume\ItemResume;
 use App\Providers\Core\Home\Item\Resume\ProductResume;
 use App\Providers\Core\Home\Item\View\ConsumptionView;
+use App\Providers\Core\InvalidCursor;
 use App\Services\PaginationService;
-use Illuminate\Pagination\Cursor;
 
 class ConsumptionFinder
 {
@@ -75,14 +75,17 @@ class ConsumptionFinder
 
     public function listByItemIdByCursor(string $itemId, CursorRequest $request): CursorResponse
     {
-        $id = $request->cursor
-            ? ConsumptionModel::where('public_id', $request->cursor)->value('id')
-            : null;
+        $id = match ($request->cursor) {
+            null => null,
+            default => ConsumptionModel::where('public_id', $request->cursor)->value('id')
+                ?? throw new InvalidCursor('Invalid cursor provided for Consumption listing.')
+        };
 
         return PaginationService::buildCursorQuery(
             query: ConsumptionModel::whereHas('item', fn($q) => $q->where('public_id', $itemId))
                 ->orderBy('id'),
-            cursor: $id ? new Cursor(['id' => $id]) : null,
+            cursorName: 'id',
+            cursor: $id,
             size: $request->size,
             mapper: fn($item) => $this->toView($item)
         );

@@ -10,8 +10,8 @@ use App\Models\PlaceModel;
 use App\Providers\Core\Home\House\Detail\PlaceDetail;
 use App\Providers\Core\Home\House\Resume\HouseResume;
 use App\Providers\Core\Home\House\View\PlaceView;
+use App\Providers\Core\InvalidCursor;
 use App\Services\PaginationService;
-use Illuminate\Pagination\Cursor;
 
 class PlaceFinder
 {
@@ -41,6 +41,7 @@ class PlaceFinder
     public function listByHouseIdByOffset(string $houseId, OffsetRequest $request): OffsetResponse
     {
         $result = PlaceModel::whereHas('house', fn($q) => $q->where('public_id', $houseId))
+            ->when($request->filters['name'] ?? null, fn($q, $v) => $q->whereLike('name', "%$v%"))
             ->orderBy('id')
             ->paginate(perPage: $request->size, page: $request->page);
         return new OffsetResponse(
@@ -64,14 +65,18 @@ class PlaceFinder
 
     public function listByHouseIdByCursor(string $houseId, CursorRequest $request): CursorResponse
     {
-        $id = $request->cursor
-            ? PlaceModel::where('public_id', $request->cursor)->value('id')
-            : null;
+        $id = match ($request->cursor) {
+            null => null,
+            default => PlaceModel::where('public_id', $request->cursor)->value('id')
+                ?? throw new InvalidCursor('Invalid cursor provided for Place listing.')
+        };
 
         return PaginationService::buildCursorQuery(
             query: PlaceModel::whereHas('house', fn($q) => $q->where('public_id', $houseId))
+                ->when($request->filters['name'] ?? null, fn($q, $v) => $q->whereLike('name', "%$v%"))
                 ->orderBy('id'),
-            cursor: $id ? new Cursor(['id' => $id]) : null,
+            cursorName: 'id',
+            cursor: $id,
             size: $request->size,
             mapper: fn($item) => $this->toView($item)
         );

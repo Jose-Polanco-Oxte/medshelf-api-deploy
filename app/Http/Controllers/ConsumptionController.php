@@ -7,7 +7,7 @@ use App\Core\Home\Item\Application\Dto\Response\ConsumptionResponse;
 use App\Core\Home\Item\Application\UseCase\ConsumeItem;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
-use App\Http\Requests\ListRequest;
+use App\Http\Requests\UuidListRequest;
 use App\Providers\Core\Home\Item\Detail\ConsumptionDetail;
 use App\Providers\Core\Home\Item\Service\ConsumptionFinder;
 use App\Services\PaginationService;
@@ -23,7 +23,7 @@ class ConsumptionController extends Controller
     {
     }
 
-    public function index(ListRequest $request, string $itemId): JsonResponse
+    public function index(UuidListRequest $request, string $itemId): JsonResponse
     {
         return PaginationService::paginate(
             $request,

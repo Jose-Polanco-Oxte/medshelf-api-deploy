@@ -6,7 +6,8 @@ readonly class CursorRequest
 {
     public function __construct(
         public ?string $cursor = null,
-        public int     $size = 10
+        public int     $size = 10,
+        public array   $filters = [],
     )
     {
     }
