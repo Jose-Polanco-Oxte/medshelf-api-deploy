@@ -7,6 +7,8 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\PharmaceuticalFormController;
 use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TreatmentController;
 use Illuminate\Support\Facades\Route;
 
 Route::group([], function () {
@@ -35,6 +37,23 @@ Route::group([], function () {
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/{productId}', [ProductController::class, 'show']);
     Route::post('/products', [ProductController::class, 'store']);
+
+    // Profiles
+    Route::get('/profiles', [ProfileController::class, 'index']);
+    Route::get('/profiles/{profileId}', [ProfileController::class, 'show']);
+    Route::post('/profiles', [ProfileController::class, 'store']);
+
+    // Treatments
+    Route::post('/treatments', [TreatmentController::class, 'store']);
+    Route::get('/treatments', [TreatmentController::class, 'index']);
+    Route::get('/treatments/{treatmentId}', [TreatmentController::class, 'show']);
+    Route::put('/treatments/{treatmentId}', [TreatmentController::class, 'update']);
+    Route::post('/treatments/{treatmentId}/pause', [TreatmentController::class, 'pause']);
+    Route::post('/treatments/{treatmentId}/resume', [TreatmentController::class, 'resume']);
+    Route::post('/treatments/{treatmentId}/cancel', [TreatmentController::class, 'cancel']);
+    Route::post('/treatments/{treatmentId}/complete', [TreatmentController::class, 'complete']);
+    Route::post('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'storeDose']);
+    Route::get('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'indexDoses']);
 
     // Active Ingredients
     Route::get('/active-ingredients', [ActiveIngredientController::class, 'index']);

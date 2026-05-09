@@ -22,7 +22,8 @@ final readonly class ConsumeItem
         $consumption = $this->consumptionCreator->consume(
             itemId: $request->itemId,
             houseId: $request->houseId,
-            amount: $request->amount
+            amount: $request->amount,
+            treatmentId: $request->treatmentId,
         );
         $this->eventPublisher->publish(...$consumption->pullEvents());
         return ItemMapper::toConsumptionResponse($consumption);
