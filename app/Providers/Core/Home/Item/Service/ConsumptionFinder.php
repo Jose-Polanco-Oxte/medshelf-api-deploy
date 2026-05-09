@@ -51,11 +51,11 @@ class ConsumptionFinder
     {
         $result = ConsumptionModel::whereHas('item', fn($q) => $q->where('public_id', $itemId))
             ->orderBy('id')
-            ->paginate(perPage: $request->size, page: $request->cursor);
+            ->paginate(perPage: $request->size, page: $request->page);
 
         return new OffsetResponse(
             totalCount: $result->total(),
-            page: $request->cursor,
+            page: $request->page,
             size: $request->size,
             hasMorePages: $result->hasMorePages(),
             items: collect($result->items())
