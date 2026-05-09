@@ -23,7 +23,7 @@ class ItemModelFactory extends Factory
             'public_id' => fake()->unique()->uuid(),
             'product_id' => ProductModel::factory(),
             'storage_id' => StorageModel::factory(),
-            'total_quantity' => fake()->numberBetween(1, 100),
+            'total_content' => fake()->numberBetween(10, 100),
             'expiration_date' => fake()->dateTimeBetween('now', '+1 year'),
         ];
     }
