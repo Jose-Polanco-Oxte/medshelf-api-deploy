@@ -51,11 +51,11 @@ class ConsumptionFinder
     {
         $result = ConsumptionModel::whereHas('item', fn($q) => $q->where('public_id', $itemId))
             ->orderBy('id')
-            ->paginate(perPage: $request->size, page: $request->cursor);
+            ->paginate(perPage: $request->size, page: $request->page);
 
         return new OffsetResponse(
             totalCount: $result->total(),
-            page: $request->cursor,
+            page: $request->page,
             size: $request->size,
             hasMorePages: $result->hasMorePages(),
             items: collect($result->items())
@@ -83,6 +83,41 @@ class ConsumptionFinder
 
         return PaginationService::buildCursorQuery(
             query: ConsumptionModel::whereHas('item', fn($q) => $q->where('public_id', $itemId))
+                ->orderBy('id'),
+            cursorName: 'id',
+            cursor: $id,
+            size: $request->size,
+            mapper: fn($item) => $this->toView($item)
+        );
+    }
+
+    public function listByTreatmentIdByOffset(string $treatmentId, OffsetRequest $request): OffsetResponse
+    {
+        $result = ConsumptionModel::whereHas('treatment', fn($q) => $q->where('public_id', $treatmentId))
+            ->orderBy('id')
+            ->paginate(perPage: $request->size, page: $request->page);
+
+        return new OffsetResponse(
+            totalCount: $result->total(),
+            page: $request->page,
+            size: $request->size,
+            hasMorePages: $result->hasMorePages(),
+            items: collect($result->items())
+                ->map(fn($item) => $this->toView($item))
+                ->toArray()
+        );
+    }
+
+    public function listByTreatmentIdByCursor(string $treatmentId, CursorRequest $request): CursorResponse
+    {
+        $id = match ($request->cursor) {
+            null => null,
+            default => ConsumptionModel::where('public_id', $request->cursor)->value('id')
+                ?? throw new InvalidCursor('Invalid cursor provided for Consumption listing.')
+        };
+
+        return PaginationService::buildCursorQuery(
+            query: ConsumptionModel::whereHas('treatment', fn($q) => $q->where('public_id', $treatmentId))
                 ->orderBy('id'),
             cursorName: 'id',
             cursor: $id,

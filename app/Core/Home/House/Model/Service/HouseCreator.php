@@ -18,7 +18,7 @@ final readonly class HouseCreator
     {
         $house = House::create($ownerId, $name);
         $this->houseRepository->save($house);
-        $this->placeCreator->create($house, 'Default Place');
+        $this->placeCreator->create($house->getId(), 'Default Place');
         return $house;
     }
 }

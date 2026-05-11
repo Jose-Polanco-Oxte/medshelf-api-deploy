@@ -16,12 +16,14 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $public_id
  * @property int $item_id
+ * @property int|null $treatment_id
  * @property float $amount
  * @property Carbon $consumed_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  * @property-read \App\Models\ItemModel $item
+ * @property-read \App\Models\TreatmentModel|null $treatment
  * @method static \Database\Factories\ConsumptionModelFactory factory($count = null, $state = [])
  * @method static Builder<static>|ConsumptionModel newModelQuery()
  * @method static Builder<static>|ConsumptionModel newQuery()
@@ -37,7 +39,7 @@ use Illuminate\Support\Carbon;
  * @mixin Eloquent
  */
 #[Table('consumptions')]
-#[Fillable(['public_id', 'item_id', 'amount', 'consumed_at'])]
+#[Fillable(['public_id', 'item_id', 'treatment_id', 'amount', 'consumed_at'])]
 class ConsumptionModel extends Model
 {
     /** @uses HasFactory<ConsumptionModelFactory> */
@@ -46,6 +48,11 @@ class ConsumptionModel extends Model
     public function item(): BelongsTo
     {
         return $this->belongsTo(ItemModel::class, 'item_id');
+    }
+
+    public function treatment(): BelongsTo
+    {
+        return $this->belongsTo(TreatmentModel::class, 'treatment_id');
     }
 
     protected function casts(): array

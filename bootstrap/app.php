@@ -2,12 +2,16 @@
 
 use App\Core\Shared\Application\AppException;
 use App\Core\Shared\Domain\DomainException;
+use App\Http\Middleware\AuthenticateApi;
 use App\Providers\Core\InfrastructureException;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,37 +21,87 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->redirectGuestsTo(null);
+        $middleware->alias([
+            'jwt.auth' => AuthenticateApi::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (Throwable $e, Request $request) {
-            if ($e instanceof DomainException) {
-                return response()->json([
-                    'message' => $e->getMessage(),
-                    'timestamp' => now()->toIso8601String(),
-                ], 400);
-            } else if ($e instanceof AppException) {
-                return response()->json([
-                    'message' => $e->getMessage(),
-                    'timestamp' => now()->toIso8601String(),
-                ], 409);
-            } else if ($e instanceof InfrastructureException) {
-                return response()->json([
-                    'message' => 'An unexpected error has occurred',
-                    'details' => $e->getMessage(),
-                    'timestamp' => now()->toIso8601String(),
-                ], 500);
-            } else if ($e instanceof ValidationException) {
-                return response()->json([
-                    'message' => 'Validation failed',
-                    'errors' => $e->errors(),
-                    'timestamp' => now()->toIso8601String(),
-                ], 422);
-            } else {
-                return response()->json([
-                    'message' => 'An unexpected error occurred',
-                    'timestamp' => now()->toIso8601String(),
-                ], 500);
+        $exceptions->renderable(function (DomainException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'timestamp' => now()->toIso8601String(),
+            ], 400);
+        });
+
+        $exceptions->renderable(function (AppException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'timestamp' => now()->toIso8601String(),
+            ], 409);
+        });
+
+        $exceptions->renderable(function (InfrastructureException $e, Request $request) {
+            $payload = [
+                'message' => 'An unexpected error has occurred',
+                'details' => $e->getMessage(),
+                'timestamp' => now()->toIso8601String(),
+            ];
+
+            if (config('app.debug')) {
+                $payload['details'] = $e->getMessage();
             }
+
+            return response()->json($payload, 500);
+        });
+
+        $exceptions->renderable(function (ValidationException $e, Request $request) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+                'timestamp' => now()->toIso8601String(),
+            ], 422);
+        });
+
+        $exceptions->renderable(function (AuthenticationException $e, Request $request) {
+            return response()->json([
+                'message' => 'Authentication required',
+                'timestamp' => now()->toIso8601String(),
+            ], 401);
+        });
+
+        $exceptions->renderable(function (AuthorizationException $e, Request $request) {
+            return response()->json([
+                'message' => 'Forbidden',
+                'timestamp' => now()->toIso8601String(),
+            ], 403);
+        });
+
+        $exceptions->renderable(function (HttpExceptionInterface $e, Request $request) {
+            $status = $e->getStatusCode();
+            $message = match ($status) {
+                404 => 'Resource not found',
+                405 => 'Method not allowed',
+                401 => 'Authentication required',
+                403 => 'Forbidden',
+                default => 'HTTP error',
+            };
+
+            return response()->json([
+                'message' => $message,
+                'timestamp' => now()->toIso8601String(),
+            ], $status);
+        });
+
+        $exceptions->render(function (Throwable $e, Request $request) {
+            $payload = [
+                'message' => 'An unexpected error occurred',
+                'timestamp' => now()->toIso8601String(),
+            ];
+
+            if (config('app.debug')) {
+                $payload['details'] = $e->getMessage();
+            }
+
+            return response()->json($payload, 500);
         });
     })->create();
