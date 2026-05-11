@@ -38,7 +38,7 @@ class ItemController extends Controller
 
     public function store(Request $request, string $placeId): JsonResponse
     {
-        $houseId = $request->header('X-House-Id');
+        $houseId = $this->getAuthHouseId();
         $data = $request->validate([
             'productId' => 'required|uuid',
             'expirationDate' => 'required|date_format:Y-m-d\TH:i:s.v\Z,Y-m-d\TH:i:s\Z',
@@ -85,7 +85,7 @@ class ItemController extends Controller
 
     public function destroy(Request $request, string $itemId): JsonResponse
     {
-        $houseId = $request->header('X-House-Id');
+        $houseId = $this->getAuthHouseId();
         $this->removeItem->execute(
             new RemoveItemRequest(
                 $itemId,
