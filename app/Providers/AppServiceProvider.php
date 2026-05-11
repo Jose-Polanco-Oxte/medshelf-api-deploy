@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Core\Shared\Application\EventPublisher;
 use App\Providers\Core\LaravelEventPublisher;
 use Illuminate\Support\ServiceProvider;
+use URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,5 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
     }
 }
