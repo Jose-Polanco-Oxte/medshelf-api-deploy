@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActiveIngredientController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConsumptionController;
 use App\Http\Controllers\HouseController;
 use App\Http\Controllers\ItemController;
@@ -11,7 +12,21 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TreatmentController;
 use Illuminate\Support\Facades\Route;
 
-Route::group([], function () {
+// Auth routes (public)
+Route::prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+});
+
+// Auth routes (protected)
+Route::prefix('auth')->middleware(\App\Http\Middleware\AuthenticateApi::class)->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::get('/me', [AuthController::class, 'me']);
+});
+
+Route::group(['middleware' => \App\Http\Middleware\AuthenticateApi::class], function () {
+    Route::get('/houses', [HouseController::class, 'index']);
     Route::get('/houses/{houseId}', [HouseController::class, 'show']);
 
     // Places

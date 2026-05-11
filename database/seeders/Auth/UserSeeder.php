@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             'public_id' => Utils::generateUUIDV4(),
             'name' => 'Admin',
             'email' => 'admin@example.com',
-            'password' => '12345',
+            'password' => 'password123',
         ]);
         $house = HouseModel::factory()->create([
             'owner_id' => $user->id,
