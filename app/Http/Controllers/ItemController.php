@@ -36,6 +36,16 @@ class ItemController extends Controller
         );
     }
 
+    public function indexAll(UuidListRequest $request): JsonResponse
+    {
+        $houseId = $this->getAuthHouseId();
+        return PaginationService::paginate(
+            $request,
+            fn(CursorRequest $cursorRequest) => $this->finder->listByHouseIdByCursor($houseId, $cursorRequest),
+            fn(OffsetRequest $offsetRequest) => $this->finder->listByHouseIdByOffset($houseId, $offsetRequest),
+        );
+    }
+
     public function store(Request $request, string $placeId): JsonResponse
     {
         $houseId = $this->getAuthHouseId();
@@ -83,7 +93,7 @@ class ItemController extends Controller
         return $this->buildResponse($item);
     }
 
-    public function destroy(Request $request, string $itemId): JsonResponse
+    public function destroy(string $itemId): JsonResponse
     {
         $houseId = $this->getAuthHouseId();
         $this->removeItem->execute(

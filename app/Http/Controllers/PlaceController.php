@@ -96,7 +96,7 @@ class PlaceController extends Controller
         return $this->buildResponse($result);
     }
 
-    public function destroy(Request $request, string $placeId): JsonResponse
+    public function destroy(string $placeId): JsonResponse
     {
         $houseId = $this->getAuthHouseId();
         $this->removePlace->execute(

@@ -10,6 +10,7 @@ use App\Http\Controllers\PlaceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TreatmentController;
+use App\Http\Middleware\AuthenticateApi;
 use Illuminate\Support\Facades\Route;
 
 // Auth routes (public)
@@ -19,14 +20,14 @@ Route::prefix('auth')->group(function () {
 });
 
 // Auth routes (protected)
-Route::prefix('auth')->middleware(\App\Http\Middleware\AuthenticateApi::class)->group(function () {
+Route::prefix('auth')->middleware(AuthenticateApi::class)->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/me', [AuthController::class, 'me']);
 });
 
-Route::group(['middleware' => \App\Http\Middleware\AuthenticateApi::class], function () {
-    Route::get('/houses', [HouseController::class, 'index']);
+Route::group(['middleware' => AuthenticateApi::class], function () {
+    Route::get('/houses/me', [HouseController::class, 'myHouse']);
     Route::get('/houses/{houseId}', [HouseController::class, 'show']);
 
     // Places
@@ -39,6 +40,7 @@ Route::group(['middleware' => \App\Http\Middleware\AuthenticateApi::class], func
 
     // Items
     Route::get('/places/{placeId}/items', [ItemController::class, 'index']);
+    Route::get('/items', [ItemController::class, 'indexAll']);
     Route::get('/items/{itemId}', [ItemController::class, 'show']);
     Route::post('/places/{placeId}/items', [ItemController::class, 'store']);
     Route::delete('/items/{itemId}', [ItemController::class, 'destroy']);
@@ -63,10 +65,7 @@ Route::group(['middleware' => \App\Http\Middleware\AuthenticateApi::class], func
     Route::get('/treatments', [TreatmentController::class, 'index']);
     Route::get('/treatments/{treatmentId}', [TreatmentController::class, 'show']);
     Route::put('/treatments/{treatmentId}', [TreatmentController::class, 'update']);
-    Route::post('/treatments/{treatmentId}/pause', [TreatmentController::class, 'pause']);
-    Route::post('/treatments/{treatmentId}/resume', [TreatmentController::class, 'resume']);
-    Route::post('/treatments/{treatmentId}/cancel', [TreatmentController::class, 'cancel']);
-    Route::post('/treatments/{treatmentId}/complete', [TreatmentController::class, 'complete']);
+    Route::patch('/treatments/{treatmentId}', [TreatmentController::class, 'modify']);
     Route::post('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'storeDose']);
     Route::get('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'indexDoses']);
 

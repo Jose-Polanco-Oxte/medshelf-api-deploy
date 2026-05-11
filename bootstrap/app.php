@@ -22,7 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'jwt.auth' => \App\Http\Middleware\AuthenticateApi::class,
+            'jwt.auth' => AuthenticateApi::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -43,6 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (InfrastructureException $e, Request $request) {
             $payload = [
                 'message' => 'An unexpected error has occurred',
+                'details' => $e->getMessage(),
                 'timestamp' => now()->toIso8601String(),
             ];
 

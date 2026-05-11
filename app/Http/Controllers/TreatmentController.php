@@ -108,25 +108,39 @@ class TreatmentController extends Controller
         return response()->json($result);
     }
 
-    public function pause(string $treatmentId): JsonResponse
+    public function modify(Request $request, string $treatmentId): JsonResponse
+    {
+        $data = $request->validate([
+            'status' => 'nullable|string|in:active,paused,completed,cancelled',
+        ]);
+        return match ($data['status']) {
+            'paused' => $this->pause($treatmentId),
+            'active' => $this->resume($treatmentId),
+            'cancelled' => $this->cancel($treatmentId),
+            'completed' => $this->complete($treatmentId),
+            default => response()->json(['message' => 'Invalid status'], 400),
+        };
+    }
+
+    private function pause(string $treatmentId): JsonResponse
     {
         $result = $this->pauseTreatment->execute(new TreatmentActionRequest($treatmentId));
         return response()->json($result);
     }
 
-    public function resume(string $treatmentId): JsonResponse
+    private function resume(string $treatmentId): JsonResponse
     {
         $result = $this->resumeTreatment->execute(new TreatmentActionRequest($treatmentId));
         return response()->json($result);
     }
 
-    public function cancel(string $treatmentId): JsonResponse
+    private function cancel(string $treatmentId): JsonResponse
     {
         $result = $this->cancelTreatment->execute(new TreatmentActionRequest($treatmentId));
         return response()->json($result);
     }
 
-    public function complete(string $treatmentId): JsonResponse
+    private function complete(string $treatmentId): JsonResponse
     {
         $result = $this->completeTreatment->execute(new TreatmentActionRequest($treatmentId));
         return response()->json($result);

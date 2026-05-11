@@ -125,4 +125,51 @@ class ItemFinder
             mapper: fn($item) => $this->toView($item)
         );
     }
+
+    function listByHouseIdByOffset(string $houseId, OffsetRequest $request): OffsetResponse
+    {
+        $result = ItemModel::with([
+            'product',
+        ])
+            ->whereHas('storage.place.house', fn($q) => $q->where('public_id', $houseId))
+            ->when(
+                $request->filters['name'] ?? null,
+                fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
+            )
+            ->orderBy('id')
+            ->paginate(perPage: $request->size, page: $request->cursor);
+        return new OffsetResponse(
+            totalCount: $result->total(),
+            page: $request->cursor,
+            size: $request->size,
+            hasMorePages: $result->hasMorePages(),
+            items: collect($result->items())
+                ->map(fn($item) => $this->toView($item))
+                ->toArray()
+        );
+    }
+
+    function listByHouseIdByCursor(string $houseId, CursorRequest $request): CursorResponse
+    {
+        $id = match ($request->cursor) {
+            null => null,
+            default => ItemModel::where('public_id', $request->cursor)->value('id')
+                ?? throw new InvalidCursor('Invalid cursor provided for Item listing.')
+        };
+        return PaginationService::buildCursorQuery(
+            query: ItemModel::with([
+                'product',
+            ])
+                ->whereHas('storage.place.house', fn($q) => $q->where('public_id', $houseId))
+                ->when(
+                    $request->filters['name'] ?? null,
+                    fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
+                )
+                ->orderBy('id'),
+            cursorName: 'id',
+            cursor: $id,
+            size: $request->size,
+            mapper: fn($item) => $this->toView($item)
+        );
+    }
 }

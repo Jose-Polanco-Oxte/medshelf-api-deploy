@@ -14,11 +14,20 @@ class HouseController extends Controller
     {
     }
 
-    public function index(): JsonResponse
+    public function myHouse(): JsonResponse
     {
         $user = Auth::user();
-        $houses = $user->houses()->get();
-        return response()->json($houses);
+        $houseId = $this->getAuthHouseId();
+        $houses = $user->house;
+        return response()->json([
+            'id' => $houses->public_id,
+            'owner' => [
+                'id' => $user->public_id,
+                'name' => $user->name,
+            ],
+            'name' => $houses->name,
+            'createdAt' => $houses->created_at,
+        ]);
     }
 
     public function show(string $houseId): JsonResponse

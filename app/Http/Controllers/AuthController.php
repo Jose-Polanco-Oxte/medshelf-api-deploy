@@ -10,23 +10,28 @@ use App\Core\Auth\Application\UseCase\Logout;
 use App\Core\Auth\Application\UseCase\Me;
 use App\Core\Auth\Application\UseCase\RefreshToken;
 use App\Core\Auth\Application\UseCase\Register;
+use App\Core\Home\House\Model\Service\HouseCreator;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 final class AuthController extends Controller
 {
     public function __construct(
-        private Login $login,
-        private Register $register,
-        private Logout $logout,
+        private Login        $login,
+        private Register     $register,
+        private HouseCreator $houseCreator,
+        private Logout       $logout,
         private RefreshToken $refreshToken,
-        private Me $me,
-    ) {}
+        private Me           $me,
+    )
+    {
+    }
 
     public function login(LoginRequest $request): JsonResponse
     {
         try {
             $response = $this->login->execute($request);
-            return response()->json($response->toArray(), 200);
+            return response()->json($response->toArray());
         } catch (InvalidCredentialsException $e) {
             return response()->json(['message' => $e->getMessage()], 401);
         }
@@ -36,6 +41,7 @@ final class AuthController extends Controller
     {
         try {
             $response = $this->register->execute($request);
+            $this->houseCreator->create($response->user['id'], "{$response->user['name']}s House");
             return response()->json($response->toArray(), 201);
         } catch (InvalidCredentialsException $e) {
             return response()->json(['message' => $e->getMessage()], 401);
@@ -47,7 +53,7 @@ final class AuthController extends Controller
         try {
             $this->logout->execute();
             return response()->json(['message' => 'Successfully logged out'], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['message' => 'Error logging out'], 500);
         }
     }
