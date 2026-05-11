@@ -2,6 +2,7 @@
 
 use App\Core\Shared\Application\AppException;
 use App\Core\Shared\Domain\DomainException;
+use App\Http\Middleware\AuthenticateApi;
 use App\Providers\Core\InfrastructureException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,7 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->alias([
+            'jwt.auth' => \App\Http\Middleware\AuthenticateApi::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (Throwable $e, Request $request) {
