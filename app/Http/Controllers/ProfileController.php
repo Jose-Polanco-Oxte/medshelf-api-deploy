@@ -23,7 +23,7 @@ class ProfileController extends Controller
 
     public function index(UuidListRequest $request): JsonResponse
     {
-        $userId = $request->header('X-User-Id');
+        $userId = $this->getAuthUserId();
 
         return PaginationService::paginate(
             $request,
@@ -34,7 +34,7 @@ class ProfileController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $userId = $request->header('X-User-Id');
+        $userId = $this->getAuthUserId();
 
         $data = $request->validate([
             'name' => 'required|string|max:255',

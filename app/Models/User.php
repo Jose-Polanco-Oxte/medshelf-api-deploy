@@ -18,6 +18,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -74,7 +75,14 @@ class User extends Authenticatable implements JWTSubject
 
     public function getJWTCustomClaims(): array
     {
-        return [];
+        return [
+            'house_id' => $this->house?->public_id,
+        ];
+    }
+
+    public function house(): HasOne
+    {
+        return $this->hasOne(HouseModel::class, 'owner_id', 'id');
     }
 
     public function houses(): HasMany

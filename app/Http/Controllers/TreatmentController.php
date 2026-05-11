@@ -134,7 +134,7 @@ class TreatmentController extends Controller
 
     public function storeDose(Request $request, string $treatmentId): JsonResponse
     {
-        $houseId = $request->header('X-House-Id');
+        $houseId = $this->getAuthHouseId();
 
         $data = $request->validate([
             'amount' => 'required|numeric|min:0.01',
