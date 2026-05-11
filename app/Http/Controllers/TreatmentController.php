@@ -22,6 +22,7 @@ use App\Providers\Core\Home\Treatment\Service\TreatmentFinder;
 use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
 
 class TreatmentController extends Controller
 {
@@ -39,6 +40,40 @@ class TreatmentController extends Controller
     {
     }
 
+    /**
+     * @OA\Get(
+     *     path="/treatments",
+     *     tags={"Treatments"},
+     *     summary="List treatments",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="profile_id", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", minimum=1)),
+     *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OK",
+     *         @OA\JsonContent(oneOf={
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","nextCursor"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/TreatmentResponse")),
+     *                 @OA\Property(property="nextCursor", type="string", nullable=true)
+     *             ),
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","totalCount","page","size","hasMorePages"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/TreatmentResponse")),
+     *                 @OA\Property(property="totalCount", type="integer", minimum=0),
+     *                 @OA\Property(property="page", type="integer", minimum=1),
+     *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
+     *                 @OA\Property(property="hasMorePages", type="boolean")
+     *             )
+     *         })
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function index(UuidListRequest $request): JsonResponse
     {
         $profileId = $request->query('profile_id');
@@ -50,6 +85,31 @@ class TreatmentController extends Controller
         );
     }
 
+    /**
+     * @OA\Post(
+     *     path="/treatments",
+     *     tags={"Treatments"},
+     *     summary="Create treatment",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"profileId","itemId","frequencyValue","frequencyUnit","doseQuantity","startDate"},
+     *             @OA\Property(property="profileId", type="string", format="uuid"),
+     *             @OA\Property(property="itemId", type="string", format="uuid"),
+     *             @OA\Property(property="frequencyValue", type="integer", minimum=1, example=8),
+     *             @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
+     *             @OA\Property(property="doseQuantity", type="number", minimum=0.01, example=1.5),
+     *             @OA\Property(property="startDate", type="string", format="date", example="2026-05-11"),
+     *             @OA\Property(property="endDate", type="string", format="date", example="2026-05-30")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -79,6 +139,18 @@ class TreatmentController extends Controller
         return response()->json($result, 201);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/treatments/{treatmentId}",
+     *     tags={"Treatments"},
+     *     summary="Get treatment details",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function show(string $treatmentId): JsonResponse
     {
         $treatment = $this->treatmentFinder->findById($treatmentId);
@@ -90,6 +162,26 @@ class TreatmentController extends Controller
         return response()->json($treatment);
     }
 
+    /**
+     * @OA\Put(
+     *     path="/treatments/{treatmentId}",
+     *     tags={"Treatments"},
+     *     summary="Update treatment",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="frequencyValue", type="integer", minimum=1),
+     *             @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
+     *             @OA\Property(property="doseQuantity", type="number", minimum=0.01),
+     *             @OA\Property(property="endDate", type="string", format="date")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function update(Request $request, string $treatmentId): JsonResponse
     {
         $data = $request->validate([
@@ -108,6 +200,24 @@ class TreatmentController extends Controller
         return response()->json($result);
     }
 
+    /**
+     * @OA\Patch(
+     *     path="/treatments/{treatmentId}",
+     *     tags={"Treatments"},
+     *     summary="Modify treatment status",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="status", type="string", enum={"active","paused","completed","cancelled"})
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
+     *     @OA\Response(response=400, description="Bad request", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function modify(Request $request, string $treatmentId): JsonResponse
     {
         $data = $request->validate([
@@ -146,6 +256,24 @@ class TreatmentController extends Controller
         return response()->json($result);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/treatments/{treatmentId}/consumptions",
+     *     tags={"Treatments"},
+     *     summary="Register dose for treatment",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"amount"},
+     *             @OA\Property(property="amount", type="number", minimum=0.01, example=1.0)
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ConsumptionResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function storeDose(Request $request, string $treatmentId): JsonResponse
     {
         $houseId = $this->getAuthHouseId();
@@ -162,6 +290,40 @@ class TreatmentController extends Controller
         return response()->json($result, 201);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/treatments/{treatmentId}/consumptions",
+     *     tags={"Treatments"},
+     *     summary="List doses for treatment",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", minimum=1)),
+     *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OK",
+     *         @OA\JsonContent(oneOf={
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","nextCursor"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionResponse")),
+     *                 @OA\Property(property="nextCursor", type="string", nullable=true)
+     *             ),
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","totalCount","page","size","hasMorePages"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionResponse")),
+     *                 @OA\Property(property="totalCount", type="integer", minimum=0),
+     *                 @OA\Property(property="page", type="integer", minimum=1),
+     *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
+     *                 @OA\Property(property="hasMorePages", type="boolean")
+     *             )
+     *         })
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function indexDoses(UuidListRequest $request, string $treatmentId): JsonResponse
     {
         return PaginationService::paginate(
