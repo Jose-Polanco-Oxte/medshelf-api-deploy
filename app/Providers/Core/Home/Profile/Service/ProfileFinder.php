@@ -40,7 +40,12 @@ class ProfileFinder
     public function listByUserIdByOffset(string $userId, OffsetRequest $request): OffsetResponse
     {
         $result = ProfileModel::whereHas('user', fn($q) => $q->where('public_id', $userId))
-            ->orderBy('id')
+            ->whhen($request->filters ?? [], fn($q, $filters) => $q->where(function ($q) use ($filters) {
+                if (isset($filters['name'])) {
+                    $q->where('name', 'like', '%' . $filters['name'] . '%');
+                }
+            }))
+            ->orderBy('created_at', 'desc')
             ->paginate(perPage: $request->size, page: $request->page);
 
         return new OffsetResponse(
@@ -73,6 +78,11 @@ class ProfileFinder
 
         return PaginationService::buildCursorQuery(
             query: ProfileModel::whereHas('user', fn($q) => $q->where('public_id', $userId))
+                ->whhen($request->filters ?? [], fn($q, $filters) => $q->where(function ($q) use ($filters) {
+                    if (isset($filters['name'])) {
+                        $q->where('name', 'like', '%' . $filters['name'] . '%');
+                    }
+                }))
                 ->orderBy('id'),
             cursorName: 'id',
             cursor: $id,

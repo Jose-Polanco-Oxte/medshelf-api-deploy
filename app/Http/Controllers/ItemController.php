@@ -16,6 +16,7 @@ use App\Services\PaginationService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
 
 class ItemController extends Controller
 {
@@ -27,6 +28,41 @@ class ItemController extends Controller
     {
     }
 
+    /**
+     * @OA\Get(
+     *     path="/places/{placeId}/items",
+     *     tags={"Items"},
+     *     summary="Get list of items by place",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="placeId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", minimum=1)),
+     *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *     @OA\Parameter(name="filter[name]", in="query", required=false, @OA\Schema(type="string"), description="Filter items by product name (case-insensitive, partial match)"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OK",
+     *         @OA\JsonContent(oneOf={
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","nextCursor"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemResponse")),
+     *                 @OA\Property(property="nextCursor", type="string", nullable=true)
+     *             ),
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","totalCount","page","size","hasMorePages"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemResponse")),
+     *                 @OA\Property(property="totalCount", type="integer", minimum=0),
+     *                 @OA\Property(property="page", type="integer", minimum=1),
+     *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
+     *                 @OA\Property(property="hasMorePages", type="boolean")
+     *             )
+     *         })
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function index(UuidListRequest $request, string $placeId): JsonResponse
     {
         return PaginationService::paginate(
@@ -36,6 +72,40 @@ class ItemController extends Controller
         );
     }
 
+    /**
+     * @OA\Get(
+     *     path="/items",
+     *     tags={"Items"},
+     *     summary="Get list of items by house",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", minimum=1)),
+     *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *     @OA\Parameter(name="filter[name]", in="query", required=false, @OA\Schema(type="string"), description="Filter items by product name (case-insensitive, partial match)"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OK",
+     *         @OA\JsonContent(oneOf={
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","nextCursor"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemResponse")),
+     *                 @OA\Property(property="nextCursor", type="string", nullable=true)
+     *             ),
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","totalCount","page","size","hasMorePages"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemResponse")),
+     *                 @OA\Property(property="totalCount", type="integer", minimum=0),
+     *                 @OA\Property(property="page", type="integer", minimum=1),
+     *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
+     *                 @OA\Property(property="hasMorePages", type="boolean")
+     *             )
+     *         })
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function indexAll(UuidListRequest $request): JsonResponse
     {
         $houseId = $this->getAuthHouseId();
@@ -46,6 +116,25 @@ class ItemController extends Controller
         );
     }
 
+    /**
+     * @OA\Post(
+     *     path="/places/{placeId}/items",
+     *     tags={"Items"},
+     *     summary="Add item to place",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="placeId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"productId","expirationDate"},
+     *             @OA\Property(property="productId", type="string", format="uuid"),
+     *             @OA\Property(property="expirationDate", type="string", format="date-time", example="2026-12-31T00:00:00Z")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ItemResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function store(Request $request, string $placeId): JsonResponse
     {
         $houseId = $this->getAuthHouseId();
@@ -84,6 +173,18 @@ class ItemController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/items/{itemId}",
+     *     tags={"Items"},
+     *     summary="Get item details",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="itemId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ItemResponse")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function show(string $itemId): JsonResponse
     {
         $item = $this->finder->findById($itemId);
@@ -93,6 +194,17 @@ class ItemController extends Controller
         return $this->buildResponse($item);
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/items/{itemId}",
+     *     tags={"Items"},
+     *     summary="Remove item",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="itemId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Response(response=204, description="No content"),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function destroy(string $itemId): JsonResponse
     {
         $houseId = $this->getAuthHouseId();
