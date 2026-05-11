@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\ActiveIngredientModel;
+use App\Models\PharmaceuticalFormModel;
 use App\Models\ProductCompoundModel;
 use App\Models\ProductModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,22 +22,19 @@ class ProductModelFactory extends Factory
         return [
             'public_id' => fake()->unique()->uuid(),
             'name' => fake()->word(),
-            'presentation' => fake()->randomElement(['tablet', 'syrup', 'injection']),
-            'consume_type' => fake()->randomElement(['DISCRETE', 'CONTINUOUS']),
-            'sales_unit_value' => fake()->randomFloat(2, 0.1, 100),
-            'sales_unit' => fake()->randomElement(['mg', 'ml', 'g']),
+            'net_content_value' => fake()->randomFloat(2, 1, 100),
+            'net_content_unit' => fake()->randomElement(['mg', 'ml', 'g']),
+            'total_quantity' => fake()->numberBetween(10, 100),
+            'pharmaceutical_form_id' => PharmaceuticalFormModel::factory(),
+            'composition_reference_amount' => fake()->randomFloat(2, 1, 100),
         ];
     }
 
     public function configure(): static
     {
         return $this->afterCreating(function (ProductModel $product) {
-            ProductCompoundModel::factory()->count(3)->create([
+            ProductCompoundModel::factory()->count(2)->create([
                 'product_id' => $product->id,
-                'active_compound_id' => ActiveIngredientModel::factory(),
-                'concentration_value' => fake()->randomFloat(2, 0.1, 100),
-                'concentration_unit' => fake()->randomElement(['mg/ml', 'g/l', 'µg/ml']),
-                'base_amount' => fake()->randomFloat(2, 0.1, 1000),
             ]);
         });
     }

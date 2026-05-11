@@ -19,7 +19,7 @@ final readonly class ConsumptionCreator
     {
     }
 
-    public function consume(string $itemId, string $houseId, float $amount): Consumption
+    public function consume(string $itemId, string $houseId, float $amount, ?string $treatmentId = null): Consumption
     {
         $item = $this->itemRepository->findByIdAndHouseId($itemId, $houseId) ??
             throw ConsumptionException::itemNotFound($itemId);
@@ -28,7 +28,8 @@ final readonly class ConsumptionCreator
         $this->itemPolicy->assertConsumption($item, $amount, $product);
         $consumption = Consumption::create(
             itemId: $item->getId(),
-            amount: $amount
+            amount: $amount,
+            treatmentId: $treatmentId,
         );
         $this->consumptionRepository->consume($consumption);
         return $consumption;

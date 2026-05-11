@@ -82,7 +82,7 @@ class PlaceController extends Controller
 
     public function update(Request $request, string $placeId): JsonResponse
     {
-        $houseId = $request->header('X-House-Id');
+        $houseId = $this->getAuthHouseId();
         $data = $request->validate([
             'name' => 'required',
         ]);
@@ -96,9 +96,9 @@ class PlaceController extends Controller
         return $this->buildResponse($result);
     }
 
-    public function destroy(Request $request, string $placeId): JsonResponse
+    public function destroy(string $placeId): JsonResponse
     {
-        $houseId = $request->header('X-House-Id');
+        $houseId = $this->getAuthHouseId();
         $this->removePlace->execute(
             new RemovePlaceRequest(
                 $placeId,

@@ -16,8 +16,9 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
-use Laravel\Sanctum\HasApiTokens;
-use Laravel\Sanctum\PersonalAccessToken;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -51,10 +52,10 @@ use Laravel\Sanctum\PersonalAccessToken;
 #[Table('users')]
 #[Fillable(['public_id', 'name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable;
 
     protected function casts(): array
     {
@@ -65,5 +66,27 @@ class User extends Authenticatable
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',
         ];
+    }
+
+    public function getJWTIdentifier(): mixed
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(): array
+    {
+        return [
+            'house_id' => $this->house?->public_id,
+        ];
+    }
+
+    public function house(): HasOne
+    {
+        return $this->hasOne(HouseModel::class, 'owner_id', 'id');
+    }
+
+    public function houses(): HasMany
+    {
+        return $this->hasMany(HouseModel::class, 'owner_id', 'id');
     }
 }

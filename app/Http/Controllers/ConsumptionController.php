@@ -12,7 +12,6 @@ use App\Providers\Core\Home\Item\Detail\ConsumptionDetail;
 use App\Providers\Core\Home\Item\Service\ConsumptionFinder;
 use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ConsumptionController extends Controller
 {
@@ -32,9 +31,9 @@ class ConsumptionController extends Controller
         );
     }
 
-    public function store(Request $request, string $itemId): JsonResponse
+    public function store(string $itemId): JsonResponse
     {
-        $houseId = $request->header('X-House-Id');
+        $houseId = $this->getAuthHouseId();
         $data = request()->validate([
             'amount' => 'required|numeric|min:0',
         ]);

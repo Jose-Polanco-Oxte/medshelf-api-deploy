@@ -14,21 +14,23 @@ final class Consumption
     private array $events = [];
 
     private function __construct(
-        protected string $id,
-        protected string $itemId,
-        protected float  $amount,
-        protected Carbon $consumedAt
+        protected string  $id,
+        protected string  $itemId,
+        protected float   $amount,
+        protected Carbon  $consumedAt,
+        protected ?string $treatmentId = null,
     )
     {
     }
 
-    public static function create(string $itemId, float $amount): Consumption
+    public static function create(string $itemId, float $amount, ?string $treatmentId = null): Consumption
     {
         $consumption = new self(
             Utils::generateUUIDV4(),
             $itemId,
             $amount,
-            Carbon::now()
+            Carbon::now(),
+            $treatmentId,
         );
         $consumption->addEvent(
             new ItemConsumed(
@@ -44,13 +46,14 @@ final class Consumption
         $this->events[] = $event;
     }
 
-    public static function load(string $id, string $itemId, float $amount, Carbon $consumedAt): Consumption
+    public static function load(string $id, string $itemId, float $amount, Carbon $consumedAt, ?string $treatmentId = null): Consumption
     {
         return new self(
             $id,
             $itemId,
             $amount,
-            $consumedAt
+            $consumedAt,
+            $treatmentId,
         );
     }
 
@@ -72,6 +75,11 @@ final class Consumption
     public function getConsumedAt(): Carbon
     {
         return $this->consumedAt;
+    }
+
+    public function getTreatmentId(): ?string
+    {
+        return $this->treatmentId;
     }
 
     /**
