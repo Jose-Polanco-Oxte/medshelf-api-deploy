@@ -11,6 +11,7 @@ use App\Providers\Core\Home\Profile\Service\ProfileFinder;
 use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
 
 class ProfileController extends Controller
 {
@@ -21,6 +22,40 @@ class ProfileController extends Controller
     {
     }
 
+    /**
+     * @OA\Get(
+     *     path="/profiles",
+     *     tags={"Profiles"},
+     *     summary="Profiles list",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", minimum=1)),
+     *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *     @OA\Parameter(name="filter[name]", in="query", required=false, @OA\Schema(type="string", maxLength=255), description="Partial filter by name"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Profiles list",
+     *         @OA\JsonContent(oneOf={
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","nextCursor"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ProfileResponse")),
+     *                 @OA\Property(property="nextCursor", type="string", nullable=true)
+     *             ),
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","totalCount","page","size","hasMorePages"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ProfileResponse")),
+     *                 @OA\Property(property="totalCount", type="integer", minimum=0),
+     *                 @OA\Property(property="page", type="integer", minimum=1),
+     *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
+     *                 @OA\Property(property="hasMorePages", type="boolean")
+     *             )
+     *         })
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function index(UuidListRequest $request): JsonResponse
     {
         $userId = $this->getAuthUserId();
@@ -32,6 +67,25 @@ class ProfileController extends Controller
         );
     }
 
+    /**
+     * @OA\Post(
+     *     path="/profiles",
+     *     tags={"Profiles"},
+     *     summary="Create profile",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name"},
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Maria"),
+     *             @OA\Property(property="relationship", type="string", maxLength=255, example="parent")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ProfileResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function store(Request $request): JsonResponse
     {
         $userId = $this->getAuthUserId();
@@ -56,6 +110,18 @@ class ProfileController extends Controller
         ], 201);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/profiles/{profileId}",
+     *     tags={"Profiles"},
+     *     summary="Get profile details",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="profileId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProfileResponse")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function show(string $profileId): JsonResponse
     {
         $profile = $this->finder->findById($profileId);

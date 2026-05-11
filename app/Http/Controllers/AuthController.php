@@ -13,6 +13,7 @@ use App\Core\Auth\Application\UseCase\Register;
 use App\Core\Home\House\Model\Service\HouseCreator;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Annotations as OA;
 
 final class AuthController extends Controller
 {
@@ -27,6 +28,23 @@ final class AuthController extends Controller
     {
     }
 
+    /**
+     * @OA\Post(
+     *     path="/auth/login",
+     *     tags={"Auth"},
+     *     summary="Start session",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", minLength=8)
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/AuthResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function login(LoginRequest $request): JsonResponse
     {
         try {
@@ -37,6 +55,24 @@ final class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/auth/register",
+     *     tags={"Auth"},
+     *     summary="Register new user",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password"},
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Maria"),
+     *             @OA\Property(property="email", type="string", format="email", example="maria@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", minLength=5)
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/AuthResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
@@ -48,6 +84,17 @@ final class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/auth/logout",
+     *     tags={"Auth"},
+     *     summary="Close session",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/MessageResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=500, description="Server error", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function logout(): JsonResponse
     {
         try {
@@ -58,12 +105,32 @@ final class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/auth/refresh",
+     *     tags={"Auth"},
+     *     summary="Refresh token",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/AuthResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function refresh(): JsonResponse
     {
         $response = $this->refreshToken->execute();
         return response()->json($response->toArray(), 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/auth/me",
+     *     tags={"Auth"},
+     *     summary="Get authenticated user data",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProfileResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function me(): JsonResponse
     {
         $userData = $this->me->execute();

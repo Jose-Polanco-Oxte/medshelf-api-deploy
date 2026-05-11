@@ -1,0 +1,4035 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Medshelf API",
+        "description": "Documentacion OpenAPI para los endpoints de Medshelf.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api",
+            "description": "Base URL"
+        }
+    ],
+    "paths": {
+        "/active-ingredients": {
+            "get": {
+                "tags": [
+                    "ActiveIngredients"
+                ],
+                "summary": "List active ingredients",
+                "operationId": "74cc57a4f5319a74036936ca105fd12c",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[name]",
+                        "in": "query",
+                        "description": "Filter by active ingredient name (partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ActiveIngredientResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ActiveIngredientResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "ActiveIngredients"
+                ],
+                "summary": "Add active ingredient",
+                "operationId": "f9554616320e4806968c8edadb9f65b3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Ibuprofeno"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ActiveIngredientResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/active-ingredients/{activeIngredientId}": {
+            "delete": {
+                "tags": [
+                    "ActiveIngredients"
+                ],
+                "summary": "Remove active ingredient",
+                "operationId": "162f0e4a17d57006f4179219235d4755",
+                "parameters": [
+                    {
+                        "name": "activeIngredientId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Start session",
+                "operationId": "8cb7742ae98d0990acb2907c4e00bf24",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register new user",
+                "operationId": "ed42f392010c301892e640067141676e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Maria"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "maria@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Close session",
+                "operationId": "0d29c740dc06d77602af8095bf4654cc",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh token",
+                "operationId": "f6c9683ed975ace7d035a09e6e2a9332",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get authenticated user data",
+                "operationId": "a9c495788506b114956e3f509e5d90a2",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/items/{itemId}/consumptions": {
+            "get": {
+                "tags": [
+                    "Consumptions"
+                ],
+                "summary": "List item consumptions",
+                "operationId": "abe7b7a4313dbd698b18cbcdc608570f",
+                "parameters": [
+                    {
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[name]",
+                        "in": "query",
+                        "description": "Filter by consumer name (partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ConsumptionResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ConsumptionResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Consumptions"
+                ],
+                "summary": "Register consumption",
+                "operationId": "62c017496692565efbae47a51a6b7e56",
+                "parameters": [
+                    {
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "example": 1.5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConsumptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/consumptions/{consumptionId}": {
+            "get": {
+                "tags": [
+                    "Consumptions"
+                ],
+                "summary": "Get consumption details",
+                "operationId": "4997b593fa533951513d89ae2081a799",
+                "parameters": [
+                    {
+                        "name": "consumptionId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConsumptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/houses/me": {
+            "get": {
+                "tags": [
+                    "Houses"
+                ],
+                "summary": "Get my house details",
+                "operationId": "7766f485e02d4c522056880d33475857",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HouseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/houses/{houseId}": {
+            "get": {
+                "tags": [
+                    "Houses"
+                ],
+                "summary": "Get house details by ID",
+                "operationId": "4ccb30b7c65e1251cefeb60d57e22016",
+                "parameters": [
+                    {
+                        "name": "houseId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HouseResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/places/{placeId}/items": {
+            "get": {
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get list of items by place",
+                "operationId": "9b445808d692d9dbb90cff098b1980b4",
+                "parameters": [
+                    {
+                        "name": "placeId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[name]",
+                        "in": "query",
+                        "description": "Filter items by product name (case-insensitive, partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ItemResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ItemResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Add item to place",
+                "operationId": "04bacbb76c347f721d385b6d208f5ef1",
+                "parameters": [
+                    {
+                        "name": "placeId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "productId",
+                                    "expirationDate"
+                                ],
+                                "properties": {
+                                    "productId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "expirationDate": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-12-31T00:00:00Z"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/items": {
+            "get": {
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get list of items by house",
+                "operationId": "f57805e6de7a6a04dbe462e477f1707f",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[name]",
+                        "in": "query",
+                        "description": "Filter items by product name (case-insensitive, partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ItemResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ItemResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/items/{itemId}": {
+            "get": {
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Get item details",
+                "operationId": "b54009d3d507c08fd6e8b238d0e3cf50",
+                "parameters": [
+                    {
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Remove item",
+                "operationId": "16ea818d936aa928a218f792a09e9953",
+                "parameters": [
+                    {
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/pharmaceutical-forms": {
+            "get": {
+                "tags": [
+                    "PharmaceuticalForms"
+                ],
+                "summary": "List pharmaceutical forms",
+                "operationId": "c0ab13ba3febf5e789bb72a148f488b6",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[name]",
+                        "in": "query",
+                        "description": "Filter by pharmaceutical form name (partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PharmaceuticalFormResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PharmaceuticalFormResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "PharmaceuticalForms"
+                ],
+                "summary": "Add pharmaceutical form",
+                "operationId": "d3a92b575191a16ba606a5683e064bba",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "consumptionType"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Tableta"
+                                    },
+                                    "consumptionType": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Discrete",
+                                            "Continuous",
+                                            "Applicable",
+                                            "discrete",
+                                            "continuous",
+                                            "applicable"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PharmaceuticalFormResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/pharmaceutical-forms/{pharmaceuticalFormId}": {
+            "delete": {
+                "tags": [
+                    "PharmaceuticalForms"
+                ],
+                "summary": "Remove pharmaceutical form",
+                "operationId": "0eb06bcd424e589c369932c9fc203141",
+                "parameters": [
+                    {
+                        "name": "pharmaceuticalFormId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/houses/{houseId}/places": {
+            "get": {
+                "tags": [
+                    "Places"
+                ],
+                "summary": "Get all places in a house",
+                "operationId": "167adff11895cf8211b0d973f4b260f0",
+                "parameters": [
+                    {
+                        "name": "houseId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[name]",
+                        "in": "query",
+                        "description": "Filter by name (partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PlaceResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/PlaceResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Places"
+                ],
+                "summary": "Add new place to a house",
+                "operationId": "18db6f506551d3f13cdb0e5412bef276",
+                "parameters": [
+                    {
+                        "name": "houseId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Cocina"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlaceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/places/{placeId}": {
+            "get": {
+                "tags": [
+                    "Places"
+                ],
+                "summary": "Get place details",
+                "operationId": "6a80f6283c96866183dd2cc9c38a4dfb",
+                "parameters": [
+                    {
+                        "name": "placeId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlaceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Places"
+                ],
+                "summary": "Update place",
+                "operationId": "c164b7ecac6f9a9f413baf756c89d375",
+                "parameters": [
+                    {
+                        "name": "placeId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Botiquin"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PlaceResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Places"
+                ],
+                "summary": "Remove place",
+                "operationId": "e1c2abeea131cd78fa35416f8b38c69f",
+                "parameters": [
+                    {
+                        "name": "placeId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/houses/{houseId}/places/bulk-delete": {
+            "post": {
+                "tags": [
+                    "Places"
+                ],
+                "summary": "Remove places in bulk",
+                "operationId": "4e258179808202dab8205bc10928ed96",
+                "parameters": [
+                    {
+                        "name": "houseId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "placeIds"
+                                ],
+                                "properties": {
+                                    "placeIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "List products",
+                "operationId": "c1ff6f862214e1896c59cfe0491ce0e8",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[name]",
+                        "in": "query",
+                        "description": "Filter by product name (partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ProductResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ProductResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Add product",
+                "operationId": "399770d33fa4672f1216707d0e236763",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "pharmaceuticalForm",
+                                    "composition"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Paracetamol"
+                                    },
+                                    "netContent": {
+                                        "properties": {
+                                            "value": {
+                                                "type": "number",
+                                                "minimum": 0,
+                                                "example": 100
+                                            },
+                                            "unit": {
+                                                "type": "string",
+                                                "example": "ml"
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "totalQuantity": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "example": 20
+                                    },
+                                    "pharmaceuticalForm": {
+                                        "type": "string",
+                                        "example": "Jarabe"
+                                    },
+                                    "composition": {
+                                        "properties": {
+                                            "referenceAmount": {
+                                                "type": "number",
+                                                "minimum": 0,
+                                                "example": 5
+                                            },
+                                            "activeIngredients": {
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Acetaminofen"
+                                                        },
+                                                        "strength": {
+                                                            "properties": {
+                                                                "value": {
+                                                                    "type": "number",
+                                                                    "minimum": 0,
+                                                                    "example": 500
+                                                                },
+                                                                "unit": {
+                                                                    "type": "string",
+                                                                    "example": "mg"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/products/{productId}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Get product details",
+                "operationId": "59868682c75d47fe2401d30a6e9d88e8",
+                "parameters": [
+                    {
+                        "name": "productId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProductResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/profiles": {
+            "get": {
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Profiles list",
+                "operationId": "313661758971eb804cf92949669fbc2e",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "filter[name]",
+                        "in": "query",
+                        "description": "Partial filter by name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profiles list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ProfileResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ProfileResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Create profile",
+                "operationId": "22ac13592fe7c5d287d6186f134069fb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Maria"
+                                    },
+                                    "relationship": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "parent"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/profiles/{profileId}": {
+            "get": {
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Get profile details",
+                "operationId": "859f5796c218e011626e468b1a58f0ab",
+                "parameters": [
+                    {
+                        "name": "profileId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/treatments": {
+            "get": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "List treatments",
+                "operationId": "87d07501682135ff9fd87ba478c8d47e",
+                "parameters": [
+                    {
+                        "name": "profile_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/TreatmentResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/TreatmentResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "Create treatment",
+                "operationId": "4f2e6d1b91fa537f9109b172652955ec",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "profileId",
+                                    "itemId",
+                                    "frequencyValue",
+                                    "frequencyUnit",
+                                    "doseQuantity",
+                                    "startDate"
+                                ],
+                                "properties": {
+                                    "profileId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "itemId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "frequencyValue": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 8
+                                    },
+                                    "frequencyUnit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "hours",
+                                            "days",
+                                            "weeks"
+                                        ]
+                                    },
+                                    "doseQuantity": {
+                                        "type": "number",
+                                        "minimum": 0.01,
+                                        "example": 1.5
+                                    },
+                                    "startDate": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-05-11"
+                                    },
+                                    "endDate": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-05-30"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TreatmentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/treatments/{treatmentId}": {
+            "get": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "Get treatment details",
+                "operationId": "2a16254e469ae4f6b6d191493dfe7166",
+                "parameters": [
+                    {
+                        "name": "treatmentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TreatmentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "Update treatment",
+                "operationId": "8f9b29f9e7541f99f4fec2fa20a75889",
+                "parameters": [
+                    {
+                        "name": "treatmentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "frequencyValue": {
+                                        "type": "integer",
+                                        "minimum": 1
+                                    },
+                                    "frequencyUnit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "hours",
+                                            "days",
+                                            "weeks"
+                                        ]
+                                    },
+                                    "doseQuantity": {
+                                        "type": "number",
+                                        "minimum": 0.01
+                                    },
+                                    "endDate": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TreatmentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "Modify treatment status",
+                "operationId": "76493f0daeac6473fae04d3ff3badd04",
+                "parameters": [
+                    {
+                        "name": "treatmentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "paused",
+                                            "completed",
+                                            "cancelled"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TreatmentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/treatments/{treatmentId}/consumptions": {
+            "get": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "List doses for treatment",
+                "operationId": "03108d3501dd25dc0b912b9eded972d6",
+                "parameters": [
+                    {
+                        "name": "treatmentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ConsumptionResponse"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/ConsumptionResponse"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "Register dose for treatment",
+                "operationId": "dcf66ef9c8daefd1f2287566e847d036",
+                "parameters": [
+                    {
+                        "name": "treatmentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "amount"
+                                ],
+                                "properties": {
+                                    "amount": {
+                                        "type": "number",
+                                        "minimum": 0.01,
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConsumptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ErrorResponse": {
+                "required": [
+                    "message"
+                ],
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "MessageResponse": {
+                "required": [
+                    "message"
+                ],
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthResponse": {
+                "required": [
+                    "accessToken",
+                    "refreshToken",
+                    "expiresIn",
+                    "user"
+                ],
+                "properties": {
+                    "accessToken": {
+                        "type": "string"
+                    },
+                    "refreshToken": {
+                        "type": "string"
+                    },
+                    "expiresIn": {
+                        "type": "integer"
+                    },
+                    "user": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/components/schemas/ProfileResponse"
+                            }
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "CursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "OffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "ItemCursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemResponse"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ItemOffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ItemResponse"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "PlaceCursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PlaceResponse"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PlaceOffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PlaceResponse"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductCursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductResponse"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProductOffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProductResponse"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "ProfileCursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProfileResponse"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ProfileOffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProfileResponse"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "TreatmentCursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TreatmentResponse"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "TreatmentOffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TreatmentResponse"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "ConsumptionCursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConsumptionResponse"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ConsumptionOffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ConsumptionResponse"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "ActiveIngredientCursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ActiveIngredientResponse"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ActiveIngredientOffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ActiveIngredientResponse"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "PharmaceuticalFormCursorPaginationResponse": {
+                "required": [
+                    "items",
+                    "nextCursor"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PharmaceuticalFormResponse"
+                        }
+                    },
+                    "nextCursor": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "PharmaceuticalFormOffsetPaginationResponse": {
+                "required": [
+                    "items",
+                    "totalCount",
+                    "page",
+                    "size",
+                    "hasMorePages"
+                ],
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PharmaceuticalFormResponse"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "page": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "size": {
+                        "type": "integer",
+                        "maximum": 100,
+                        "minimum": 1
+                    },
+                    "hasMorePages": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "HouseResponse": {
+                "required": [
+                    "id",
+                    "owner",
+                    "name",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "owner": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PlaceResponse": {
+                "required": [
+                    "id",
+                    "house",
+                    "name",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "house": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ItemResponse": {
+                "required": [
+                    "id",
+                    "product",
+                    "place",
+                    "totalContent",
+                    "expirationDate",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "product": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "place": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "totalContent": {
+                        "type": "number"
+                    },
+                    "expirationDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object"
+            },
+            "ConsumptionResponse": {
+                "required": [
+                    "id",
+                    "item",
+                    "amount",
+                    "consumedAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "item": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "amount": {
+                        "type": "number"
+                    },
+                    "consumedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ProfileResponse": {
+                "required": [
+                    "id",
+                    "email",
+                    "name",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ActiveIngredientResponse": {
+                "required": [
+                    "id",
+                    "name",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PharmaceuticalFormResponse": {
+                "required": [
+                    "id",
+                    "name",
+                    "consumptionType",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "consumptionType": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ProductResponse": {
+                "required": [
+                    "id",
+                    "name",
+                    "pharmaceuticalForm",
+                    "createdAt",
+                    "composition"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "netContent": {
+                        "properties": {
+                            "value": {
+                                "type": "number"
+                            },
+                            "unit": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "totalQuantity": {
+                        "type": "number",
+                        "nullable": true
+                    },
+                    "pharmaceuticalForm": {
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "consumptionType": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "composition": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "TreatmentResponse": {
+                "required": [
+                    "id",
+                    "profileId",
+                    "itemId",
+                    "status",
+                    "frequencyValue",
+                    "frequencyUnit",
+                    "doseQuantity",
+                    "startDate",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "profileId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "itemId": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "frequencyValue": {
+                        "type": "integer"
+                    },
+                    "frequencyUnit": {
+                        "type": "string"
+                    },
+                    "doseQuantity": {
+                        "type": "number"
+                    },
+                    "startDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "endDate": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth"
+        },
+        {
+            "name": "Houses"
+        },
+        {
+            "name": "Places"
+        },
+        {
+            "name": "Items"
+        },
+        {
+            "name": "Consumptions"
+        },
+        {
+            "name": "Products"
+        },
+        {
+            "name": "Profiles"
+        },
+        {
+            "name": "Treatments"
+        },
+        {
+            "name": "ActiveIngredients"
+        },
+        {
+            "name": "PharmaceuticalForms"
+        }
+    ]
+}

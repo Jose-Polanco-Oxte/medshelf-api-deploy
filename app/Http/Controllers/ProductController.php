@@ -17,6 +17,7 @@ use App\Providers\Core\Catalog\Product\Service\ProductFinder;
 use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use OpenApi\Annotations as OA;
 
 class ProductController extends Controller
 {
@@ -27,6 +28,40 @@ class ProductController extends Controller
     {
     }
 
+    /**
+     * @OA\Get(
+     *     path="/products",
+     *     tags={"Products"},
+     *     summary="List products",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", minimum=1)),
+     *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *     @OA\Parameter(name="filter[name]", in="query", required=false, @OA\Schema(type="string"), description="Filter by product name (partial match)"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OK",
+     *         @OA\JsonContent(oneOf={
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","nextCursor"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ProductResponse")),
+     *                 @OA\Property(property="nextCursor", type="string", nullable=true)
+     *             ),
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","totalCount","page","size","hasMorePages"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ProductResponse")),
+     *                 @OA\Property(property="totalCount", type="integer", minimum=0),
+     *                 @OA\Property(property="page", type="integer", minimum=1),
+     *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
+     *                 @OA\Property(property="hasMorePages", type="boolean")
+     *             )
+     *         })
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function index(UuidListRequest $request): JsonResponse
     {
         return PaginationService::paginate(
@@ -36,6 +71,51 @@ class ProductController extends Controller
         );
     }
 
+    /**
+     * @OA\Post(
+     *     path="/products",
+     *     tags={"Products"},
+     *     summary="Add product",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","pharmaceuticalForm","composition"},
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Paracetamol"),
+     *             @OA\Property(
+     *                 property="netContent",
+     *                 type="object",
+     *                 @OA\Property(property="value", type="number", minimum=0, example=100),
+     *                 @OA\Property(property="unit", type="string", example="ml")
+     *             ),
+     *             @OA\Property(property="totalQuantity", type="number", minimum=0, example=20),
+     *             @OA\Property(property="pharmaceuticalForm", type="string", example="Jarabe"),
+     *             @OA\Property(
+     *                 property="composition",
+     *                 type="object",
+     *                 @OA\Property(property="referenceAmount", type="number", minimum=0, example=5),
+     *                 @OA\Property(
+     *                     property="activeIngredients",
+     *                     type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="name", type="string", example="Acetaminofen"),
+     *                         @OA\Property(
+     *                             property="strength",
+     *                             type="object",
+     *                             @OA\Property(property="value", type="number", minimum=0, example=500),
+     *                             @OA\Property(property="unit", type="string", example="mg")
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProductResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -101,6 +181,18 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/products/{productId}",
+     *     tags={"Products"},
+     *     summary="Get product details",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="productId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProductResponse")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
     public function show(string $productId): JsonResponse
     {
         $product = $this->finder->findById($productId);
