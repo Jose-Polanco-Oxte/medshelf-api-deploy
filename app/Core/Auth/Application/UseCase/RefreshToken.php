@@ -8,18 +8,16 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 final readonly class RefreshToken
 {
-    public function __construct(private JWTAuth $jwt) {}
-
     public function execute(): AuthResponse
     {
-        $token = JWTAuth::refresh(JWTAuth::getToken());
+        $newToken = JWTAuth::refresh(JWTAuth::getToken());
+
         $user = Auth::user();
-        $ttl = config('jwt.ttl') * 60;
 
         return new AuthResponse(
-            accessToken: $token,
+            accessToken: $newToken,
             tokenType: 'Bearer',
-            expiresIn: $ttl,
+            expiresIn: config('jwt.ttl') * 60,
             user: [
                 'id' => $user->public_id,
                 'name' => $user->name,

@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Database\Factories\HouseModelFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,12 +36,14 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|HouseModel whereUpdatedAt($value)
  * @mixin Eloquent
  */
-#[Table('houses')]
-#[Fillable(['public_id', 'owner_id', 'name'])]
 class HouseModel extends Model
 {
     /** @uses HasFactory<HouseModelFactory> */
     use HasFactory;
+
+    protected $table = 'houses';
+
+    protected $fillable = ['public_id', 'owner_id', 'name'];
 
     public function owner(): BelongsTo
     {

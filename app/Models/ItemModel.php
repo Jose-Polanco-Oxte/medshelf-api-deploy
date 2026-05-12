@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Database\Factories\ItemModelFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,11 +22,11 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read Collection<int, ConsumptionModel> $consumptions
+ * @property-read Collection<int, \App\Models\ConsumptionModel> $consumptions
  * @property-read int|null $consumptions_count
- * @property-read ProductModel $product
- * @property-read StorageModel $storage
- * @method static ItemModelFactory factory($count = null, $state = [])
+ * @property-read \App\Models\ProductModel $product
+ * @property-read \App\Models\StorageModel $storage
+ * @method static \Database\Factories\ItemModelFactory factory($count = null, $state = [])
  * @method static Builder<static>|ItemModel newModelQuery()
  * @method static Builder<static>|ItemModel newQuery()
  * @method static Builder<static>|ItemModel query()
@@ -43,18 +41,20 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ItemModel whereUpdatedAt($value)
  * @mixin Eloquent
  */
-#[Table('items')]
-#[Fillable([
-    'public_id',
-    'product_id',
-    'storage_id',
-    'total_content',
-    'expiration_date',
-])]
 class ItemModel extends Model
 {
     /** @uses HasFactory<ItemModelFactory> */
     use HasFactory;
+
+    protected $table = 'items';
+
+    protected $fillable = [
+        'public_id',
+        'product_id',
+        'storage_id',
+        'total_content',
+        'expiration_date',
+    ];
 
     public function product(): BelongsTo
     {

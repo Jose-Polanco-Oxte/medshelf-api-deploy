@@ -3171,21 +3171,10 @@
             },
             "AuthResponse": {
                 "required": [
-                    "accessToken",
-                    "refreshToken",
                     "expiresIn",
                     "user"
                 ],
                 "properties": {
-                    "accessToken": {
-                        "type": "string"
-                    },
-                    "refreshToken": {
-                        "type": "string"
-                    },
-                    "expiresIn": {
-                        "type": "integer"
-                    },
                     "user": {
                         "type": "array",
                         "items": {
@@ -3194,6 +3183,9 @@
                                 "$ref": "#/components/schemas/ProfileResponse"
                             }
                         }
+                    },
+                    "expiresIn": {
+                        "type": "integer"
                     }
                 },
                 "type": "object"
@@ -3995,8 +3987,8 @@
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
-                "scheme": "bearer",
-                "bearerFormat": "JWT"
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
             }
         }
     },

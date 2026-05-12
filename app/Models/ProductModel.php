@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Database\Factories\ProductModelFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,20 +44,22 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ProductModel whereUpdatedAt($value)
  * @mixin Eloquent
  */
-#[Table('products')]
-#[Fillable([
-    'public_id',
-    'name',
-    'net_content_value',
-    'net_content_unit',
-    'total_quantity',
-    'pharmaceutical_form_id',
-    'composition_reference_amount'
-])]
 class ProductModel extends Model
 {
     /** @use HasFactory<ProductModelFactory> */
     use HasFactory;
+
+    protected $table = 'products';
+
+    protected $fillable = [
+        'public_id',
+        'name',
+        'net_content_value',
+        'net_content_unit',
+        'total_quantity',
+        'pharmaceutical_form_id',
+        'composition_reference_amount',
+    ];
 
     public function activeCompounds(): HasMany
     {

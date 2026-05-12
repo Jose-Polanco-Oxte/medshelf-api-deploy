@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Database\Factories\PharmaceuticalFormModelFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,12 +28,14 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|PharmaceuticalFormModel whereUpdatedAt($value)
  * @mixin Eloquent
  */
-#[Table('pharmaceutical_forms')]
-#[Fillable(['name', 'consumption_type'])]
 class PharmaceuticalFormModel extends Model
 {
-    /** @var HasFactory<PharmaceuticalFormModelFactory> */
+    /** @use HasFactory<PharmaceuticalFormModelFactory> */
     use HasFactory;
+
+    protected $table = 'pharmaceutical_forms';
+
+    protected $fillable = ['name', 'consumption_type'];
 
     protected function casts(): array
     {

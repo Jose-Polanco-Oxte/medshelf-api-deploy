@@ -10,24 +10,23 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 final readonly class Register
 {
-    public function __construct(private JWTAuth $jwt) {}
-
     public function execute(RegisterRequest $request): AuthResponse
     {
-        $user = User::create([
-            'public_id' => Utils::generateUUIDV4(),
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
-        ]);
+        $user = User::updateOrCreate(
+            ['public_id' => Utils::generateUUIDV4()],
+            [
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => $request->input('password'),
+            ]
+        );
 
         $token = JWTAuth::fromUser($user);
-        $ttl = config('jwt.ttl') * 60;
 
         return new AuthResponse(
             accessToken: $token,
             tokenType: 'Bearer',
-            expiresIn: $ttl,
+            expiresIn: config('jwt.ttl') * 60,
             user: [
                 'id' => $user->public_id,
                 'name' => $user->name,

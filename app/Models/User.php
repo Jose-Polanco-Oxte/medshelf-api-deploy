@@ -5,9 +5,6 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,10 +27,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read \App\Models\HouseModel|null $house
+ * @property-read Collection<int, \App\Models\HouseModel> $houses
+ * @property-read int|null $houses_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read Collection<int, PersonalAccessToken> $tokens
- * @property-read int|null $tokens_count
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
@@ -49,13 +47,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @method static Builder<static>|User whereUpdatedAt($value)
  * @mixin Eloquent
  */
-#[Table('users')]
-#[Fillable(['public_id', 'name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $table = 'users';
+
+    protected $fillable = ['public_id', 'name', 'email', 'password'];
+
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {

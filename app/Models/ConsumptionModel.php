@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Database\Factories\ConsumptionModelFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,15 +33,18 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ConsumptionModel whereId($value)
  * @method static Builder<static>|ConsumptionModel whereItemId($value)
  * @method static Builder<static>|ConsumptionModel wherePublicId($value)
+ * @method static Builder<static>|ConsumptionModel whereTreatmentId($value)
  * @method static Builder<static>|ConsumptionModel whereUpdatedAt($value)
  * @mixin Eloquent
  */
-#[Table('consumptions')]
-#[Fillable(['public_id', 'item_id', 'treatment_id', 'amount', 'consumed_at'])]
 class ConsumptionModel extends Model
 {
     /** @uses HasFactory<ConsumptionModelFactory> */
     use HasFactory;
+
+    protected $table = 'consumptions';
+
+    protected $fillable = ['public_id', 'item_id', 'treatment_id', 'amount', 'consumed_at'];
 
     public function item(): BelongsTo
     {

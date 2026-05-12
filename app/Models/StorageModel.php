@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Database\Factories\StorageModelFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,12 +36,14 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|StorageModel whereUpdatedAt($value)
  * @mixin Eloquent
  */
-#[Table('storages')]
-#[Fillable(['public_id', 'place_id', 'name'])]
 class StorageModel extends Model
 {
     /** @uses HasFactory<StorageModelFactory> */
     use HasFactory;
+
+    protected $table = 'storages';
+
+    protected $fillable = ['public_id', 'place_id', 'name'];
 
     public function place(): BelongsTo
     {

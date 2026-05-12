@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Database\Factories\ActiveIngredientModelFactory;
 use Eloquent;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,12 +26,14 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|ActiveIngredientModel whereUpdatedAt($value)
  * @mixin Eloquent
  */
-#[Table('active_ingredients')]
-#[Fillable(['name'])]
 class ActiveIngredientModel extends Model
 {
     /** @use HasFactory<ActiveIngredientModelFactory> */
     use HasFactory;
+
+    protected $table = 'active_ingredients';
+
+    protected $fillable = ['name'];
 
     protected function casts(): array
     {

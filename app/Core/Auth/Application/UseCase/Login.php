@@ -10,8 +10,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 final readonly class Login
 {
-    public function __construct(private JWTAuth $jwt) {}
-
     public function execute(LoginRequest $request): AuthResponse
     {
         $credentials = $request->only(['email', 'password']);
@@ -21,13 +19,13 @@ final readonly class Login
         }
 
         $user = Auth::user();
+
         $token = JWTAuth::fromUser($user);
-        $ttl = config('jwt.ttl') * 60;
 
         return new AuthResponse(
             accessToken: $token,
             tokenType: 'Bearer',
-            expiresIn: $ttl,
+            expiresIn: config('jwt.ttl') * 60,
             user: [
                 'id' => $user->public_id,
                 'name' => $user->name,
