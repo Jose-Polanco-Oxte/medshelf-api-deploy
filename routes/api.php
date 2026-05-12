@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TreatmentController;
 use App\Http\Middleware\AuthenticateApi;
+use App\Http\Middleware\JwtCookieMiddleware;
 use Illuminate\Support\Facades\Route;
 
 // Auth routes (public)
@@ -20,13 +21,13 @@ Route::prefix('auth')->group(function () {
 });
 
 // Auth routes (protected)
-Route::prefix('auth')->middleware(AuthenticateApi::class)->group(function () {
+Route::prefix('auth')->middleware([JwtCookieMiddleware::class,AuthenticateApi::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/me', [AuthController::class, 'me']);
 });
 
-Route::group(['middleware' => AuthenticateApi::class], function () {
+Route::group(['middleware' => [JwtCookieMiddleware::class, AuthenticateApi::class]], function () {
     Route::get('/houses/me', [HouseController::class, 'myHouse']);
     Route::get('/houses/{houseId}', [HouseController::class, 'show']);
 
