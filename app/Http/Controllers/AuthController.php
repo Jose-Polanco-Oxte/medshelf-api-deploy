@@ -13,33 +13,20 @@ use App\Core\Auth\Application\UseCase\Register;
 use App\Core\Home\House\Model\Service\HouseCreator;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Cookie;
 use OpenApi\Annotations as OA;
+use Symfony\Component\HttpFoundation\Cookie;
 
 final class AuthController extends Controller
 {
     public function __construct(
-        private Login $login,
-        private Register $register,
+        private Login        $login,
+        private Register     $register,
         private HouseCreator $houseCreator,
-        private Logout $logout,
+        private Logout       $logout,
         private RefreshToken $refreshToken,
-        private Me $me,
-    ) {}
-
-    private function tokenCookie(string $token): Cookie
+        private Me           $me,
+    )
     {
-        return cookie(
-            'access_token',
-            $token,
-            config('jwt.ttl'),
-            '/',
-            null,
-            app()->environment('production'),
-            true,
-            false,
-            'Lax'
-        );
     }
 
     /**
@@ -73,6 +60,21 @@ final class AuthController extends Controller
                 'message' => $e->getMessage()
             ], 401);
         }
+    }
+
+    private function tokenCookie(string $token): Cookie
+    {
+        return cookie(
+            'access_token',
+            $token,
+            config('jwt.ttl'),
+            '/',
+            null,
+            app()->environment('production'),
+            true,
+            false,
+            'none'
+        );
     }
 
     /**
