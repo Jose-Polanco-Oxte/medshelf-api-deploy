@@ -30,7 +30,6 @@ class ProfileFinder
     {
         return new ProfileDetail(
             id: $record->public_id,
-            userId: $record->user->public_id,
             name: $record->name,
             relationship: $record->relationship,
             createdAt: $record->created_at,
@@ -40,7 +39,7 @@ class ProfileFinder
     public function listByUserIdByOffset(string $userId, OffsetRequest $request): OffsetResponse
     {
         $result = ProfileModel::whereHas('user', fn($q) => $q->where('public_id', $userId))
-            ->whhen($request->filters ?? [], fn($q, $filters) => $q->where(function ($q) use ($filters) {
+            ->when($request->filters ?? [], fn($q, $filters) => $q->where(function ($q) use ($filters) {
                 if (isset($filters['name'])) {
                     $q->where('name', 'like', '%' . $filters['name'] . '%');
                 }
@@ -78,7 +77,7 @@ class ProfileFinder
 
         return PaginationService::buildCursorQuery(
             query: ProfileModel::whereHas('user', fn($q) => $q->where('public_id', $userId))
-                ->whhen($request->filters ?? [], fn($q, $filters) => $q->where(function ($q) use ($filters) {
+                ->when($request->filters ?? [], fn($q, $filters) => $q->where(function ($q) use ($filters) {
                     if (isset($filters['name'])) {
                         $q->where('name', 'like', '%' . $filters['name'] . '%');
                     }
