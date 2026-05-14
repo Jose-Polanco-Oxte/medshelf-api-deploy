@@ -15,7 +15,6 @@ final class ProfileMapper
     {
         return new ProfileResponse(
             id: $profile->getId(),
-            userId: $profile->getUserId(),
             name: $profile->getName(),
             relationship: $profile->getRelationship(),
             createdAt: $profile->getCreatedAt(),
