@@ -2,6 +2,7 @@
 
 namespace App\Core\Home\Treatment\Model\Exception;
 
+use App\Core\Home\Item\Model\Exception\ConsumptionException;
 use App\Core\Shared\Domain\DomainException;
 
 class TreatmentException extends DomainException
@@ -44,6 +45,22 @@ class TreatmentException extends DomainException
         return new self(sprintf(
             'Cannot cancel treatment %s. Only active or paused treatments can be cancelled.',
             $treatmentId
+        ));
+    }
+
+    public static function discreteDoseMustBeInteger(float $dose): self
+    {
+        return new self(sprintf(
+            'Dose %s is invalid for a discrete product. Dose must be an integer.',
+            $dose
+        ));
+    }
+
+    public static function cannotConsumeDose(ConsumptionException $e): self
+    {
+        return new self(sprintf(
+            'Cannot register dose for treatment due to consumption error: %s',
+            $e->getMessage()
         ));
     }
 }

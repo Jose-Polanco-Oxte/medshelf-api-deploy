@@ -7,7 +7,6 @@ use App\Core\Shared\Domain\CursorResponse;
 use App\Core\Shared\Domain\OffsetRequest;
 use App\Core\Shared\Domain\OffsetResponse;
 use App\Models\ProfileModel;
-use App\Models\TreatmentModel;
 use App\Providers\Core\Home\Profile\Detail\ProfileDetail;
 use App\Providers\Core\Home\Profile\View\ProfileView;
 use App\Providers\Core\InvalidCursor;
@@ -17,7 +16,10 @@ class ProfileFinder
 {
     public function findById(string $id): ?ProfileDetail
     {
-        $record = ProfileModel::with(['user' => fn($q) => $q->select('id', 'public_id')])
+        $record = ProfileModel::with([
+            'user' => fn($q) => $q->select('id', 'public_id'),
+            'allergies' => fn($q) => $q->select('id', 'profile_id', 'name'),
+        ])
             ->where('public_id', $id)
             ->first();
 
@@ -32,13 +34,18 @@ class ProfileFinder
             id: $record->public_id,
             name: $record->name,
             relationship: $record->relationship,
+            birthDate: $record->birthdate,
+            allergies: $record->allergies->pluck('name')->toArray(),
             createdAt: $record->created_at,
         );
     }
 
     public function listByUserIdByOffset(string $userId, OffsetRequest $request): OffsetResponse
     {
-        $result = ProfileModel::whereHas('user', fn($q) => $q->where('public_id', $userId))
+        $result = ProfileModel::with([
+            'allergies' => fn($q) => $q->select('id', 'profile_id', 'name'),
+        ])
+            ->whereHas('user', fn($q) => $q->where('public_id', $userId))
             ->when($request->filters ?? [], fn($q, $filters) => $q->where(function ($q) use ($filters) {
                 if (isset($filters['name'])) {
                     $q->where('name', 'like', '%' . $filters['name'] . '%');
@@ -64,6 +71,8 @@ class ProfileFinder
             id: $record->public_id,
             name: $record->name,
             relationship: $record->relationship,
+            birthDate: $record->birthdate?->toDateString(),
+            allergies: $record->allergies->pluck('name')->toArray(),
         );
     }
 
@@ -71,12 +80,15 @@ class ProfileFinder
     {
         $id = match ($request->cursor) {
             null => null,
-            default => TreatmentModel::where('public_id', $userId)->value('id')
-                ?? throw new InvalidCursor('Invalid cursor provided for Treatment listing.')
+            default => ProfileModel::where('public_id', $request->cursor)->value('id')
+                ?? throw new InvalidCursor('Invalid cursor provided for Profile listing.')
         };
 
         return PaginationService::buildCursorQuery(
-            query: ProfileModel::whereHas('user', fn($q) => $q->where('public_id', $userId))
+            query: ProfileModel::with([
+                'allergies' => fn($q) => $q->select('id', 'profile_id', 'name'),
+            ])
+                ->whereHas('user', fn($q) => $q->where('public_id', $userId))
                 ->when($request->filters ?? [], fn($q, $filters) => $q->where(function ($q) use ($filters) {
                     if (isset($filters['name'])) {
                         $q->where('name', 'like', '%' . $filters['name'] . '%');

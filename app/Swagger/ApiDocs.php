@@ -50,8 +50,22 @@ use OpenApi\Annotations as OA;
  *     schema="AuthResponse",
  *     type="object",
  *     required={"expiresIn","user"},
- *     @OA\Property(property="user", type="array", @OA\Items(type="object", @OA\Items(ref="#/components/schemas/ProfileResponse"))),
+ *     @OA\Property(
+ *         property="user",
+ *         type="object",
+ *         required={"id","name","email"},
+ *         @OA\Property(property="id", type="string", format="uuid"),
+ *         @OA\Property(property="name", type="string"),
+ *         @OA\Property(property="email", type="string")
+ *     ),
  *     @OA\Property(property="expiresIn", type="integer"),
+ *     @OA\Property(
+ *         property="house",
+ *         type="object",
+ *         nullable=true,
+ *         @OA\Property(property="id", type="string", format="uuid"),
+ *         @OA\Property(property="name", type="string")
+ *     )
  * )
  * @OA\Schema(
  *     schema="CursorPaginationResponse",
@@ -236,6 +250,27 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="createdAt", type="string", format="date")
  * )
  * @OA\Schema(
+ *     schema="ItemView",
+ *     type="object",
+ *     required={"id","product","place","availableContent","expirationDate","createdAt"},
+ *     @OA\Property(property="id", type="string", format="uuid"),
+ *     @OA\Property(property="product", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="name", type="string")),
+ *     @OA\Property(property="place", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="name", type="string")),
+ *     @OA\Property(property="availableContent", type="number"),
+ *     @OA\Property(property="expirationDate", type="string", format="date")
+ * )
+ * @OA\Schema(
+ *     schema="ItemDetail",
+ *     type="object",
+ *     required={"id","product","place","availableContent","expirationDate","createdAt"},
+ *     @OA\Property(property="id", type="string", format="uuid"),
+ *     @OA\Property(property="product", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="name", type="string"), @OA\Property(property="netContent", type="object", @OA\Property(property="value", type="number"), @OA\Property(property="unit", type="string")), @OA\Property(property="totalQuantity", type="number", nullable=true), @OA\Property(property="pharmaceuticalForm", type="object", @OA\Property(property="name", type="string"), @OA\Property(property="consumptionType", type="string"))),
+ *     @OA\Property(property="place", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="name", type="string")),
+ *     @OA\Property(property="availableContent", type="number"),
+ *     @OA\Property(property="expirationDate", type="string", format="date"),
+ *     @OA\Property(property="createdAt", type="string", format="date")
+ * )
+ * @OA\Schema(
  *     schema="ConsumptionResponse",
  *     type="object",
  *     required={"id","item","amount","consumedAt"},
@@ -247,11 +282,33 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="ProfileResponse",
  *     type="object",
- *     required={"id", "email","name","createdAt"},
+ *     required={"id","name","birthDate","createdAt"},
  *     @OA\Property(property="id", type="string", format="uuid"),
- *     @OA\Property(property="email", type="string"),
  *     @OA\Property(property="name", type="string"),
+ *     @OA\Property(property="relationship", type="string", nullable=true),
+ *     @OA\Property(property="birthDate", type="string", format="date"),
+ *     @OA\Property(property="allergies", type="array", @OA\Items(type="string")),
  *     @OA\Property(property="createdAt", type="string", format="date-time")
+ * )
+ * @OA\Schema(
+ *     schema="MeResponse",
+ *     type="object",
+ *     required={"user","house"},
+ *     @OA\Property(
+ *          property="user",
+ *          type="object",
+ *          required={"id","name","email"},
+ *          @OA\Property(property="id", type="string", format="uuid"),
+ *          @OA\Property(property="name", type="string"),
+ *          @OA\Property(property="email", type="string")
+ *      ),
+ *      @OA\Property(
+ *          property="house",
+ *          type="object",
+ *          nullable=true,
+ *          @OA\Property(property="id", type="string", format="uuid"),
+ *          @OA\Property(property="name", type="string")
+ *      )
  * )
  * @OA\Schema(
  *     schema="ActiveIngredientResponse",
@@ -285,14 +342,27 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="TreatmentResponse",
  *     type="object",
- *     required={"id","profileId","itemId","status","frequencyValue","frequencyUnit","doseQuantity","startDate","createdAt"},
+ *     required={"id","profileId","itemId","status","dose","frequencyUnit","startDate","createdAt"},
  *     @OA\Property(property="id", type="string", format="uuid"),
- *     @OA\Property(property="profileId", type="string", format="uuid"),
- *     @OA\Property(property="itemId", type="string", format="uuid"),
+ *     @OA\Property(property="profile", type="object", @OA\Property(property="id", type="string", format="uuid")),
+ *     @OA\Property(property="item", type="object", @OA\Property(property="id", type="string", format="uuid")),
  *     @OA\Property(property="status", type="string"),
- *     @OA\Property(property="frequencyValue", type="integer"),
+ *     @OA\Property(property="dose", type="number"),
  *     @OA\Property(property="frequencyUnit", type="string"),
- *     @OA\Property(property="doseQuantity", type="number"),
+ *     @OA\Property(property="startDate", type="string", format="date"),
+ *     @OA\Property(property="endDate", type="string", format="date", nullable=true),
+ *     @OA\Property(property="createdAt", type="string", format="date-time")
+ * )
+ * @OA\Schema(
+ *     schema="TreatmentView",
+ *     type="object",
+ *     required={"id","profile","item","status","dose","frequencyUnit","startDate","createdAt"},
+ *     @OA\Property(property="id", type="string", format="uuid"),
+ *     @OA\Property(property="profile", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="name", type="string")),
+ *     @OA\Property(property="item", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="product", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="name", type="string"))),
+ *     @OA\Property(property="status", type="string"),
+ *     @OA\Property(property="dose", type="number"),
+ *     @OA\Property(property="frequencyUnit", type="string"),
  *     @OA\Property(property="startDate", type="string", format="date"),
  *     @OA\Property(property="endDate", type="string", format="date", nullable=true),
  *     @OA\Property(property="createdAt", type="string", format="date-time")

@@ -2,14 +2,14 @@
 
 namespace App\Core\Home\Treatment\Application\Dto\Request;
 
-readonly class AddTreatmentRequest
+readonly class CreateTreatmentRequest
 {
     public function __construct(
         public string  $profileId,
         public string  $itemId,
-        public int     $frequencyValue,
+        public string  $houseId,
+        public float   $dose,
         public string  $frequencyUnit,
-        public float   $doseQuantity,
         public string  $startDate,
         public ?string $endDate,
     )

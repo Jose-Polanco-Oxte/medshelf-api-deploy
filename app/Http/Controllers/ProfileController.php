@@ -76,9 +76,11 @@ class ProfileController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name"},
+     *             required={"name","birthDate"},
      *             @OA\Property(property="name", type="string", maxLength=255, example="Maria"),
-     *             @OA\Property(property="relationship", type="string", maxLength=255, example="parent")
+     *             @OA\Property(property="relationship", type="string", maxLength=255, example="parent"),
+     *             @OA\Property(property="birthDate", type="string", format="date", example="1995-08-20"),
+     *             @OA\Property(property="allergies", type="array", @OA\Items(type="string"), example={"Penicillin","Pollen"})
      *         )
      *     ),
      *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ProfileResponse")),
@@ -93,18 +95,30 @@ class ProfileController extends Controller
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'relationship' => 'nullable|string|max:255',
+            'birthDate' => 'required|date_format:Y-m-d',
+            'allergies' => 'nullable|array',
+            'allergies.*' => 'string|max:255',
         ]);
+
+        $allergies = array_values(array_unique(array_filter(array_map(
+            fn(string $name) => trim($name),
+            $data['allergies'] ?? []
+        ))));
 
         $result = $this->addProfile->execute(new AddProfileRequest(
             userId: $userId,
             name: $data['name'],
             relationship: $data['relationship'] ?? null,
+            birthDate: $data['birthDate'],
+            allergies: $allergies,
         ));
 
         return response()->json([
             'id' => $result->id,
             'name' => $result->name,
             'relationship' => $result->relationship,
+            'birthDate' => $result->birthDate->toDateString(),
+            'allergies' => $result->allergies,
             'createdAt' => $result->createdAt->toIso8601String(),
         ], 201);
     }

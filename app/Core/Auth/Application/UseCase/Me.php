@@ -9,11 +9,17 @@ final readonly class Me
     public function execute(): array
     {
         $user = Auth::user();
-
+        $house = $user->house;
         return [
-            'id' => $user->public_id,
-            'name' => $user->name,
-            'email' => $user->email,
+            'user' => [
+                'id' => $house->public_id,
+                'name' => $house->name,
+                'email' => $house->email,
+            ],
+            'house' => [
+                'id' => $house->public_id,
+                'name' => $house->name,
+            ]
         ];
     }
 }

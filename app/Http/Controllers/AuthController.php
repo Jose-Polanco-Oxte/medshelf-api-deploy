@@ -10,7 +10,6 @@ use App\Core\Auth\Application\UseCase\Logout;
 use App\Core\Auth\Application\UseCase\Me;
 use App\Core\Auth\Application\UseCase\RefreshToken;
 use App\Core\Auth\Application\UseCase\Register;
-use App\Core\Home\House\Model\Service\HouseCreator;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Annotations as OA;
@@ -21,7 +20,6 @@ final class AuthController extends Controller
     public function __construct(
         private Login        $login,
         private Register     $register,
-        private HouseCreator $houseCreator,
         private Logout       $logout,
         private RefreshToken $refreshToken,
         private Me           $me,
@@ -100,10 +98,6 @@ final class AuthController extends Controller
         try {
             $response = $this->register->execute($request);
 
-            $this->houseCreator->create(
-                $response->user['id'],
-                "{$response->user['name']}s House"
-            );
 
             return response()
                 ->json($response->toArray(), 201)
@@ -170,7 +164,7 @@ final class AuthController extends Controller
      *     tags={"Auth"},
      *     summary="Get authenticated user data",
      *     security={{"bearerAuth": {}}},
-     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProfileResponse")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/MeResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
