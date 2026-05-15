@@ -22,6 +22,8 @@ final readonly class AddProfile
             userId: $request->userId,
             name: $request->name,
             relationship: $request->relationship,
+            birthDate: \Carbon\Carbon::parse($request->birthDate),
+            allergies: $request->allergies,
         );
 
         $this->profileRepository->save($profile);

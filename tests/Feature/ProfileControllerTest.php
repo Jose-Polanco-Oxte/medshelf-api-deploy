@@ -18,9 +18,16 @@ class ProfileControllerTest extends TestCase
         $this->postJson('/api/profiles', [
             'name' => 'Maria',
             'relationship' => 'parent',
+            'birthDate' => '1995-08-20',
+            'allergies' => ['Pollen', 'Penicillin'],
         ], ['X-User-Id' => $user->public_id])
             ->assertStatus(201)
-            ->assertJsonFragment(['name' => 'Maria', 'relationship' => 'parent']);
+            ->assertJsonFragment([
+                'name' => 'Maria',
+                'relationship' => 'parent',
+                'birthDate' => '1995-08-20',
+            ])
+            ->assertJsonFragment(['allergies' => ['Pollen', 'Penicillin']]);
     }
 
     public function test_store_returns_422_when_name_missing(): void

@@ -6,13 +6,15 @@ use App\Core\Home\House\Model\Place;
 use App\Core\Home\House\Model\Repository\PlaceRepository;
 use App\Core\Home\Storage\Model\Repository\StorageRepository;
 use App\Core\Home\Storage\Model\Storage;
+use App\Core\Shared\Application\TransactionManager;
 
 final readonly class PlaceCreator
 {
     public function __construct(
-        private PlaceRepository   $placeRepository,
-        private StorageRepository $storageUnitRepository,
-        private HousePolicy       $houseService,
+        private PlaceRepository    $placeRepository,
+        private StorageRepository  $storageUnitRepository,
+        private HousePolicy        $houseService,
+        private TransactionManager $transactionManager,
     )
     {
     }
@@ -26,13 +28,16 @@ final readonly class PlaceCreator
 
     public function create(string $houseId, string $placeName): Place
     {
-        // Create the place
-        $place = Place::create($houseId, $placeName);
-        $this->placeRepository->save($place);
+        return $this->transactionManager->run(
+            function () use ($houseId, $placeName) {
+                $place = Place::create($houseId, $placeName);
+                $this->placeRepository->save($place);
 
-        //Create initial storage
-        $storageUnit = Storage::create($place->getId(), 'Default Storage');
-        $this->storageUnitRepository->save($storageUnit);
-        return $place;
+                //Create initial storage
+                $storageUnit = Storage::create($place->getId(), 'Default Storage');
+                $this->storageUnitRepository->save($storageUnit);
+                return $place;
+            }
+        );
     }
 }

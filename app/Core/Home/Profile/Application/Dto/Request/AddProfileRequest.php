@@ -8,6 +8,9 @@ readonly class AddProfileRequest
         public string  $userId,
         public string  $name,
         public ?string $relationship,
+        public string  $birthDate,
+        /** @var string[] */
+        public array   $allergies,
     )
     {
     }
