@@ -13,9 +13,8 @@ final class Treatment
         protected string          $profileId,
         protected string          $itemId,
         protected TreatmentStatus $status,
-        protected int             $frequencyValue,
+        protected float           $dose,
         protected string          $frequencyUnit,
-        protected float           $doseQuantity,
         protected Carbon          $startDate,
         protected ?Carbon         $endDate,
         protected Carbon          $createdAt,
@@ -26,9 +25,8 @@ final class Treatment
     public static function create(
         string  $profileId,
         string  $itemId,
-        int     $frequencyValue,
+        float   $dose,
         string  $frequencyUnit,
-        float   $doseQuantity,
         Carbon  $startDate,
         ?Carbon $endDate,
     ): Treatment
@@ -38,9 +36,8 @@ final class Treatment
             $profileId,
             $itemId,
             TreatmentStatus::ACTIVE,
-            $frequencyValue,
+            $dose,
             $frequencyUnit,
-            $doseQuantity,
             $startDate,
             $endDate,
             Carbon::now(),
@@ -52,9 +49,8 @@ final class Treatment
         string          $profileId,
         string          $itemId,
         TreatmentStatus $status,
-        int             $frequencyValue,
+        float           $dose,
         string          $frequencyUnit,
-        float           $doseQuantity,
         Carbon          $startDate,
         ?Carbon         $endDate,
         Carbon          $createdAt,
@@ -65,21 +61,30 @@ final class Treatment
             $profileId,
             $itemId,
             $status,
-            $frequencyValue,
+            $dose,
             $frequencyUnit,
-            $doseQuantity,
             $startDate,
             $endDate,
             $createdAt,
         );
     }
 
-    public function pause(): void
+    public function changeStatus(TreatmentStatus $status): void
     {
-        if ($this->status !== TreatmentStatus::ACTIVE) {
-            throw TreatmentException::cannotPause($this->id);
+        switch ($status) {
+            case TreatmentStatus::ACTIVE:
+                $this->resume();
+                break;
+            case TreatmentStatus::PAUSED:
+                $this->pause();
+                break;
+            case TreatmentStatus::COMPLETED:
+                $this->complete();
+                break;
+            case TreatmentStatus::CANCELLED:
+                $this->cancel();
+                break;
         }
-        $this->status = TreatmentStatus::PAUSED;
     }
 
     public function resume(): void
@@ -88,6 +93,14 @@ final class Treatment
             throw TreatmentException::cannotResume($this->id);
         }
         $this->status = TreatmentStatus::ACTIVE;
+    }
+
+    public function pause(): void
+    {
+        if ($this->status !== TreatmentStatus::ACTIVE) {
+            throw TreatmentException::cannotPause($this->id);
+        }
+        $this->status = TreatmentStatus::PAUSED;
     }
 
     public function complete(): void
@@ -104,22 +117,6 @@ final class Treatment
             throw TreatmentException::cannotCancel($this->id);
         }
         $this->status = TreatmentStatus::CANCELLED;
-    }
-
-    public function update(?int $frequencyValue, ?string $frequencyUnit, ?float $doseQuantity, ?string $endDate): void
-    {
-        if ($frequencyValue !== null) {
-            $this->frequencyValue = $frequencyValue;
-        }
-        if ($frequencyUnit !== null) {
-            $this->frequencyUnit = $frequencyUnit;
-        }
-        if ($doseQuantity !== null) {
-            $this->doseQuantity = $doseQuantity;
-        }
-        if ($endDate !== null) {
-            $this->endDate = Carbon::parse($endDate);
-        }
     }
 
     public function assertCanRegisterDose(): void
@@ -149,19 +146,14 @@ final class Treatment
         return $this->status;
     }
 
-    public function getFrequencyValue(): int
+    public function getDose(): float
     {
-        return $this->frequencyValue;
+        return $this->dose;
     }
 
     public function getFrequencyUnit(): string
     {
         return $this->frequencyUnit;
-    }
-
-    public function getDoseQuantity(): float
-    {
-        return $this->doseQuantity;
     }
 
     public function getStartDate(): Carbon
@@ -177,5 +169,26 @@ final class Treatment
     public function getCreatedAt(): Carbon
     {
         return $this->createdAt;
+    }
+
+    public function changeDose(?float $dose): void
+    {
+        if ($dose !== null) {
+            $this->dose = $dose;
+        }
+    }
+
+    public function changeFrequencyUnit(?string $frequencyUnit): void
+    {
+        if ($frequencyUnit !== null) {
+            $this->frequencyUnit = $frequencyUnit;
+        }
+    }
+
+    public function changeEndDate(?Carbon $endDate): void
+    {
+        if ($endDate !== null) {
+            $this->endDate = $endDate;
+        }
     }
 }

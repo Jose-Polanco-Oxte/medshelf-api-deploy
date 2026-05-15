@@ -9,6 +9,7 @@ readonly class AuthResponse
         public string $tokenType,
         public int    $expiresIn,
         public array  $user,
+        public ?array $house,
     )
     {
     }
@@ -18,6 +19,7 @@ readonly class AuthResponse
         return [
             'user' => $this->user,
             'expiresIn' => $this->expiresIn,
+            'house' => $this->house,
         ];
     }
 }

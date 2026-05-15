@@ -10,6 +10,9 @@ readonly class ProfileResponse
         public string  $id,
         public string  $name,
         public ?string $relationship,
+        public Carbon  $birthDate,
+        /** @var string[] */
+        public array   $allergies,
         public Carbon  $createdAt,
     )
     {

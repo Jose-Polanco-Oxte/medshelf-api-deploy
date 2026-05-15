@@ -17,6 +17,8 @@ final class ProfileMapper
             id: $profile->getId(),
             name: $profile->getName(),
             relationship: $profile->getRelationship(),
+            birthDate: $profile->getBirthDate(),
+            allergies: $profile->getAllergies(),
             createdAt: $profile->getCreatedAt(),
         );
     }

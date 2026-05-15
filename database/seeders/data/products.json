@@ -441,11 +441,11 @@
     },
     {
         "name": "Voltaren-Diclofenaco 75mg Inyectable",
-        "netContent": { "value": 3, "unit": "ml" },
-        "totalQuantity": null,
+        "netContent": null,
+        "totalQuantity": 1,
         "pharmaceuticalForm": {
             "name": "Injectable",
-            "consumptionType": "Continuous"
+            "consumptionType": "Discrete"
         },
         "composition": {
             "referenceAmount": 3,
@@ -459,11 +459,11 @@
     },
     {
         "name": "Ketorolaco 30mg Inyectable",
-        "netContent": { "value": 1, "unit": "ml" },
-        "totalQuantity": null,
+        "netContent": null,
+        "totalQuantity": 3,
         "pharmaceuticalForm": {
             "name": "Injectable",
-            "consumptionType": "Continuous"
+            "consumptionType": "Discrete"
         },
         "composition": {
             "referenceAmount": 1,

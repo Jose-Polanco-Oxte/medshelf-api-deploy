@@ -12,14 +12,18 @@ final class Profile
         protected string  $userId,
         protected string  $name,
         protected ?string $relationship,
+        protected Carbon  $birthDate,
+        /** @var string[] */
+        protected array   $allergies,
         protected Carbon  $createdAt,
     )
     {
     }
 
-    public static function create(string $userId, string $name, ?string $relationship): Profile
+    /** @param string[] $allergies */
+    public static function create(string $userId, string $name, ?string $relationship, Carbon $birthDate, array $allergies): Profile
     {
-        return new self(Utils::generateUUIDV4(), $userId, $name, $relationship, Carbon::now());
+        return new self(Utils::generateUUIDV4(), $userId, $name, $relationship, $birthDate, $allergies, Carbon::now());
     }
 
     public static function load(
@@ -27,10 +31,12 @@ final class Profile
         string  $userId,
         string  $name,
         ?string $relationship,
+        Carbon  $birthDate,
+        array   $allergies,
         Carbon  $createdAt
     ): Profile
     {
-        return new self($id, $userId, $name, $relationship, $createdAt);
+        return new self($id, $userId, $name, $relationship, $birthDate, $allergies, $createdAt);
     }
 
     public function getId(): string
@@ -51,6 +57,17 @@ final class Profile
     public function getRelationship(): ?string
     {
         return $this->relationship;
+    }
+
+    public function getBirthDate(): Carbon
+    {
+        return $this->birthDate;
+    }
+
+    /** @return string[] */
+    public function getAllergies(): array
+    {
+        return $this->allergies;
     }
 
     public function getCreatedAt(): Carbon

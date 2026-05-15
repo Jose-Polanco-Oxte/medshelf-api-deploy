@@ -459,7 +459,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ProfileResponse"
+                                    "$ref": "#/components/schemas/MeResponse"
                                 }
                             }
                         }
@@ -906,7 +906,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/ItemResponse"
+                                                        "$ref": "#/components/schemas/ItemView"
                                                     }
                                                 },
                                                 "nextCursor": {
@@ -928,7 +928,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/ItemResponse"
+                                                        "$ref": "#/components/schemas/ItemView"
                                                     }
                                                 },
                                                 "totalCount": {
@@ -1105,7 +1105,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/ItemResponse"
+                                                        "$ref": "#/components/schemas/ItemView"
                                                     }
                                                 },
                                                 "nextCursor": {
@@ -1127,7 +1127,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/ItemResponse"
+                                                        "$ref": "#/components/schemas/ItemView"
                                                     }
                                                 },
                                                 "totalCount": {
@@ -1196,7 +1196,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ItemResponse"
+                                    "$ref": "#/components/schemas/ItemDetail"
                                 }
                             }
                         }
@@ -2386,7 +2386,8 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name"
+                                    "name",
+                                    "birthDate"
                                 ],
                                 "properties": {
                                     "name": {
@@ -2398,6 +2399,21 @@
                                         "type": "string",
                                         "maxLength": 255,
                                         "example": "parent"
+                                    },
+                                    "birthDate": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1995-08-20"
+                                    },
+                                    "allergies": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "Penicillin",
+                                            "Pollen"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -2501,16 +2517,16 @@
                 ]
             }
         },
-        "/treatments": {
+        "/profiles/{profileId}/treatments": {
             "get": {
                 "tags": [
                     "Treatments"
                 ],
-                "summary": "List treatments",
-                "operationId": "87d07501682135ff9fd87ba478c8d47e",
+                "summary": "List treatments for profile",
+                "operationId": "1b6cb959e2e6dcfda08b24ab89a563b0",
                 "parameters": [
                     {
-                        "name": "profile_id",
+                        "name": "profileId",
                         "in": "query",
                         "required": false,
                         "schema": {
@@ -2563,7 +2579,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/TreatmentResponse"
+                                                        "$ref": "#/components/schemas/TreatmentView"
                                                     }
                                                 },
                                                 "nextCursor": {
@@ -2585,7 +2601,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/TreatmentResponse"
+                                                        "$ref": "#/components/schemas/TreatmentView"
                                                     }
                                                 },
                                                 "totalCount": {
@@ -2634,7 +2650,18 @@
                     "Treatments"
                 ],
                 "summary": "Create treatment",
-                "operationId": "4f2e6d1b91fa537f9109b172652955ec",
+                "operationId": "89e739e5464b4cc08c68f8952d1b6df9",
+                "parameters": [
+                    {
+                        "name": "profileId",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -2649,18 +2676,14 @@
                                     "startDate"
                                 ],
                                 "properties": {
-                                    "profileId": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
                                     "itemId": {
                                         "type": "string",
                                         "format": "uuid"
                                     },
-                                    "frequencyValue": {
-                                        "type": "integer",
-                                        "minimum": 1,
-                                        "example": 8
+                                    "dose": {
+                                        "type": "number",
+                                        "minimum": 0.01,
+                                        "example": 1.5
                                     },
                                     "frequencyUnit": {
                                         "type": "string",
@@ -2669,11 +2692,6 @@
                                             "days",
                                             "weeks"
                                         ]
-                                    },
-                                    "doseQuantity": {
-                                        "type": "number",
-                                        "minimum": 0.01,
-                                        "example": 1.5
                                     },
                                     "startDate": {
                                         "type": "string",
@@ -2740,6 +2758,126 @@
                 ]
             }
         },
+        "/treatments": {
+            "get": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "List treatments for authenticated user",
+                "operationId": "87f0cd3492cccaea16985e81c3815b02",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "oneOf": [
+                                        {
+                                            "required": [
+                                                "items",
+                                                "nextCursor"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/TreatmentView"
+                                                    }
+                                                },
+                                                "nextCursor": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        {
+                                            "required": [
+                                                "items",
+                                                "totalCount",
+                                                "page",
+                                                "size",
+                                                "hasMorePages"
+                                            ],
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/TreatmentView"
+                                                    }
+                                                },
+                                                "totalCount": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "size": {
+                                                    "type": "integer",
+                                                    "maximum": 100,
+                                                    "minimum": 1
+                                                },
+                                                "hasMorePages": {
+                                                    "type": "boolean"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/treatments/{treatmentId}": {
             "get": {
                 "tags": [
@@ -2764,7 +2902,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TreatmentResponse"
+                                    "$ref": "#/components/schemas/TreatmentView"
                                 }
                             }
                         }
@@ -2796,12 +2934,12 @@
                     }
                 ]
             },
-            "put": {
+            "patch": {
                 "tags": [
                     "Treatments"
                 ],
                 "summary": "Update treatment",
-                "operationId": "8f9b29f9e7541f99f4fec2fa20a75889",
+                "operationId": "e8cfeeca9c63f6b69720647bb18f43ad",
                 "parameters": [
                     {
                         "name": "treatmentId",
@@ -2819,9 +2957,10 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "frequencyValue": {
-                                        "type": "integer",
-                                        "minimum": 1
+                                    "dose": {
+                                        "type": "number",
+                                        "minimum": 0.01,
+                                        "example": 1.5
                                     },
                                     "frequencyUnit": {
                                         "type": "string",
@@ -2831,9 +2970,14 @@
                                             "weeks"
                                         ]
                                     },
-                                    "doseQuantity": {
-                                        "type": "number",
-                                        "minimum": 0.01
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "active",
+                                            "paused",
+                                            "completed",
+                                            "cancelled"
+                                        ]
                                     },
                                     "endDate": {
                                         "type": "string",
@@ -2852,82 +2996,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/TreatmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            },
-            "patch": {
-                "tags": [
-                    "Treatments"
-                ],
-                "summary": "Modify treatment status",
-                "operationId": "76493f0daeac6473fae04d3ff3badd04",
-                "parameters": [
-                    {
-                        "name": "treatmentId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "status": {
-                                        "type": "string",
-                                        "enum": [
-                                            "active",
-                                            "paused",
-                                            "completed",
-                                            "cancelled"
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/TreatmentResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -3176,16 +3244,40 @@
                 ],
                 "properties": {
                     "user": {
-                        "type": "array",
-                        "items": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/components/schemas/ProfileResponse"
+                        "required": [
+                            "id",
+                            "name",
+                            "email"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
                             }
-                        }
+                        },
+                        "type": "object"
                     },
                     "expiresIn": {
                         "type": "integer"
+                    },
+                    "house": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -3778,6 +3870,132 @@
                 },
                 "type": "object"
             },
+            "ItemView": {
+                "required": [
+                    "id",
+                    "product",
+                    "place",
+                    "availableContent",
+                    "expirationDate",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "product": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "place": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "availableContent": {
+                        "type": "number"
+                    },
+                    "expirationDate": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object"
+            },
+            "ItemDetail": {
+                "required": [
+                    "id",
+                    "product",
+                    "place",
+                    "availableContent",
+                    "expirationDate",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "product": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "netContent": {
+                                "properties": {
+                                    "value": {
+                                        "type": "number"
+                                    },
+                                    "unit": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "totalQuantity": {
+                                "type": "number",
+                                "nullable": true
+                            },
+                            "pharmaceuticalForm": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "consumptionType": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "place": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "availableContent": {
+                        "type": "number"
+                    },
+                    "expirationDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "type": "object"
+            },
             "ConsumptionResponse": {
                 "required": [
                     "id",
@@ -3812,8 +4030,8 @@
             "ProfileResponse": {
                 "required": [
                     "id",
-                    "email",
                     "name",
+                    "birthDate",
                     "createdAt"
                 ],
                 "properties": {
@@ -3821,15 +4039,68 @@
                         "type": "string",
                         "format": "uuid"
                     },
-                    "email": {
-                        "type": "string"
-                    },
                     "name": {
                         "type": "string"
+                    },
+                    "relationship": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "birthDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "allergies": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "createdAt": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "MeResponse": {
+                "required": [
+                    "user",
+                    "house"
+                ],
+                "properties": {
+                    "user": {
+                        "required": [
+                            "id",
+                            "name",
+                            "email"
+                        ],
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            },
+                            "email": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "house": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -3936,9 +4207,8 @@
                     "profileId",
                     "itemId",
                     "status",
-                    "frequencyValue",
+                    "dose",
                     "frequencyUnit",
-                    "doseQuantity",
                     "startDate",
                     "createdAt"
                 ],
@@ -3947,25 +4217,106 @@
                         "type": "string",
                         "format": "uuid"
                     },
-                    "profileId": {
-                        "type": "string",
-                        "format": "uuid"
+                    "profile": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        },
+                        "type": "object"
                     },
-                    "itemId": {
-                        "type": "string",
-                        "format": "uuid"
+                    "item": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            }
+                        },
+                        "type": "object"
                     },
                     "status": {
                         "type": "string"
                     },
-                    "frequencyValue": {
-                        "type": "integer"
+                    "dose": {
+                        "type": "number"
                     },
                     "frequencyUnit": {
                         "type": "string"
                     },
-                    "doseQuantity": {
+                    "startDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "endDate": {
+                        "type": "string",
+                        "format": "date",
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "TreatmentView": {
+                "required": [
+                    "id",
+                    "profile",
+                    "item",
+                    "status",
+                    "dose",
+                    "frequencyUnit",
+                    "startDate",
+                    "createdAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "profile": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "item": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "product": {
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "dose": {
                         "type": "number"
+                    },
+                    "frequencyUnit": {
+                        "type": "string"
                     },
                     "startDate": {
                         "type": "string",

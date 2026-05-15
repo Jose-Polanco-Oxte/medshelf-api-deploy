@@ -29,13 +29,13 @@ class ItemRepositoryAdapter implements ItemRepository
         );
     }
 
-    public function findByIdAndHouseId(string $medicalItemId, string $houseId): ?Item
+    public function findByIdAndHouseId(string $itemId, string $houseId): ?Item
     {
         $record = ItemModel::with([
             'product' => fn($q) => $q->select('id', 'public_id'),
             'storage' => fn($q) => $q->select('id', 'public_id', 'place_id'),
         ])
-            ->where('public_id', $medicalItemId)
+            ->where('public_id', $itemId)
             ->whereHas('storage.place.house', fn($q) => $q->where('public_id', $houseId))
             ->first();
         if (!$record) {
@@ -59,5 +59,19 @@ class ItemRepositoryAdapter implements ItemRepository
     public function remove(Item $item): void
     {
         ItemModel::where('public_id', $item->getId())->delete();
+    }
+
+    public function findById(string $id): ?Item
+    {
+        $record = ItemModel::with([
+            'product' => fn($q) => $q->select('id', 'public_id'),
+            'storage' => fn($q) => $q->select('id', 'public_id', 'place_id'),
+        ])
+            ->where('public_id', $id)
+            ->first();
+        if (!$record) {
+            return null;
+        }
+        return $this->toDomain($record);
     }
 }

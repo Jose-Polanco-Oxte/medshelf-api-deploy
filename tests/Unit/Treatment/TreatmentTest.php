@@ -10,30 +10,13 @@ use PHPUnit\Framework\TestCase;
 
 class TreatmentTest extends TestCase
 {
-    private function makeTreatment(TreatmentStatus $status = TreatmentStatus::ACTIVE): Treatment
-    {
-        return Treatment::load(
-            id: 'test-id',
-            profileId: 'profile-id',
-            itemId: 'item-id',
-            status: $status,
-            frequencyValue: 8,
-            frequencyUnit: 'hours',
-            doseQuantity: 1.0,
-            startDate: Carbon::today(),
-            endDate: null,
-            createdAt: Carbon::now(),
-        );
-    }
-
     public function test_create_sets_status_to_active(): void
     {
         $treatment = Treatment::create(
             profileId: 'profile-id',
             itemId: 'item-id',
-            frequencyValue: 8,
+            dose: 8,
             frequencyUnit: 'hours',
-            doseQuantity: 1.0,
             startDate: Carbon::today(),
             endDate: null,
         );
@@ -47,6 +30,21 @@ class TreatmentTest extends TestCase
         $treatment->pause();
 
         $this->assertEquals(TreatmentStatus::PAUSED, $treatment->getStatus());
+    }
+
+    private function makeTreatment(TreatmentStatus $status = TreatmentStatus::ACTIVE): Treatment
+    {
+        return Treatment::load(
+            id: 'test-id',
+            profileId: 'profile-id',
+            itemId: 'item-id',
+            status: $status,
+            dose: 8,
+            frequencyUnit: 'hours',
+            startDate: Carbon::today(),
+            endDate: null,
+            createdAt: Carbon::now(),
+        );
     }
 
     public function test_pause_throws_when_not_active(): void
@@ -128,36 +126,5 @@ class TreatmentTest extends TestCase
 
         $treatment = $this->makeTreatment(TreatmentStatus::PAUSED);
         $treatment->assertCanRegisterDose();
-    }
-
-    public function test_update_only_modifies_non_null_fields(): void
-    {
-        $treatment = $this->makeTreatment();
-
-        $treatment->update(
-            frequencyValue: 24,
-            frequencyUnit: null,
-            doseQuantity: null,
-            endDate: null,
-        );
-
-        $this->assertEquals(24, $treatment->getFrequencyValue());
-        $this->assertEquals('hours', $treatment->getFrequencyUnit());
-        $this->assertEquals(1.0, $treatment->getDoseQuantity());
-    }
-
-    public function test_update_sets_end_date_when_provided(): void
-    {
-        $treatment = $this->makeTreatment();
-
-        $treatment->update(
-            frequencyValue: null,
-            frequencyUnit: null,
-            doseQuantity: null,
-            endDate: '2030-12-31',
-        );
-
-        $this->assertNotNull($treatment->getEndDate());
-        $this->assertEquals('2030-12-31', $treatment->getEndDate()->toDateString());
     }
 }

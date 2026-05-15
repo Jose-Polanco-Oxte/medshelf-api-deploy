@@ -60,7 +60,9 @@ class ItemFinder
                 id: $place->public_id,
                 name: $place->name,
             ),
-            availableContent: $itemModel->total_content - ($itemModel->consumptions_sum_amount ?? 0),
+            availableContent: $product->pharmaceuticalForm->consumption_type == 'Discrete'
+                ? ($itemModel->total_quantity - ($itemModel->consumptions_sum_amount ?? 0))
+                : $itemModel->total_content - ($itemModel->consumptions_sum_amount ?? 0),
             expirationDate: $itemModel->expiration_date,
             createdAt: $itemModel->created_at,
         );
@@ -70,6 +72,7 @@ class ItemFinder
     {
         $result = ItemModel::with([
             'product',
+            'storage.place',
         ])
             ->whereHas('storage.place', fn($q) => $q->where('public_id', $placeId))
             ->when(
@@ -98,6 +101,11 @@ class ItemFinder
                 id: $product->public_id,
                 name: $product->name,
             ),
+            place: new PlaceResume(
+                id: $itemModel->storage->place->public_id,
+                name: $itemModel->storage->place->name,
+            ),
+            availableContent: $itemModel->total_content - ($itemModel->consumptions_sum_amount ?? 0),
             expirationDate: $itemModel->expiration_date,
         );
     }
@@ -112,6 +120,7 @@ class ItemFinder
         return PaginationService::buildCursorQuery(
             query: ItemModel::with([
                 'product',
+                'storage.place',
             ])
                 ->whereHas('storage.place', fn($q) => $q->where('public_id', $placeId))
                 ->when(
@@ -130,6 +139,7 @@ class ItemFinder
     {
         $result = ItemModel::with([
             'product',
+            'storage.place',
         ])
             ->whereHas('storage.place.house', fn($q) => $q->where('public_id', $houseId))
             ->when(
@@ -159,6 +169,7 @@ class ItemFinder
         return PaginationService::buildCursorQuery(
             query: ItemModel::with([
                 'product',
+                'storage.place',
             ])
                 ->whereHas('storage.place.house', fn($q) => $q->where('public_id', $houseId))
                 ->when(

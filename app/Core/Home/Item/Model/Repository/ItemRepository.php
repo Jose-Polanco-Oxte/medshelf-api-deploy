@@ -8,7 +8,9 @@ interface ItemRepository
 {
     public function save(Item $item): void;
 
-    public function findByIdAndHouseId(string $medicalItemId, string $houseId): ?Item;
+    public function findByIdAndHouseId(string $itemId, string $houseId): ?Item;
+
+    public function findById(string $id): ?Item;
 
     public function remove(Item $item): void;
 }
