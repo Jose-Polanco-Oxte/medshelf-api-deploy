@@ -96,7 +96,7 @@ class TreatmentFinder
             status: $record->status,
             dose: $record->dose,
             frequencyHours: $record->frequency_hours,
-            startDate: $record->start_date->toDateString(),
+            startDate: $record->start_date->toIso8601ZuluString('millisecond'),
             days: $record->days,
         );
     }

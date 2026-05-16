@@ -21,7 +21,7 @@ class TreatmentModelFactory extends Factory
             'status' => 'active',
             'dose' => 1.0,
             'frequency_hours' => 8,
-            'start_date' => now()->toDateString(),
+            'start_date' => now()->toIso8601ZuluString('millisecond'),
             'days' => 7,
         ];
     }

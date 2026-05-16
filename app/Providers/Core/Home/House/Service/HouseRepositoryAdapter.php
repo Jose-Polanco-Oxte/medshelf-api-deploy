@@ -44,4 +44,9 @@ class HouseRepositoryAdapter implements HouseRepository
 
         return $query->exists();
     }
+
+    public function existsById(string $houseId): bool
+    {
+        return HouseModel::where('public_id', $houseId)->exists();
+    }
 }

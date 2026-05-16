@@ -2,6 +2,7 @@
 
 namespace App\Core\Home\House\Model\Service;
 
+use App\Core\Home\House\Model\Exception\HouseException;
 use App\Core\Home\House\Model\Exception\PlaceException;
 use App\Core\Home\House\Model\Repository\HouseRepository;
 
@@ -23,6 +24,13 @@ final readonly class HousePolicy
         }
         $this->houseRepository->existsOtherPlaceWithSameNameInHouse($houseId, $placeName) &&
         throw PlaceException::cannotAddPlaceWithSameNameInHouse($houseId);
+    }
+
+    public function assertExistsHouse(string $houseId): void
+    {
+        if (!$this->houseRepository->existsById($houseId)) {
+            throw HouseException::houseNotFound();
+        }
     }
 
     public function assertCanRemovePlace(string $houseId): void

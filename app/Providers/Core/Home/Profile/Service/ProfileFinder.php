@@ -71,7 +71,7 @@ class ProfileFinder
             id: $record->public_id,
             name: $record->name,
             relationship: $record->relationship,
-            birthDate: $record->birthdate?->toDateString(),
+            birthDate: $record->birthdate?->toIso8601ZuluString('millisecond'),
             allergies: $record->allergies->pluck('name')->toArray(),
         );
     }

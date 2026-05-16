@@ -28,6 +28,7 @@ final readonly class PlaceCreator
 
     public function create(string $houseId, string $placeName): Place
     {
+        $this->houseService->assertExistsHouse($houseId);
         return $this->transactionManager->run(
             function () use ($houseId, $placeName) {
                 $place = Place::create($houseId, $placeName);

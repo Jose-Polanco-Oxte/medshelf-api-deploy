@@ -167,8 +167,8 @@ class ItemController extends Controller
                     'id' => $result->placeId,
                 ],
                 'totalContent' => $result->totalContent,
-                'expirationDate' => $result->expirationDate->toDateString(),
-                'createdAt' => $result->createdAt->toDateString(),
+                'expirationDate' => $result->expirationDate->toIso8601ZuluString('millisecond'),
+                'createdAt' => $result->createdAt->toIso8601ZuluString('millisecond'),
             ], 201);
         }
     }

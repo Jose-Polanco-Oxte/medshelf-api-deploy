@@ -120,7 +120,7 @@ class ProfileController extends Controller
             'id' => $result->id,
             'name' => $result->name,
             'relationship' => $result->relationship,
-            'birthDate' => $result->birthDate->toDateString(),
+            'birthDate' => $result->birthDate->toIso8601ZuluString('millisecond'),
             'allergies' => $result->allergies,
             'createdAt' => $result->createdAt->toIso8601ZuluString('millisecond'),
         ], 201);
