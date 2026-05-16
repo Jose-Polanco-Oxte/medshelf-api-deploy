@@ -30,6 +30,8 @@ class AddProfileTest extends TestCase
             userId: 'user-uuid',
             name: 'Maria',
             relationship: null,
+            birthDate: '1990-01-01',
+            allergies: [],
         );
 
         $response = $this->useCase->execute($request);
@@ -48,6 +50,8 @@ class AddProfileTest extends TestCase
             userId: 'user-uuid',
             name: 'Juan',
             relationship: 'parent',
+            birthDate: '1990-01-01',
+            allergies: [],
         );
 
         $response = $this->useCase->execute($request);
@@ -70,6 +74,8 @@ class AddProfileTest extends TestCase
             userId: 'expected-user-uuid',
             name: 'Test',
             relationship: null,
+            birthDate: '1990-01-01',
+            allergies: [],
         );
 
         $this->useCase->execute($request);
@@ -86,6 +92,8 @@ class AddProfileTest extends TestCase
             userId: 'uid',
             name: 'Unique Name 12345',
             relationship: null,
+            birthDate: '1990-01-01',
+            allergies: [],
         );
 
         $response = $this->useCase->execute($request);

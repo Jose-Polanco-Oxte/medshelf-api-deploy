@@ -22,9 +22,16 @@ class ProfileControllerTest extends TestCase
         $this->postJson('/api/profiles', [
             'name'         => 'Maria',
             'relationship' => 'parent',
+            'birthDate'    => '1995-08-20',
+            'allergies'    => ['Pollen', 'Penicillin'],
         ], $this->authHeaders($user))
             ->assertStatus(201)
-            ->assertJsonFragment(['name' => 'Maria', 'relationship' => 'parent']);
+            ->assertJsonFragment([
+                'name' => 'Maria',
+                'relationship' => 'parent',
+                'birthDate' => '1995-08-20',
+            ])
+            ->assertJsonFragment(['allergies' => ['Pollen', 'Penicillin']]);
     }
 
     public function test_store_response_has_required_fields(): void
@@ -33,9 +40,10 @@ class ProfileControllerTest extends TestCase
 
         $this->postJson('/api/profiles', [
             'name' => 'Carlos',
+            'birthDate' => '1990-01-01',
         ], $this->authHeaders($user))
             ->assertStatus(201)
-            ->assertJsonStructure(['id', 'name', 'relationship', 'createdAt']);
+            ->assertJsonStructure(['id', 'name', 'relationship', 'birthDate', 'allergies', 'createdAt']);
     }
 
     public function test_store_returns_422_when_name_missing(): void
@@ -44,6 +52,7 @@ class ProfileControllerTest extends TestCase
 
         $this->postJson('/api/profiles', [
             'relationship' => 'parent',
+            'birthDate'    => '1990-01-01',
         ], $this->authHeaders($user))
             ->assertStatus(422);
     }

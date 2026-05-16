@@ -7,8 +7,9 @@ use App\Core\Shared\Domain\CursorResponse;
 use App\Core\Shared\Domain\OffsetRequest;
 use App\Core\Shared\Domain\OffsetResponse;
 use App\Models\TreatmentModel;
+use App\Providers\Core\Home\Item\Resume\ItemResume;
+use App\Providers\Core\Home\Item\Resume\ProductResume;
 use App\Providers\Core\Home\Treatment\Detail\TreatmentDetail;
-use App\Providers\Core\Home\Treatment\Resume\ItemResume;
 use App\Providers\Core\Home\Treatment\Resume\ProfileResume;
 use App\Providers\Core\Home\Treatment\View\TreatmentView;
 use App\Providers\Core\InvalidCursor;
@@ -20,7 +21,8 @@ class TreatmentFinder
     {
         $record = TreatmentModel::with([
             'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
-            'item' => fn($q) => $q->select('id', 'public_id'),
+            'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
+            'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
         ])
             ->where('public_id', $id)
             ->first();
@@ -40,14 +42,17 @@ class TreatmentFinder
             ),
             item: new ItemResume(
                 id: $record->item->public_id,
+                product: new ProductResume(
+                    id: $record->item->public_id,
+                    name: $record->item->product->name,
+                )
             ),
             status: $record->status,
-            frequencyValue: $record->frequency_value,
+            dose: $record->dose,
             frequencyUnit: $record->frequency_unit,
-            doseQuantity: $record->dose_quantity,
-            startDate: $record->start_date->toDateString(),
-            endDate: $record->end_date?->toDateString(),
-            createdAt: $record->created_at->toIso8601String(),
+            startDate: $record->start_date,
+            endDate: $record->end_date,
+            createdAt: $record->created_at,
         );
     }
 
@@ -55,7 +60,8 @@ class TreatmentFinder
     {
         $result = TreatmentModel::with([
             'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
-            'item' => fn($q) => $q->select('id', 'public_id'),
+            'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
+            'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
         ])
             ->whereHas('profile', fn($q) => $q->where('public_id', $profileId))
             ->orderBy('id')
@@ -76,12 +82,20 @@ class TreatmentFinder
     {
         return new TreatmentView(
             id: $record->public_id,
-            profile: ['id' => $record->profile->public_id],
-            item: ['id' => $record->item->public_id],
+            profile: new ProfileResume(
+                id: $record->profile->public_id,
+                name: $record->profile->name,
+            ),
+            item: new ItemResume(
+                id: $record->item->public_id,
+                product: new ProductResume(
+                    $record->item->product->public_id,
+                    $record->item->product->name,
+                )
+            ),
             status: $record->status,
-            frequencyValue: $record->frequency_value,
+            dose: $record->dose,
             frequencyUnit: $record->frequency_unit,
-            doseQuantity: $record->dose_quantity,
             startDate: $record->start_date->toDateString(),
             endDate: $record->end_date?->toDateString(),
         );
@@ -98,7 +112,8 @@ class TreatmentFinder
         return PaginationService::buildCursorQuery(
             query: TreatmentModel::with([
                 'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
-                'item' => fn($q) => $q->select('id', 'public_id'),
+                'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
+                'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
             ])
                 ->whereHas('profile', fn($q) => $q->where('public_id', $profileId))
                 ->orderBy('id'),
@@ -106,6 +121,51 @@ class TreatmentFinder
             cursor: $id,
             size: $request->size,
             mapper: fn($item) => $this->toView($item)
+        );
+    }
+
+    public function listByUserIdByCursor(string $userId, CursorRequest $request): CursorResponse
+    {
+        $id = match ($request->cursor) {
+            null => null,
+            default => TreatmentModel::where('public_id', $request->cursor)->value('id')
+                ?? throw new InvalidCursor('Invalid cursor provided for Treatment listing.')
+        };
+
+        return PaginationService::buildCursorQuery(
+            query: TreatmentModel::with([
+                'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
+                'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
+                'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+            ])
+                ->whereHas('profile.user', fn($q) => $q->where('public_id', $userId))
+                ->orderBy('id'),
+            cursorName: 'id',
+            cursor: $id,
+            size: $request->size,
+            mapper: fn($item) => $this->toView($item)
+        );
+    }
+
+    public function listByUserIdByOffset(string $userId, OffsetRequest $request): OffsetResponse
+    {
+        $result = TreatmentModel::with([
+            'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
+            'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
+            'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+        ])
+            ->whereHas('profile.user', fn($q) => $q->where('public_id', $userId))
+            ->orderBy('id')
+            ->paginate(perPage: $request->size, page: $request->page);
+
+        return new OffsetResponse(
+            totalCount: $result->total(),
+            page: $request->page,
+            size: $request->size,
+            hasMorePages: $result->hasMorePages(),
+            items: collect($result->items())
+                ->map(fn($item) => $this->toView($item))
+                ->toArray()
         );
     }
 }

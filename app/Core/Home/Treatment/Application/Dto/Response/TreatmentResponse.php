@@ -2,19 +2,20 @@
 
 namespace App\Core\Home\Treatment\Application\Dto\Response;
 
+use Carbon\Carbon;
+
 readonly class TreatmentResponse
 {
     public function __construct(
         public string  $id,
-        public array   $profile,
-        public array   $item,
+        public string  $profileId,
+        public string  $itemId,
         public string  $status,
-        public int     $frequencyValue,
+        public float   $dose,
         public string  $frequencyUnit,
-        public float   $doseQuantity,
-        public string  $startDate,
-        public ?string $endDate,
-        public string  $createdAt,
+        public Carbon  $startDate,
+        public ?Carbon $endDate,
+        public Carbon  $createdAt,
     )
     {
     }

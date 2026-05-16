@@ -28,6 +28,8 @@ class UpdateProfileTest extends TestCase
             userId: 'user-uuid',
             name: $name,
             relationship: $relationship,
+            birthDate: Carbon::parse('1990-06-15'),
+            allergies: [],
             createdAt: Carbon::parse('2026-01-01T00:00:00+00:00'),
         );
     }

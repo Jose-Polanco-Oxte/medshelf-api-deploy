@@ -2,13 +2,13 @@
 
 namespace App\Core\Home\Treatment\Application\Dto\Request;
 
-readonly class UpdateTreatmentRequest
+readonly class ModifyTreatmentRequest
 {
     public function __construct(
         public string  $treatmentId,
-        public ?int    $frequencyValue,
+        public ?int    $dose,
         public ?string $frequencyUnit,
-        public ?float  $doseQuantity,
+        public ?string $status,
         public ?string $endDate,
     )
     {

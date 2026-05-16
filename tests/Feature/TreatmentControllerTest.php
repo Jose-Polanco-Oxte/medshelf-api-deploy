@@ -36,14 +36,13 @@ class TreatmentControllerTest extends TestCase
     public function test_store_creates_treatment_and_returns_201(): void
     {
         $profile = $this->createProfile();
-        $item = $this->createItem();
+        $item = $this->createItem('continuous', 10, $this->actor);
+        $this->actor->load('house');
 
-        $this->postJson('/api/treatments', [
-            'profileId' => $profile->public_id,
+        $this->postJson("/api/profiles/{$profile->public_id}/treatments", [
             'itemId' => $item->public_id,
-            'frequencyValue' => 8,
+            'dose' => 1.5,
             'frequencyUnit' => 'hours',
-            'doseQuantity' => 1.5,
             'startDate' => now()->toDateString(),
         ], $this->authHeaders($this->actor))
             ->assertStatus(201)
@@ -53,23 +52,22 @@ class TreatmentControllerTest extends TestCase
     public function test_store_response_has_required_fields(): void
     {
         $profile = $this->createProfile();
-        $item = $this->createItem();
+        $item = $this->createItem('continuous', 10, $this->actor);
+        $this->actor->load('house');
 
-        $this->postJson('/api/treatments', [
-            'profileId' => $profile->public_id,
+        $this->postJson("/api/profiles/{$profile->public_id}/treatments", [
             'itemId' => $item->public_id,
-            'frequencyValue' => 8,
+            'dose' => 1.0,
             'frequencyUnit' => 'hours',
-            'doseQuantity' => 1.0,
             'startDate' => now()->toDateString(),
         ], $this->authHeaders($this->actor))
             ->assertStatus(201)
-            ->assertJsonStructure(['id', 'status', 'frequencyValue', 'frequencyUnit', 'doseQuantity', 'startDate', 'createdAt']);
+            ->assertJsonStructure(['id', 'status', 'dose', 'frequencyUnit', 'startDate', 'createdAt']);
     }
 
     public function test_store_returns_401_without_auth(): void
     {
-        $this->postJson('/api/treatments', [])->assertStatus(401);
+        $this->postJson('/api/profiles/' . \Illuminate\Support\Str::uuid() . '/treatments', [])->assertStatus(401);
     }
 
     private function createProfile(): ProfileModel
@@ -138,18 +136,17 @@ class TreatmentControllerTest extends TestCase
         ]);
     }
 
-    // ── POST /api/treatments ───────────────────────────────────────────────
+    // ── POST /api/profiles/{profileId}/treatments ─────────────────────────
 
     public function test_store_returns_404_when_profile_not_found(): void
     {
-        $item = $this->createItem();
+        $item = $this->createItem('continuous', 10, $this->actor);
+        $this->actor->load('house');
 
-        $this->postJson('/api/treatments', [
-            'profileId' => Str::uuid(),
+        $this->postJson('/api/profiles/' . Str::uuid() . '/treatments', [
             'itemId' => $item->public_id,
-            'frequencyValue' => 8,
+            'dose' => 1.0,
             'frequencyUnit' => 'hours',
-            'doseQuantity' => 1.0,
             'startDate' => now()->toDateString(),
         ], $this->authHeaders($this->actor))
             ->assertStatus(404);
@@ -157,8 +154,11 @@ class TreatmentControllerTest extends TestCase
 
     public function test_store_returns_422_on_validation_failure(): void
     {
-        $this->postJson('/api/treatments', [
-            'profileId' => 'not-a-uuid',
+        $this->createItem('continuous', 10, $this->actor);
+        $this->actor->load('house');
+
+        $this->postJson('/api/profiles/' . Str::uuid() . '/treatments', [
+            'itemId' => 'not-a-uuid',
         ], $this->authHeaders($this->actor))
             ->assertStatus(422);
     }
@@ -167,7 +167,7 @@ class TreatmentControllerTest extends TestCase
     {
         $treatment = $this->createTreatment();
 
-        $this->getJson("/api/treatments?profile_id={$treatment->profile->public_id}", $this->authHeaders($this->actor))
+        $this->getJson("/api/profiles/{$treatment->profile->public_id}/treatments", $this->authHeaders($this->actor))
             ->assertStatus(200)
             ->assertJsonFragment(['id' => $treatment->public_id]);
     }
@@ -184,9 +184,8 @@ class TreatmentControllerTest extends TestCase
             'profile_id' => $profile->id,
             'item_id' => $item->id,
             'status' => $status,
-            'frequency_value' => 8,
+            'dose' => 1.0,
             'frequency_unit' => 'hours',
-            'dose_quantity' => 1.0,
             'start_date' => now()->toDateString(),
             'end_date' => null,
         ]);
@@ -209,18 +208,19 @@ class TreatmentControllerTest extends TestCase
             ->assertStatus(404);
     }
 
-    // ── PUT /api/treatments/{id} ───────────────────────────────────────────
+    // ── PATCH /api/treatments/{id} (update fields + status transitions) ─────
 
     public function test_update_returns_updated_treatment(): void
     {
         $treatment = $this->createTreatment();
 
-        $this->putJson("/api/treatments/{$treatment->public_id}", [
-            'frequencyValue' => 24,
-            'frequencyUnit' => 'hours',
+        $this->patchJson("/api/treatments/{$treatment->public_id}", [
+            'dose' => 2.0,
+            'frequencyUnit' => 'days',
+            'status' => 'paused',
         ], $this->authHeaders($this->actor))
             ->assertStatus(200)
-            ->assertJsonFragment(['frequencyValue' => 24]);
+            ->assertJsonFragment(['dose' => 2.0]);
     }
 
     // ── POST /api/treatments/{id}/pause ───────────────────────────────────
@@ -286,9 +286,8 @@ class TreatmentControllerTest extends TestCase
             'profile_id'      => $profile->id,
             'item_id'         => $item->id,
             'status'          => 'active',
-            'frequency_value' => 8,
+            'dose'            => 1.0,
             'frequency_unit'  => 'hours',
-            'dose_quantity'   => 1.0,
             'start_date'      => now()->toDateString(),
             'end_date'        => null,
         ]);
@@ -312,9 +311,8 @@ class TreatmentControllerTest extends TestCase
             'profile_id'      => $profile->id,
             'item_id'         => $item->id,
             'status'          => 'paused',
-            'frequency_value' => 8,
+            'dose'            => 1.0,
             'frequency_unit'  => 'hours',
-            'dose_quantity'   => 1.0,
             'start_date'      => now()->toDateString(),
             'end_date'        => null,
         ]);

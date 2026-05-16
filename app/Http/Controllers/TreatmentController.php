@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Core\Home\Treatment\Application\Dto\Request\AddTreatmentRequest;
+use App\Core\Home\Profile\Application\Exception\ProfileNotFound;
+use App\Core\Home\Treatment\Application\Dto\Request\CreateTreatmentRequest;
+use App\Core\Home\Treatment\Application\Dto\Request\ModifyTreatmentRequest;
 use App\Core\Home\Treatment\Application\Dto\Request\RegisterDoseRequest;
-use App\Core\Home\Treatment\Application\Dto\Request\TreatmentActionRequest;
-use App\Core\Home\Treatment\Application\Dto\Request\UpdateTreatmentRequest;
-use App\Core\Home\Treatment\Application\UseCase\AddTreatment;
-use App\Core\Home\Treatment\Application\UseCase\CancelTreatment;
-use App\Core\Home\Treatment\Application\UseCase\CompleteTreatment;
-use App\Core\Home\Treatment\Application\UseCase\PauseTreatment;
+use App\Core\Home\Treatment\Application\Exception\TreatmentNotFound;
+use App\Core\Home\Treatment\Application\UseCase\CreateTreatment;
+use App\Core\Home\Treatment\Application\UseCase\ModifyTreatment;
 use App\Core\Home\Treatment\Application\UseCase\RegisterDose;
-use App\Core\Home\Treatment\Application\UseCase\ResumeTreatment;
-use App\Core\Home\Treatment\Application\UseCase\UpdateTreatment;
+use App\Core\Home\Treatment\Model\Exception\TreatmentException;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
 use App\Http\Requests\UuidListRequest;
@@ -30,12 +28,8 @@ class TreatmentController extends Controller
     public function __construct(
         protected TreatmentFinder   $treatmentFinder,
         protected ConsumptionFinder $consumptionFinder,
-        protected AddTreatment      $addTreatment,
-        protected UpdateTreatment   $updateTreatment,
-        protected PauseTreatment    $pauseTreatment,
-        protected ResumeTreatment   $resumeTreatment,
-        protected CancelTreatment   $cancelTreatment,
-        protected CompleteTreatment $completeTreatment,
+        protected CreateTreatment   $addTreatment,
+        protected ModifyTreatment   $modifyTreatment,
         protected RegisterDose      $registerDose,
     )
     {
@@ -43,11 +37,11 @@ class TreatmentController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/treatments",
+     *     path="/profiles/{profileId}/treatments",
      *     tags={"Treatments"},
-     *     summary="List treatments",
+     *     summary="List treatments for profile",
      *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(name="profile_id", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="profileId", in="query", required=false, @OA\Schema(type="string", format="uuid")),
      *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", minimum=1)),
      *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
      *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
@@ -58,13 +52,13 @@ class TreatmentController extends Controller
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","nextCursor"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/TreatmentResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/TreatmentView")),
      *                 @OA\Property(property="nextCursor", type="string", nullable=true)
      *             ),
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","totalCount","page","size","hasMorePages"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/TreatmentResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/TreatmentView")),
      *                 @OA\Property(property="totalCount", type="integer", minimum=0),
      *                 @OA\Property(property="page", type="integer", minimum=1),
      *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
@@ -75,10 +69,8 @@ class TreatmentController extends Controller
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
-    public function index(UuidListRequest $request): JsonResponse
+    public function index(UuidListRequest $request, string $profileId): JsonResponse
     {
-        $profileId = $request->query('profile_id');
-
         return PaginationService::paginate(
             $request,
             fn(CursorRequest $cursorRequest) => $this->treatmentFinder->listByProfileIdByCursor($profileId, $cursorRequest),
@@ -87,8 +79,54 @@ class TreatmentController extends Controller
     }
 
     /**
-     * @OA\Post(
+     * @OA\Get(
      *     path="/treatments",
+     *     tags={"Treatments"},
+     *     summary="List treatments for authenticated user",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", minimum=1)),
+     *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OK",
+     *         @OA\JsonContent(oneOf={
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","nextCursor"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/TreatmentView")),
+     *                 @OA\Property(property="nextCursor", type="string", nullable=true)
+     *             ),
+     *             @OA\Schema(
+     *                 type="object",
+     *                 required={"items","totalCount","page","size","hasMorePages"},
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/TreatmentView")),
+     *                 @OA\Property(property="totalCount", type="integer", minimum=0),
+     *                 @OA\Property(property="page", type="integer", minimum=1),
+     *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
+     *                 @OA\Property(property="hasMorePages", type="boolean")
+     *             )
+     *         })
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function indexAll(UuidListRequest $request): JsonResponse
+    {
+        $userId = $this->getAuthUserId();
+        return PaginationService::paginate(
+            $request,
+            fn(CursorRequest $request) => $this->treatmentFinder->listByUserIdByCursor($userId, $request),
+            fn(OffsetRequest $request) => $this->treatmentFinder->listByUserIdByOffset($userId, $request),
+        );
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/profiles/{profileId}/treatments",
+     *     parameters={
+     *         @OA\Parameter(name="profileId", in="query", required=true, @OA\Schema(type="string", format="uuid"))
+     *     },
      *     tags={"Treatments"},
      *     summary="Create treatment",
      *     security={{"bearerAuth": {}}},
@@ -96,11 +134,9 @@ class TreatmentController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             required={"profileId","itemId","frequencyValue","frequencyUnit","doseQuantity","startDate"},
-     *             @OA\Property(property="profileId", type="string", format="uuid"),
      *             @OA\Property(property="itemId", type="string", format="uuid"),
-     *             @OA\Property(property="frequencyValue", type="integer", minimum=1, example=8),
+     *             @OA\Property(property="dose", type="number", minimum=0.01, example=1.5),
      *             @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
-     *             @OA\Property(property="doseQuantity", type="number", minimum=0.01, example=1.5),
      *             @OA\Property(property="startDate", type="string", format="date", example="2026-05-11"),
      *             @OA\Property(property="endDate", type="string", format="date", example="2026-05-30")
      *         )
@@ -111,29 +147,46 @@ class TreatmentController extends Controller
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, string $profileId): JsonResponse
     {
+        $houseId = $this->getAuthHouseId();
         $data = $request->validate([
-            'profileId' => 'required|uuid',
             'itemId' => 'required|uuid',
-            'frequencyValue' => 'required|integer|min:1',
+            'dose' => 'required|numeric:min:0.01',
             'frequencyUnit' => 'required|string|in:hours,days,weeks',
-            'doseQuantity' => 'required|numeric|min:0.01',
             'startDate' => 'required|date_format:Y-m-d',
             'endDate' => 'nullable|date_format:Y-m-d',
         ]);
 
-        $result = $this->addTreatment->execute(new AddTreatmentRequest(
-            profileId: $data['profileId'],
-            itemId: $data['itemId'],
-            frequencyValue: $data['frequencyValue'],
-            frequencyUnit: $data['frequencyUnit'],
-            doseQuantity: $data['doseQuantity'],
-            startDate: $data['startDate'],
-            endDate: $data['endDate'] ?? null,
-        ));
+        try {
+            $result = $this->addTreatment->execute(new CreateTreatmentRequest(
+                profileId: $profileId,
+                itemId: $data['itemId'],
+                houseId: $houseId,
+                dose: $data['dose'],
+                frequencyUnit: $data['frequencyUnit'],
+                startDate: $data['startDate'],
+                endDate: $data['endDate'] ?? null,
+            ));
+        } catch (ProfileNotFound $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
 
-        return response()->json($result, 201);
+        return response()->json([
+            'id' => $result->id,
+            'profile' => [
+                'id' => $result->profileId,
+            ],
+            'item' => [
+                'id' => $result->itemId,
+            ],
+            'status' => $result->status,
+            'dose' => $result->dose,
+            'frequencyUnit' => $result->frequencyUnit,
+            'startDate' => $result->startDate,
+            'endDate' => $result->endDate,
+            'createdAt' => $result->createdAt,
+        ], 201);
     }
 
     /**
@@ -143,7 +196,7 @@ class TreatmentController extends Controller
      *     summary="Get treatment details",
      *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
-     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentView")),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
@@ -160,7 +213,7 @@ class TreatmentController extends Controller
     }
 
     /**
-     * @OA\Put(
+     * @OA\Patch(
      *     path="/treatments/{treatmentId}",
      *     tags={"Treatments"},
      *     summary="Update treatment",
@@ -169,9 +222,9 @@ class TreatmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="frequencyValue", type="integer", minimum=1),
+     *             @OA\Property(property="dose", type="number", minimum=0.01, example=1.5),
      *             @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
-     *             @OA\Property(property="doseQuantity", type="number", minimum=0.01),
+     *             @OA\Property(property="status", type="string", enum={"active","paused","completed","cancelled"}),
      *             @OA\Property(property="endDate", type="string", format="date")
      *         )
      *     ),
@@ -179,78 +232,41 @@ class TreatmentController extends Controller
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
-    public function update(Request $request, string $treatmentId): JsonResponse
+    public function patch(Request $request, string $treatmentId): JsonResponse
     {
         $data = $request->validate([
-            'frequencyValue' => 'nullable|integer|min:1',
+            'dose' => 'nullable|numeric|min:0.01',
             'frequencyUnit' => 'nullable|string|in:hours,days,weeks',
-            'doseQuantity' => 'nullable|numeric|min:0.01',
+            'status' => 'nullable|string|in:active,paused,completed,cancelled',
             'endDate' => 'nullable|date_format:Y-m-d',
         ]);
-        $result = $this->updateTreatment->execute(new UpdateTreatmentRequest(
-            treatmentId: $treatmentId,
-            frequencyValue: $data['frequencyValue'] ?? null,
-            frequencyUnit: $data['frequencyUnit'] ?? null,
-            doseQuantity: $data['doseQuantity'] ?? null,
-            endDate: $data['endDate'] ?? null,
-        ));
-        return response()->json($result);
-    }
+        try {
+            $result = $this->modifyTreatment->execute(new ModifyTreatmentRequest(
+                treatmentId: $treatmentId,
+                dose: $data['dose'] ?? null,
+                frequencyUnit: $data['frequencyUnit'] ?? null,
+                status: $data['status'] ?? null,
+                endDate: $data['endDate'] ?? null,
+            ));
+        } catch (TreatmentNotFound $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        }
 
-    /**
-     * @OA\Patch(
-     *     path="/treatments/{treatmentId}",
-     *     tags={"Treatments"},
-     *     summary="Modify treatment status",
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             @OA\Property(property="status", type="string", enum={"active","paused","completed","cancelled"})
-     *         )
-     *     ),
-     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
-     *     @OA\Response(response=400, description="Bad request", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
-     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
-     * )
-     */
-    public function modify(Request $request, string $treatmentId): JsonResponse
-    {
-        $data = $request->validate([
-            'status' => 'nullable|string|in:active,paused,completed,cancelled',
+        return response()->json([
+            'id' => $result->id,
+            'profile' => [
+                'id' => $result->profileId,
+            ],
+            'item' => [
+                'id' => $result->itemId,
+            ],
+            'status' => $result->status,
+            'dose' => $result->dose,
+            'frequencyUnit' => $result->frequencyUnit,
+            'startDate' => $result->startDate,
+            'endDate' => $result->endDate,
+            'createdAt' => $result->createdAt,
         ]);
-        return match ($data['status']) {
-            'paused' => $this->pause($treatmentId),
-            'active' => $this->resume($treatmentId),
-            'cancelled' => $this->cancel($treatmentId),
-            'completed' => $this->complete($treatmentId),
-            default => response()->json(['message' => 'Invalid status'], 400),
-        };
-    }
-
-    private function pause(string $treatmentId): JsonResponse
-    {
-        $result = $this->pauseTreatment->execute(new TreatmentActionRequest($treatmentId));
-        return response()->json($result);
-    }
-
-    private function resume(string $treatmentId): JsonResponse
-    {
-        $result = $this->resumeTreatment->execute(new TreatmentActionRequest($treatmentId));
-        return response()->json($result);
-    }
-
-    private function cancel(string $treatmentId): JsonResponse
-    {
-        $result = $this->cancelTreatment->execute(new TreatmentActionRequest($treatmentId));
-        return response()->json($result);
-    }
-
-    private function complete(string $treatmentId): JsonResponse
-    {
-        $result = $this->completeTreatment->execute(new TreatmentActionRequest($treatmentId));
-        return response()->json($result);
     }
 
     /**
@@ -278,11 +294,17 @@ class TreatmentController extends Controller
         $data = $request->validate([
             'amount' => 'required|numeric|min:0.01',
         ]);
-        $result = $this->registerDose->execute(new RegisterDoseRequest(
-            treatmentId: $treatmentId,
-            amount: $data['amount'],
-            houseId: $houseId,
-        ));
+        try {
+            $result = $this->registerDose->execute(new RegisterDoseRequest(
+                treatmentId: $treatmentId,
+                amount: $data['amount'],
+                houseId: $houseId,
+            ));
+        } catch (TreatmentNotFound $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        } catch (TreatmentException $e) {
+            return response()->json(['message' => $e->getMessage()], 400);
+        }
 
         return response()->json($result, 201);
     }
@@ -355,13 +377,12 @@ class TreatmentController extends Controller
         }
 
         $payload = json_encode([
-            'id'             => $treatment->id,
-            'status'         => $treatment->status,
-            'frequencyValue' => $treatment->frequencyValue,
-            'frequencyUnit'  => $treatment->frequencyUnit,
-            'doseQuantity'   => $treatment->doseQuantity,
-            'startDate'      => $treatment->startDate,
-            'endDate'        => $treatment->endDate,
+            'id'            => $treatment->id,
+            'status'        => $treatment->status,
+            'dose'          => $treatment->dose,
+            'frequencyUnit' => $treatment->frequencyUnit,
+            'startDate'     => $treatment->startDate->toDateString(),
+            'endDate'       => $treatment->endDate?->toDateString(),
         ], JSON_THROW_ON_ERROR);
 
         $image = QrCode::format('png')->size(300)->generate($payload);

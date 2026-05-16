@@ -21,7 +21,7 @@ Route::prefix('auth')->group(function () {
 });
 
 // Auth routes (protected)
-Route::prefix('auth')->middleware([JwtCookieMiddleware::class,AuthenticateApi::class])->group(function () {
+Route::prefix('auth')->middleware([JwtCookieMiddleware::class, AuthenticateApi::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/me', [AuthController::class, 'me']);
@@ -64,11 +64,11 @@ Route::group(['middleware' => [JwtCookieMiddleware::class, AuthenticateApi::clas
     Route::patch('/profiles/{profileId}', [ProfileController::class, 'update']);
 
     // Treatments
-    Route::post('/treatments', [TreatmentController::class, 'store']);
-    Route::get('/treatments', [TreatmentController::class, 'index']);
+    Route::post('/profiles/{profileId}/treatments', [TreatmentController::class, 'store']);
+    Route::get('/profiles/{profileId}/treatments', [TreatmentController::class, 'index']);
     Route::get('/treatments/{treatmentId}', [TreatmentController::class, 'show']);
-    Route::put('/treatments/{treatmentId}', [TreatmentController::class, 'update']);
-    Route::patch('/treatments/{treatmentId}', [TreatmentController::class, 'modify']);
+    Route::get('/treatments', [TreatmentController::class, 'indexAll']);
+    Route::patch('/treatments/{treatmentId}', [TreatmentController::class, 'patch']);
     Route::post('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'storeDose']);
     Route::get('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'indexDoses']);
     Route::get('/treatments/{treatmentId}/qr', [TreatmentController::class, 'qr']);

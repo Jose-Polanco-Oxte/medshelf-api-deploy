@@ -9,8 +9,6 @@ use App\Core\Auth\Application\UseCase\Logout;
 use App\Core\Auth\Application\UseCase\Me;
 use App\Core\Auth\Application\UseCase\RefreshToken;
 use App\Core\Auth\Application\UseCase\Register;
-use App\Core\Home\House\Model\Service\HouseCreator;
-use App\Core\Shared\Application\TransactionManager;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Annotations as OA;
@@ -20,13 +18,11 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 final class AuthController extends Controller
 {
     public function __construct(
-        private Login              $login,
-        private Register           $register,
-        private HouseCreator       $houseCreator,
-        private Logout             $logout,
-        private RefreshToken       $refreshToken,
-        private Me                 $me,
-        private TransactionManager $transactionManager,
+        private Login        $login,
+        private Register     $register,
+        private Logout       $logout,
+        private RefreshToken $refreshToken,
+        private Me           $me,
     )
     {
     }
@@ -92,16 +88,7 @@ final class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        $response = $this->transactionManager->run(function () use ($request) {
-            $authResponse = $this->register->execute($request);
-
-            $this->houseCreator->create(
-                $authResponse->user['id'],
-                "{$authResponse->user['name']}s House"
-            );
-
-            return $authResponse;
-        });
+        $response = $this->register->execute($request);
 
         return response()
             ->json($response->toArray(), 201)
@@ -162,7 +149,7 @@ final class AuthController extends Controller
      *     tags={"Auth"},
      *     summary="Get authenticated user data",
      *     security={{"bearerAuth": {}}},
-     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProfileResponse")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/MeResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */

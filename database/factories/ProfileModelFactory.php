@@ -18,6 +18,7 @@ class ProfileModelFactory extends Factory
             'user_id' => User::factory(),
             'name' => fake()->firstName(),
             'relationship' => fake()->randomElement(['parent', 'child', 'sibling', null]),
+            'birthdate' => fake()->date('Y-m-d', '-10 years'),
         ];
     }
 }

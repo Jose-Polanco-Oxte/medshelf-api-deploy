@@ -23,14 +23,13 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
         TreatmentModel::updateOrCreate(
             ['public_id' => $treatment->getId()],
             [
-                'profile_id'      => $profileInternalId,
-                'item_id'         => $itemInternalId,
-                'status'          => $treatment->getStatus()->value,
-                'frequency_value' => $treatment->getFrequencyValue(),
-                'frequency_unit'  => $treatment->getFrequencyUnit(),
-                'dose_quantity'   => $treatment->getDoseQuantity(),
-                'start_date'      => $treatment->getStartDate(),
-                'end_date'        => $treatment->getEndDate(),
+                'profile_id' => $profileInternalId,
+                'item_id' => $itemInternalId,
+                'status' => $treatment->getStatus()->value,
+                'dose' => $treatment->getDose(),
+                'frequency_unit' => $treatment->getFrequencyUnit(),
+                'start_date' => $treatment->getStartDate(),
+                'end_date' => $treatment->getEndDate(),
             ]
         );
     }
@@ -39,7 +38,7 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
     {
         $record = TreatmentModel::with([
             'profile' => fn($q) => $q->select('id', 'public_id'),
-            'item'    => fn($q) => $q->select('id', 'public_id'),
+            'item' => fn($q) => $q->select('id', 'public_id'),
         ])
             ->where('public_id', $id)
             ->first();
@@ -49,11 +48,6 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
         return $this->toDomain($record);
     }
 
-    public function remove(Treatment $treatment): void
-    {
-        TreatmentModel::where('public_id', $treatment->getId())->delete();
-    }
-
     private function toDomain(TreatmentModel $record): Treatment
     {
         return Treatment::load(
@@ -61,12 +55,16 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
             profileId: $record->profile->public_id,
             itemId: $record->item->public_id,
             status: TreatmentStatus::from($record->status),
-            frequencyValue: $record->frequency_value,
+            dose: $record->dose,
             frequencyUnit: $record->frequency_unit,
-            doseQuantity: $record->dose_quantity,
             startDate: $record->start_date,
             endDate: $record->end_date,
             createdAt: $record->created_at,
         );
+    }
+
+    public function remove(Treatment $treatment): void
+    {
+        TreatmentModel::where('public_id', $treatment->getId())->delete();
     }
 }

@@ -2,8 +2,9 @@
 
 namespace App\Providers\Core\Home\Treatment\Detail;
 
-use App\Providers\Core\Home\Treatment\Resume\ItemResume;
+use App\Providers\Core\Home\Item\Resume\ItemResume;
 use App\Providers\Core\Home\Treatment\Resume\ProfileResume;
+use Carbon\Carbon;
 
 readonly class TreatmentDetail
 {
@@ -12,12 +13,11 @@ readonly class TreatmentDetail
         public ProfileResume $profile,
         public ItemResume    $item,
         public string        $status,
-        public int           $frequencyValue,
+        public float         $dose,
         public string        $frequencyUnit,
-        public float         $doseQuantity,
-        public string        $startDate,
-        public ?string       $endDate,
-        public string        $createdAt,
+        public Carbon        $startDate,
+        public ?Carbon       $endDate,
+        public Carbon        $createdAt,
     )
     {
     }

@@ -46,13 +46,13 @@ class ItemController extends Controller
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","nextCursor"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemView")),
      *                 @OA\Property(property="nextCursor", type="string", nullable=true)
      *             ),
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","totalCount","page","size","hasMorePages"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemView")),
      *                 @OA\Property(property="totalCount", type="integer", minimum=0),
      *                 @OA\Property(property="page", type="integer", minimum=1),
      *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
@@ -89,13 +89,13 @@ class ItemController extends Controller
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","nextCursor"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemView")),
      *                 @OA\Property(property="nextCursor", type="string", nullable=true)
      *             ),
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","totalCount","page","size","hasMorePages"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ItemView")),
      *                 @OA\Property(property="totalCount", type="integer", minimum=0),
      *                 @OA\Property(property="page", type="integer", minimum=1),
      *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
@@ -180,7 +180,7 @@ class ItemController extends Controller
      *     summary="Get item details",
      *     security={{"bearerAuth": {}}},
      *     @OA\Parameter(name="itemId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
-     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ItemResponse")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ItemDetail")),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )

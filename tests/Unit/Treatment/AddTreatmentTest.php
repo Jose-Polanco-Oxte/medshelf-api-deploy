@@ -2,11 +2,16 @@
 
 namespace Tests\Unit\Treatment;
 
+use App\Core\Home\Item\Model\Item;
+use App\Core\Home\Item\Model\Product;
+use App\Core\Home\Item\Model\Repository\ItemRepository;
+use App\Core\Home\Item\Model\Repository\ProductRepository;
+use App\Core\Home\Item\Model\ValueObject\ConsumptionType;
 use App\Core\Home\Profile\Application\Exception\ProfileNotFound;
 use App\Core\Home\Profile\Model\Profile;
 use App\Core\Home\Profile\Model\Repository\ProfileRepository;
-use App\Core\Home\Treatment\Application\Dto\Request\AddTreatmentRequest;
-use App\Core\Home\Treatment\Application\UseCase\AddTreatment;
+use App\Core\Home\Treatment\Application\Dto\Request\CreateTreatmentRequest;
+use App\Core\Home\Treatment\Application\UseCase\CreateTreatment;
 use App\Core\Home\Treatment\Model\Repository\TreatmentRepository;
 use App\Core\Home\Treatment\Model\Treatment;
 use App\Core\Home\Treatment\Model\TreatmentStatus;
@@ -16,14 +21,23 @@ use PHPUnit\Framework\TestCase;
 class AddTreatmentTest extends TestCase
 {
     private ProfileRepository $profileRepository;
+    private ItemRepository $itemRepository;
     private TreatmentRepository $treatmentRepository;
-    private AddTreatment $useCase;
+    private ProductRepository $productRepository;
+    private CreateTreatment $useCase;
 
     protected function setUp(): void
     {
         $this->profileRepository   = $this->createMock(ProfileRepository::class);
+        $this->itemRepository      = $this->createMock(ItemRepository::class);
         $this->treatmentRepository = $this->createMock(TreatmentRepository::class);
-        $this->useCase = new AddTreatment($this->profileRepository, $this->treatmentRepository);
+        $this->productRepository   = $this->createMock(ProductRepository::class);
+        $this->useCase = new CreateTreatment(
+            $this->profileRepository,
+            $this->itemRepository,
+            $this->treatmentRepository,
+            $this->productRepository,
+        );
     }
 
     private function makeProfile(): Profile
@@ -33,30 +47,57 @@ class AddTreatmentTest extends TestCase
             userId: 'user-uuid',
             name: 'Maria',
             relationship: null,
+            birthDate: Carbon::parse('1990-01-01'),
+            allergies: [],
             createdAt: Carbon::now(),
         );
     }
 
-    private function makeRequest(array $overrides = []): AddTreatmentRequest
+    private function makeItem(): Item
     {
-        return new AddTreatmentRequest(
-            profileId: $overrides['profileId'] ?? 'profile-uuid',
-            itemId: $overrides['itemId'] ?? 'item-uuid',
-            frequencyValue: $overrides['frequencyValue'] ?? 8,
-            frequencyUnit: $overrides['frequencyUnit'] ?? 'hours',
-            doseQuantity: $overrides['doseQuantity'] ?? 1.0,
-            startDate: $overrides['startDate'] ?? '2026-01-01',
-            endDate: $overrides['endDate'] ?? null,
+        return Item::load(
+            id: 'item-uuid',
+            productId: 'product-uuid',
+            storageId: 'storage-uuid',
+            totalContent: 30.0,
+            expirationDate: Carbon::parse('2027-01-01'),
+            createdAt: Carbon::now(),
         );
+    }
+
+    private function makeProduct(): Product
+    {
+        return new Product(
+            id: 'product-uuid',
+            contentValue: null,
+            totalQuantity: null,
+            consumptionType: ConsumptionType::CONTINUOUS,
+        );
+    }
+
+    private function makeRequest(array $overrides = []): CreateTreatmentRequest
+    {
+        return new CreateTreatmentRequest(
+            profileId: $overrides['profileId'] ?? 'profile-uuid',
+            itemId:    $overrides['itemId'] ?? 'item-uuid',
+            houseId:   $overrides['houseId'] ?? 'house-uuid',
+            dose:      $overrides['dose'] ?? 1.0,
+            frequencyUnit: $overrides['frequencyUnit'] ?? 'hours',
+            startDate: $overrides['startDate'] ?? '2026-01-01',
+            endDate:   $overrides['endDate'] ?? null,
+        );
+    }
+
+    private function setupRepositories(): void
+    {
+        $this->profileRepository->method('findById')->willReturn($this->makeProfile());
+        $this->itemRepository->method('findByIdAndHouseId')->willReturn($this->makeItem());
+        $this->productRepository->method('findById')->willReturn($this->makeProduct());
     }
 
     public function test_execute_creates_active_treatment(): void
     {
-        $profile = $this->makeProfile();
-
-        $this->profileRepository
-            ->method('findById')
-            ->willReturn($profile);
+        $this->setupRepositories();
 
         $this->treatmentRepository
             ->expects($this->once())
@@ -68,18 +109,14 @@ class AddTreatmentTest extends TestCase
         $this->assertEquals('active', $response->status);
     }
 
-    public function test_execute_returns_response_with_correct_frequency(): void
+    public function test_execute_returns_response_with_correct_frequency_unit(): void
     {
-        $this->profileRepository->method('findById')->willReturn($this->makeProfile());
+        $this->setupRepositories();
         $this->treatmentRepository->expects($this->once())->method('save');
 
-        $response = $this->useCase->execute($this->makeRequest([
-            'frequencyValue' => 12,
-            'frequencyUnit' => 'hours',
-        ]));
+        $response = $this->useCase->execute($this->makeRequest(['frequencyUnit' => 'days']));
 
-        $this->assertEquals(12, $response->frequencyValue);
-        $this->assertEquals('hours', $response->frequencyUnit);
+        $this->assertEquals('days', $response->frequencyUnit);
     }
 
     public function test_execute_throws_profile_not_found_when_profile_missing(): void
@@ -97,6 +134,8 @@ class AddTreatmentTest extends TestCase
         $capturedTreatment = null;
 
         $this->profileRepository->method('findById')->willReturn($this->makeProfile());
+        $this->itemRepository->method('findByIdAndHouseId')->willReturn($this->makeItem());
+        $this->productRepository->method('findById')->willReturn($this->makeProduct());
         $this->treatmentRepository
             ->expects($this->once())
             ->method('save')
@@ -104,14 +143,15 @@ class AddTreatmentTest extends TestCase
                 $capturedTreatment = $t;
             });
 
-        $this->useCase->execute($this->makeRequest(['itemId' => 'specific-item-uuid']));
+        $this->useCase->execute($this->makeRequest(['itemId' => 'item-uuid']));
 
-        $this->assertEquals('specific-item-uuid', $capturedTreatment->getItemId());
+        $this->assertNotNull($capturedTreatment);
+        $this->assertEquals('item-uuid', $capturedTreatment->getItemId());
     }
 
     public function test_execute_accepts_optional_end_date(): void
     {
-        $this->profileRepository->method('findById')->willReturn($this->makeProfile());
+        $this->setupRepositories();
         $this->treatmentRepository->expects($this->once())->method('save');
 
         $response = $this->useCase->execute($this->makeRequest(['endDate' => '2026-12-31']));
@@ -121,7 +161,7 @@ class AddTreatmentTest extends TestCase
 
     public function test_execute_without_end_date_leaves_it_null(): void
     {
-        $this->profileRepository->method('findById')->willReturn($this->makeProfile());
+        $this->setupRepositories();
         $this->treatmentRepository->expects($this->once())->method('save');
 
         $response = $this->useCase->execute($this->makeRequest(['endDate' => null]));
@@ -129,3 +169,4 @@ class AddTreatmentTest extends TestCase
         $this->assertNull($response->endDate);
     }
 }
+

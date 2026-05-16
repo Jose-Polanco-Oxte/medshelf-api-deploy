@@ -15,15 +15,14 @@ final class TreatmentMapper
     {
         return new TreatmentResponse(
             id: $treatment->getId(),
-            profile: ['id' => $treatment->getProfileId()],
-            item: ['id' => $treatment->getItemId()],
+            profileId: $treatment->getProfileId(),
+            itemId: $treatment->getItemId(),
             status: $treatment->getStatus()->value,
-            frequencyValue: $treatment->getFrequencyValue(),
+            dose: $treatment->getDose(),
             frequencyUnit: $treatment->getFrequencyUnit(),
-            doseQuantity: $treatment->getDoseQuantity(),
-            startDate: $treatment->getStartDate()->toDateString(),
-            endDate: $treatment->getEndDate()?->toDateString(),
-            createdAt: $treatment->getCreatedAt()->toIso8601String(),
+            startDate: $treatment->getStartDate(),
+            endDate: $treatment->getEndDate(),
+            createdAt: $treatment->getCreatedAt(),
         );
     }
 }

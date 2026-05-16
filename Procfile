@@ -1,2 +1,1 @@
-release: php artisan migrate --force && php artisan l5-swagger:generate
-web: vendor/bin/heroku-php-apache2 public/
+web: php artisan migrate --force && php artisan l5-swagger:generate && php artisan config:cache && php artisan route:cache && php artisan event:cache && php artisan serve --host=0.0.0.0 --port=$PORT
