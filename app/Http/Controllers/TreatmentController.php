@@ -22,7 +22,9 @@ use App\Providers\Core\Home\Treatment\Service\TreatmentFinder;
 use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use OpenApi\Annotations as OA;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TreatmentController extends Controller
 {
@@ -331,5 +333,44 @@ class TreatmentController extends Controller
             fn(CursorRequest $cursorRequest) => $this->consumptionFinder->listByTreatmentIdByCursor($treatmentId, $cursorRequest),
             fn(OffsetRequest $offsetRequest) => $this->consumptionFinder->listByTreatmentIdByOffset($treatmentId, $offsetRequest),
         );
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/treatments/{treatmentId}/qr",
+     *     tags={"Treatments"},
+     *     summary="Generate QR code image for a treatment",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="PNG image of the QR code encoding the treatment summary",
+     *         @OA\MediaType(mediaType="image/png", @OA\Schema(type="string", format="binary"))
+     *     ),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function qr(string $treatmentId): Response|JsonResponse
+    {
+        $treatment = $this->treatmentFinder->findById($treatmentId);
+
+        if (!$treatment) {
+            return response()->json(['message' => 'Treatment not found'], 404);
+        }
+
+        $payload = json_encode([
+            'id'             => $treatment->id,
+            'status'         => $treatment->status,
+            'frequencyValue' => $treatment->frequencyValue,
+            'frequencyUnit'  => $treatment->frequencyUnit,
+            'doseQuantity'   => $treatment->doseQuantity,
+            'startDate'      => $treatment->startDate?->toDateString(),
+            'endDate'        => $treatment->endDate?->toDateString(),
+        ], JSON_THROW_ON_ERROR);
+
+        $image = QrCode::format('png')->size(300)->generate($payload);
+
+        return response($image, 200, ['Content-Type' => 'image/png']);
     }
 }
