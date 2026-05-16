@@ -15,6 +15,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Annotations as OA;
 use Symfony\Component\HttpFoundation\Cookie;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 final class AuthController extends Controller
 {
@@ -179,5 +180,26 @@ final class AuthController extends Controller
         return response()->json(
             $this->me->execute()
         );
+    }
+
+    /**
+     * @OA\Delete(
+     *     path="/auth/account",
+     *     tags={"Auth"},
+     *     summary="Soft-delete the authenticated user account",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/MessageResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function deleteAccount(): JsonResponse
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        JWTAuth::parseToken()->invalidate();
+        $user->delete();
+
+        return response()
+            ->json(['message' => 'Account deleted successfully'])
+            ->withoutCookie('access_token');
     }
 }
