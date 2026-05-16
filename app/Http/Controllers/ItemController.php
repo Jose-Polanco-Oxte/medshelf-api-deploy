@@ -82,6 +82,7 @@ class ItemController extends Controller
      *     @OA\Parameter(name="cursor", in="query", required=false, @OA\Schema(type="string", format="uuid")),
      *     @OA\Parameter(name="size", in="query", required=false, @OA\Schema(type="integer", minimum=1, maximum=100)),
      *     @OA\Parameter(name="filter[name]", in="query", required=false, @OA\Schema(type="string"), description="Filter items by product name (case-insensitive, partial match)"),
+     *     @OA\Parameter(name="filter[productId]", in="query", required=false, @OA\Schema(type="string", format="uuid"), description="Filter items belonging to a specific product"),
      *     @OA\Response(
      *         response=200,
      *         description="OK",
