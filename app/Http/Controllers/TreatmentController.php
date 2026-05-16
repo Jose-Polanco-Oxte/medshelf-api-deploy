@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Core\Home\Profile\Application\Exception\ProfileNotFound;
 use App\Core\Home\Treatment\Application\Dto\Request\AddTreatmentRequest;
 use App\Core\Home\Treatment\Application\Dto\Request\RegisterDoseRequest;
 use App\Core\Home\Treatment\Application\Dto\Request\TreatmentActionRequest;
@@ -122,19 +121,15 @@ class TreatmentController extends Controller
             'endDate' => 'nullable|date_format:Y-m-d',
         ]);
 
-        try {
-            $result = $this->addTreatment->execute(new AddTreatmentRequest(
-                profileId: $data['profileId'],
-                itemId: $data['itemId'],
-                frequencyValue: $data['frequencyValue'],
-                frequencyUnit: $data['frequencyUnit'],
-                doseQuantity: $data['doseQuantity'],
-                startDate: $data['startDate'],
-                endDate: $data['endDate'] ?? null,
-            ));
-        } catch (ProfileNotFound $e) {
-            return response()->json(['message' => $e->getMessage()], 404);
-        }
+        $result = $this->addTreatment->execute(new AddTreatmentRequest(
+            profileId: $data['profileId'],
+            itemId: $data['itemId'],
+            frequencyValue: $data['frequencyValue'],
+            frequencyUnit: $data['frequencyUnit'],
+            doseQuantity: $data['doseQuantity'],
+            startDate: $data['startDate'],
+            endDate: $data['endDate'] ?? null,
+        ));
 
         return response()->json($result, 201);
     }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Core\Auth\Application\Dto\Request\LoginRequest;
 use App\Core\Auth\Application\Dto\Request\RegisterRequest;
-use App\Core\Auth\Application\Exception\InvalidCredentialsException;
 use App\Core\Auth\Application\UseCase\Login;
 use App\Core\Auth\Application\UseCase\Logout;
 use App\Core\Auth\Application\UseCase\Me;
@@ -50,18 +49,11 @@ final class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        try {
-            $response = $this->login->execute($request);
+        $response = $this->login->execute($request);
 
-            return response()
-                ->json($response->toArray())
-                ->cookie($this->tokenCookie($response->accessToken));
-
-        } catch (InvalidCredentialsException $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 401);
-        }
+        return response()
+            ->json($response->toArray())
+            ->cookie($this->tokenCookie($response->accessToken));
     }
 
     private function tokenCookie(string $token): Cookie
@@ -99,27 +91,20 @@ final class AuthController extends Controller
      */
     public function register(RegisterRequest $request): JsonResponse
     {
-        try {
-            $response = $this->transactionManager->run(function () use ($request) {
-                $authResponse = $this->register->execute($request);
+        $response = $this->transactionManager->run(function () use ($request) {
+            $authResponse = $this->register->execute($request);
 
-                $this->houseCreator->create(
-                    $authResponse->user['id'],
-                    "{$authResponse->user['name']}s House"
-                );
+            $this->houseCreator->create(
+                $authResponse->user['id'],
+                "{$authResponse->user['name']}s House"
+            );
 
-                return $authResponse;
-            });
+            return $authResponse;
+        });
 
-            return response()
-                ->json($response->toArray(), 201)
-                ->cookie($this->tokenCookie($response->accessToken));
-
-        } catch (InvalidCredentialsException $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 401);
-        }
+        return response()
+            ->json($response->toArray(), 201)
+            ->cookie($this->tokenCookie($response->accessToken));
     }
 
     /**

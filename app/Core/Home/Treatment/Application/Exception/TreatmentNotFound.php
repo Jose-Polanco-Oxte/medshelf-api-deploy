@@ -2,9 +2,9 @@
 
 namespace App\Core\Home\Treatment\Application\Exception;
 
-use App\Core\Shared\Application\AppException;
+use App\Core\Shared\Application\NotFoundException;
 
-class TreatmentNotFound extends AppException
+class TreatmentNotFound extends NotFoundException
 {
     public function __construct(string $treatmentId)
     {

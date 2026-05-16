@@ -2,9 +2,9 @@
 
 namespace App\Core\Catalog\Product\Application\Exception;
 
-use App\Core\Shared\Application\AppException;
+use App\Core\Shared\Application\NotFoundException;
 
-class ProductNotFound extends AppException
+class ProductNotFound extends NotFoundException
 {
     public function __construct(string $productId)
     {

@@ -2,9 +2,9 @@
 
 namespace App\Core\Home\House\Application\Exception;
 
-use App\Core\Shared\Application\AppException;
+use App\Core\Shared\Application\NotFoundException;
 
-class PlaceNotFound extends AppException
+class PlaceNotFound extends NotFoundException
 {
     public function __construct(string $placeId)
     {
