@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Core\Home\Profile\Application\Exception\ProfileNotFound;
 use App\Core\Home\Treatment\Application\Dto\Request\CreateTreatmentRequest;
-use App\Core\Home\Treatment\Application\Dto\Request\ModifyTreatmentRequest;
 use App\Core\Home\Treatment\Application\Dto\Request\RegisterDoseRequest;
+use App\Core\Home\Treatment\Application\Dto\Request\UpdateTreatmentRequest;
 use App\Core\Home\Treatment\Application\Exception\TreatmentNotFound;
 use App\Core\Home\Treatment\Application\UseCase\CreateTreatment;
-use App\Core\Home\Treatment\Application\UseCase\ModifyTreatment;
 use App\Core\Home\Treatment\Application\UseCase\RegisterDose;
+use App\Core\Home\Treatment\Application\UseCase\UpdateTreatment;
 use App\Core\Home\Treatment\Model\Exception\TreatmentException;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
@@ -29,7 +29,7 @@ class TreatmentController extends Controller
         protected TreatmentFinder   $treatmentFinder,
         protected ConsumptionFinder $consumptionFinder,
         protected CreateTreatment   $addTreatment,
-        protected ModifyTreatment   $modifyTreatment,
+        protected UpdateTreatment   $updateTreatment,
         protected RegisterDose      $registerDose,
     )
     {
@@ -232,7 +232,7 @@ class TreatmentController extends Controller
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
-    public function patch(Request $request, string $treatmentId): JsonResponse
+    public function update(Request $request, string $treatmentId): JsonResponse
     {
         $data = $request->validate([
             'dose' => 'nullable|numeric|min:0.01',
@@ -241,7 +241,7 @@ class TreatmentController extends Controller
             'endDate' => 'nullable|date_format:Y-m-d',
         ]);
         try {
-            $result = $this->modifyTreatment->execute(new ModifyTreatmentRequest(
+            $result = $this->updateTreatment->execute(new UpdateTreatmentRequest(
                 treatmentId: $treatmentId,
                 dose: $data['dose'] ?? null,
                 frequencyUnit: $data['frequencyUnit'] ?? null,
@@ -377,12 +377,12 @@ class TreatmentController extends Controller
         }
 
         $payload = json_encode([
-            'id'            => $treatment->id,
-            'status'        => $treatment->status,
-            'dose'          => $treatment->dose,
+            'id' => $treatment->id,
+            'status' => $treatment->status,
+            'dose' => $treatment->dose,
             'frequencyUnit' => $treatment->frequencyUnit,
-            'startDate'     => $treatment->startDate->toDateString(),
-            'endDate'       => $treatment->endDate?->toDateString(),
+            'startDate' => $treatment->startDate->toDateString(),
+            'endDate' => $treatment->endDate?->toDateString(),
         ], JSON_THROW_ON_ERROR);
 
         $image = QrCode::format('png')->size(300)->generate($payload);

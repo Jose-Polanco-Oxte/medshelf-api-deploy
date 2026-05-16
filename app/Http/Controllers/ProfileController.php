@@ -18,9 +18,9 @@ use OpenApi\Annotations as OA;
 class ProfileController extends Controller
 {
     public function __construct(
-        protected ProfileFinder   $finder,
-        protected AddProfile      $addProfile,
-        protected UpdateProfile   $updateProfile,
+        protected ProfileFinder $finder,
+        protected AddProfile    $addProfile,
+        protected UpdateProfile $updateProfile,
     )
     {
     }
@@ -160,7 +160,8 @@ class ProfileController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="name", type="string", maxLength=255, example="Maria"),
-     *             @OA\Property(property="relationship", type="string", maxLength=255, example="parent")
+     *             @OA\Property(property="relationship", type="string", maxLength=255, example="parent"),
+     *             @OA\Property(property="allergies", type="array", @OA\Items(type="string"), example={"Penicillin","Pollen"})
      *         )
      *     ),
      *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProfileResponse")),
@@ -172,21 +173,24 @@ class ProfileController extends Controller
     public function update(Request $request, string $profileId): JsonResponse
     {
         $data = $request->validate([
-            'name'         => 'sometimes|string|max:255',
+            'name' => 'sometimes|nullable|string|max:255',
             'relationship' => 'sometimes|nullable|string|max:255',
+            'allergies' => 'sometimes|nullable|array',
+            'allergies.*' => 'string|max:255',
         ]);
 
         $result = $this->updateProfile->execute(new UpdateProfileRequest(
             profileId: $profileId,
             name: $data['name'] ?? null,
-            relationship: array_key_exists('relationship', $data) ? $data['relationship'] : null,
+            relationship: $data['relationship'] ?? null,
+            allergies: $data['allergies'] ?? null,
         ));
 
         return response()->json([
-            'id'           => $result->id,
-            'name'         => $result->name,
+            'id' => $result->id,
+            'name' => $result->name,
             'relationship' => $result->relationship,
-            'createdAt'    => $result->createdAt->toIso8601String(),
+            'createdAt' => $result->createdAt->toIso8601String(),
         ]);
     }
 }

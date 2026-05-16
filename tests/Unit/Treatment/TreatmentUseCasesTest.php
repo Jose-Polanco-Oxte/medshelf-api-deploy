@@ -2,10 +2,9 @@
 
 namespace Tests\Unit\Treatment;
 
-use App\Core\Home\Treatment\Application\Dto\Request\ModifyTreatmentRequest;
-use App\Core\Home\Treatment\Application\Dto\Request\TreatmentActionRequest;
+use App\Core\Home\Treatment\Application\Dto\Request\UpdateTreatmentRequest;
 use App\Core\Home\Treatment\Application\Exception\TreatmentNotFound;
-use App\Core\Home\Treatment\Application\UseCase\ModifyTreatment;
+use App\Core\Home\Treatment\Application\UseCase\UpdateTreatment;
 use App\Core\Home\Treatment\Model\Repository\TreatmentRepository;
 use App\Core\Home\Treatment\Model\Treatment;
 use App\Core\Home\Treatment\Model\TreatmentStatus;
@@ -16,9 +15,18 @@ class TreatmentUseCasesTest extends TestCase
 {
     private TreatmentRepository $repository;
 
-    protected function setUp(): void
+    public function test_modify_changes_status_to_paused_and_saves(): void
     {
-        $this->repository = $this->createMock(TreatmentRepository::class);
+        $treatment = $this->makeTreatment(TreatmentStatus::ACTIVE);
+
+        $this->repository->method('findById')->willReturn($treatment);
+        $this->repository->expects($this->once())->method('save');
+
+        $response = (new UpdateTreatment($this->repository))->execute(
+            $this->modifyRequest(['status' => 'paused'])
+        );
+
+        $this->assertEquals('paused', $response->status);
     }
 
     private function makeTreatment(TreatmentStatus $status = TreatmentStatus::ACTIVE): Treatment
@@ -36,32 +44,18 @@ class TreatmentUseCasesTest extends TestCase
         );
     }
 
-    private function modifyRequest(array $overrides = []): ModifyTreatmentRequest
+    private function modifyRequest(array $overrides = []): UpdateTreatmentRequest
     {
-        return new ModifyTreatmentRequest(
+        return new UpdateTreatmentRequest(
             treatmentId: $overrides['treatmentId'] ?? 'treatment-uuid',
-            dose:          $overrides['dose'] ?? null,
+            dose: $overrides['dose'] ?? null,
             frequencyUnit: $overrides['frequencyUnit'] ?? null,
-            status:        $overrides['status'] ?? 'active',
-            endDate:       $overrides['endDate'] ?? null,
+            status: $overrides['status'] ?? 'active',
+            endDate: $overrides['endDate'] ?? null,
         );
     }
 
     // ── ModifyTreatment ───────────────────────────────────────────────────
-
-    public function test_modify_changes_status_to_paused_and_saves(): void
-    {
-        $treatment = $this->makeTreatment(TreatmentStatus::ACTIVE);
-
-        $this->repository->method('findById')->willReturn($treatment);
-        $this->repository->expects($this->once())->method('save');
-
-        $response = (new ModifyTreatment($this->repository))->execute(
-            $this->modifyRequest(['status' => 'paused'])
-        );
-
-        $this->assertEquals('paused', $response->status);
-    }
 
     public function test_modify_changes_dose_and_saves(): void
     {
@@ -70,7 +64,7 @@ class TreatmentUseCasesTest extends TestCase
         $this->repository->method('findById')->willReturn($treatment);
         $this->repository->expects($this->once())->method('save');
 
-        $response = (new ModifyTreatment($this->repository))->execute(
+        $response = (new UpdateTreatment($this->repository))->execute(
             $this->modifyRequest(['dose' => 2, 'status' => 'paused'])
         );
 
@@ -84,7 +78,7 @@ class TreatmentUseCasesTest extends TestCase
         $this->repository->method('findById')->willReturn($treatment);
         $this->repository->expects($this->once())->method('save');
 
-        $response = (new ModifyTreatment($this->repository))->execute(
+        $response = (new UpdateTreatment($this->repository))->execute(
             $this->modifyRequest(['frequencyUnit' => 'days', 'status' => 'paused'])
         );
 
@@ -97,9 +91,14 @@ class TreatmentUseCasesTest extends TestCase
 
         $this->repository->method('findById')->willReturn(null);
 
-        (new ModifyTreatment($this->repository))->execute(
+        (new UpdateTreatment($this->repository))->execute(
             $this->modifyRequest(['treatmentId' => 'missing-uuid'])
         );
+    }
+
+    protected function setUp(): void
+    {
+        $this->repository = $this->createMock(TreatmentRepository::class);
     }
 }
 

@@ -8,7 +8,6 @@ use App\Core\Home\House\Model\Service\HouseCreator;
 use App\Core\Shared\Domain\Utils;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Throwable;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 final readonly class Register
@@ -47,11 +46,7 @@ final readonly class Register
                 'id' => $result['user']->public_id,
                 'name' => $result['user']->name,
                 'email' => $result['user']->email,
-            ],
-            house: [
-                'id' => $result['house']->getId(),
-                'name' => $result['house']->getName(),
-            ],
+            ]
         );
     }
 }

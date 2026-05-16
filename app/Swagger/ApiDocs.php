@@ -60,13 +60,6 @@ use OpenApi\Annotations as OA;
  *         @OA\Property(property="email", type="string", format="email")
  *     ),
  *     @OA\Property(property="expiresIn", type="integer", description="Token lifetime in seconds"),
- *     @OA\Property(
- *         property="house",
- *         type="object",
- *         nullable=true,
- *         @OA\Property(property="id", type="string", format="uuid"),
- *         @OA\Property(property="name", type="string")
- *     )
  * )
  * @OA\Schema(
  *     schema="CursorPaginationResponse",
@@ -292,24 +285,12 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="createdAt", type="string", format="date-time")
  * )
  * @OA\Schema(
- *     schema="MeResponse",
+ *     schema="AccountResponse",
  *     type="object",
- *     required={"user","house"},
- *     @OA\Property(
- *          property="user",
- *          type="object",
- *          required={"id","name","email"},
- *          @OA\Property(property="id", type="string", format="uuid"),
- *          @OA\Property(property="name", type="string"),
- *          @OA\Property(property="email", type="string")
- *      ),
- *      @OA\Property(
- *          property="house",
- *          type="object",
- *          nullable=true,
- *          @OA\Property(property="id", type="string", format="uuid"),
- *          @OA\Property(property="name", type="string")
- *      )
+ *     required={"id","name","email"},
+ *     @OA\Property(property="id", type="string", format="uuid"),
+ *     @OA\Property(property="name", type="string"),
+ *     @OA\Property(property="email", type="string")
  * )
  * @OA\Schema(
  *     schema="ActiveIngredientResponse",

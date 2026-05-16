@@ -145,15 +145,15 @@ final class AuthController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/auth/me",
+     *     path="/auth/account",
      *     tags={"Auth"},
      *     summary="Get authenticated user data",
      *     security={{"bearerAuth": {}}},
-     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/MeResponse")),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/AccountResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
-    public function me(): JsonResponse
+    public function account(): JsonResponse
     {
         return response()->json(
             $this->me->execute()
@@ -179,5 +179,36 @@ final class AuthController extends Controller
         return response()
             ->json(['message' => 'Account deleted successfully'])
             ->withoutCookie('access_token');
+    }
+
+    /**
+     * @OA\Patch(
+     *     path="/auth/account",
+     *     tags={"Auth"},
+     *     summary="Update authenticated user data",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Maria"),
+     *             @OA\Property(property="email", type="string", format="email", example="jose@gmail.com")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/AccountResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function updateAccount(): JsonResponse
+    {
+        $user = JWTAuth::parseToken()->authenticate();
+        $user->name = request('name', $user->name);
+        $user->email = request('email', $user->email);
+        $user->save();
+        return response()
+            ->json([
+                'id' => $user->public_id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ]);
     }
 }

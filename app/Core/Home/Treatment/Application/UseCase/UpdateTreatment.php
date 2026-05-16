@@ -2,7 +2,7 @@
 
 namespace App\Core\Home\Treatment\Application\UseCase;
 
-use App\Core\Home\Treatment\Application\Dto\Request\ModifyTreatmentRequest;
+use App\Core\Home\Treatment\Application\Dto\Request\UpdateTreatmentRequest;
 use App\Core\Home\Treatment\Application\Dto\Response\TreatmentResponse;
 use App\Core\Home\Treatment\Application\Exception\TreatmentNotFound;
 use App\Core\Home\Treatment\Application\Mapping\TreatmentMapper;
@@ -10,7 +10,7 @@ use App\Core\Home\Treatment\Model\Repository\TreatmentRepository;
 use App\Core\Home\Treatment\Model\TreatmentStatus;
 use Carbon\Carbon;
 
-final readonly class ModifyTreatment
+final readonly class UpdateTreatment
 {
     public function __construct(
         private TreatmentRepository $treatmentRepository,
@@ -18,7 +18,7 @@ final readonly class ModifyTreatment
     {
     }
 
-    public function execute(ModifyTreatmentRequest $request): TreatmentResponse
+    public function execute(UpdateTreatmentRequest $request): TreatmentResponse
     {
         $treatment = $this->treatmentRepository->findById($request->treatmentId)
             ?? throw new TreatmentNotFound($request->treatmentId);

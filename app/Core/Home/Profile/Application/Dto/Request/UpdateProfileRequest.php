@@ -8,6 +8,7 @@ readonly class UpdateProfileRequest
         public string  $profileId,
         public ?string $name,
         public ?string $relationship,
+        public ?array  $allergies,
     )
     {
     }

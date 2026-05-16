@@ -19,9 +19,9 @@ final readonly class UpdateProfile
     public function execute(UpdateProfileRequest $request): ProfileResponse
     {
         $profile = $this->profileRepository->findById($request->profileId)
-            ?? throw new ProfileNotFound("Profile with id {$request->profileId} not found");
+            ?? throw new ProfileNotFound("Profile with id $request->profileId not found");
 
-        $profile->update($request->name, $request->relationship);
+        $profile->update($request->name, $request->relationship, $request->description);
 
         $this->profileRepository->save($profile);
 
