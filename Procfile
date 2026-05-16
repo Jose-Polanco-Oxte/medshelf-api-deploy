@@ -1,2 +1,2 @@
 release: php artisan migrate --force && php artisan l5-swagger:generate
-web: php artisan config:cache && php artisan route:cache && php artisan event:cache && frankenphp php-server -r public/
+web: php artisan config:cache && php artisan route:cache && php artisan event:cache && php artisan serve --host=0.0.0.0 --port=$PORT
