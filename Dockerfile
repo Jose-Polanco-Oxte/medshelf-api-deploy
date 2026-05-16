@@ -31,3 +31,5 @@ WORKDIR /var/www
 COPY . .
 
 RUN composer install --optimize-autoloader --no-scripts --no-interaction
+
+CMD ["sh", "-c", "php artisan migrate --force && php artisan l5-swagger:generate && php artisan config:cache && php artisan route:cache && php artisan event:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
