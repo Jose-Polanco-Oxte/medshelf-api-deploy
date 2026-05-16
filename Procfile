@@ -1,2 +1,2 @@
 release: php artisan migrate --force && php artisan l5-swagger:generate
-web: frankenphp run --config /Caddyfile
+web: php artisan config:cache && php artisan route:cache && php artisan event:cache && php artisan octane:start --server=frankenphp --host=0.0.0.0 --port=$PORT
