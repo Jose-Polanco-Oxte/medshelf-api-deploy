@@ -643,7 +643,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/ConsumptionResponse"
+                                                        "$ref": "#/components/schemas/ConsumptionView"
                                                     }
                                                 },
                                                 "nextCursor": {
@@ -665,7 +665,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/ConsumptionResponse"
+                                                        "$ref": "#/components/schemas/ConsumptionView"
                                                     }
                                                 },
                                                 "totalCount": {
@@ -2800,7 +2800,7 @@
                                 "required": [
                                     "itemId",
                                     "dose",
-                                    "frequencyUnit",
+                                    "frequencyHours",
                                     "startDate"
                                 ],
                                 "properties": {
@@ -2813,23 +2813,20 @@
                                         "minimum": 0.01,
                                         "example": 1.5
                                     },
-                                    "frequencyUnit": {
-                                        "type": "string",
-                                        "enum": [
-                                            "hours",
-                                            "days",
-                                            "weeks"
-                                        ]
+                                    "frequencyHours": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 8
                                     },
                                     "startDate": {
                                         "type": "string",
-                                        "format": "date",
-                                        "example": "2026-05-11"
+                                        "format": "date-time"
                                     },
-                                    "endDate": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "example": "2026-05-30"
+                                    "days": {
+                                        "description": "Period of treatment in days.",
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 7
                                     }
                                 },
                                 "type": "object"
@@ -3090,13 +3087,9 @@
                                         "minimum": 0.01,
                                         "example": 1.5
                                     },
-                                    "frequencyUnit": {
-                                        "type": "string",
-                                        "enum": [
-                                            "hours",
-                                            "days",
-                                            "weeks"
-                                        ]
+                                    "frequencyHours": {
+                                        "type": "integer",
+                                        "minimum": 1
                                     },
                                     "status": {
                                         "type": "string",
@@ -3107,9 +3100,11 @@
                                             "cancelled"
                                         ]
                                     },
-                                    "endDate": {
-                                        "type": "string",
-                                        "format": "date"
+                                    "days": {
+                                        "description": "Period of treatment in days.",
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "example": 7
                                     }
                                 },
                                 "type": "object"
@@ -3228,7 +3223,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/ConsumptionResponse"
+                                                        "$ref": "#/components/schemas/ConsumptionView"
                                                     }
                                                 },
                                                 "nextCursor": {
@@ -3250,7 +3245,7 @@
                                                 "items": {
                                                     "type": "array",
                                                     "items": {
-                                                        "$ref": "#/components/schemas/ConsumptionResponse"
+                                                        "$ref": "#/components/schemas/ConsumptionView"
                                                     }
                                                 },
                                                 "totalCount": {
@@ -4247,6 +4242,61 @@
                 },
                 "type": "object"
             },
+            "ConsumptionView": {
+                "required": [
+                    "id",
+                    "item",
+                    "amount",
+                    "consumedAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "item": {
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "format": "uuid"
+                            },
+                            "product": {
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "place": {
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "amount": {
+                        "type": "number"
+                    },
+                    "consumedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "ProfileResponse": {
                 "required": [
                     "id",
@@ -4406,7 +4456,7 @@
                     "item",
                     "status",
                     "dose",
-                    "frequencyUnit",
+                    "frequencyHours",
                     "startDate",
                     "createdAt"
                 ],
@@ -4446,24 +4496,18 @@
                         "type": "number",
                         "minimum": 0.01
                     },
-                    "frequencyUnit": {
-                        "type": "string",
-                        "enum": [
-                            "hours",
-                            "days",
-                            "weeks"
-                        ]
+                    "frequencyHours": {
+                        "type": "integer",
+                        "minimum": 1
                     },
                     "startDate": {
                         "type": "string",
-                        "format": "date",
-                        "example": "2026-05-11"
+                        "format": "date-time"
                     },
-                    "endDate": {
-                        "type": "string",
-                        "format": "date",
-                        "example": "2026-05-30",
-                        "nullable": true
+                    "days": {
+                        "description": "Period of the treatment in days",
+                        "type": "integer",
+                        "nullable": "true"
                     },
                     "createdAt": {
                         "type": "string",
@@ -4479,7 +4523,7 @@
                     "item",
                     "status",
                     "dose",
-                    "frequencyUnit",
+                    "frequencyHours",
                     "startDate"
                 ],
                 "properties": {
@@ -4526,17 +4570,17 @@
                     "dose": {
                         "type": "number"
                     },
-                    "frequencyUnit": {
-                        "type": "string"
+                    "frequencyHours": {
+                        "type": "integer"
                     },
                     "startDate": {
                         "type": "string",
-                        "format": "date"
+                        "format": "date-time"
                     },
-                    "endDate": {
-                        "type": "string",
-                        "format": "date",
-                        "nullable": true
+                    "days": {
+                        "description": "Period of the treatment in days",
+                        "type": "integer",
+                        "nullable": "true"
                     },
                     "createdAt": {
                         "type": "string",

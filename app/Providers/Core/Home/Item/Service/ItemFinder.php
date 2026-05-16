@@ -63,8 +63,8 @@ class ItemFinder
             availableContent: $product->pharmaceuticalForm->consumption_type == 'Discrete'
                 ? ($itemModel->total_quantity - ($itemModel->consumptions_sum_amount ?? 0))
                 : $itemModel->total_content - ($itemModel->consumptions_sum_amount ?? 0),
-            expirationDate: $itemModel->expiration_date,
-            createdAt: $itemModel->created_at->toIso8601String(),
+            expirationDate: $itemModel->expiration_date->toIso8601ZuluString('millisecond'),
+            createdAt: $itemModel->created_at->toIso8601ZuluString('millisecond'),
         );
     }
 
@@ -79,6 +79,7 @@ class ItemFinder
                 $request->filters['name'] ?? null,
                 fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
             )
+            ->withSum('consumptions', 'amount')
             ->orderBy('id')
             ->paginate(perPage: $request->size, page: $request->cursor);
         return new OffsetResponse(
@@ -106,7 +107,7 @@ class ItemFinder
                 name: $itemModel->storage->place->name,
             ),
             availableContent: $itemModel->total_content - ($itemModel->consumptions_sum_amount ?? 0),
-            expirationDate: $itemModel->expiration_date,
+            expirationDate: $itemModel->expiration_date->toIso8601ZuluString('millisecond'),
         );
     }
 
@@ -127,6 +128,7 @@ class ItemFinder
                     $request->filters['name'] ?? null,
                     fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
                 )
+                ->withSum('consumptions', 'amount')
                 ->orderBy('id'),
             cursorName: 'id',
             cursor: $id,
@@ -146,6 +148,7 @@ class ItemFinder
                 $request->filters['name'] ?? null,
                 fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
             )
+            ->withSum('consumptions', 'amount')
             ->orderBy('id')
             ->paginate(perPage: $request->size, page: $request->cursor);
         return new OffsetResponse(
@@ -176,6 +179,7 @@ class ItemFinder
                     $request->filters['name'] ?? null,
                     fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
                 )
+                ->withSum('consumptions', 'amount')
                 ->orderBy('id'),
             cursorName: 'id',
             cursor: $id,

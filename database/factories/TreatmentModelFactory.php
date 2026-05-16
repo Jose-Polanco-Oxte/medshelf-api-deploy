@@ -19,11 +19,10 @@ class TreatmentModelFactory extends Factory
             'profile_id' => ProfileModel::factory(),
             'item_id' => ItemModel::factory(),
             'status' => 'active',
-            'frequency_value' => 8,
-            'frequency_unit' => 'hours',
-            'dose_quantity' => 1.0,
+            'dose' => 1.0,
+            'frequency_hours' => 8,
             'start_date' => now()->toDateString(),
-            'end_date' => null,
+            'days' => 7,
         ];
     }
 }

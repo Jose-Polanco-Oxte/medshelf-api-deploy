@@ -27,9 +27,9 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
                 'item_id' => $itemInternalId,
                 'status' => $treatment->getStatus()->value,
                 'dose' => $treatment->getDose(),
-                'frequency_unit' => $treatment->getFrequencyUnit(),
+                'frequency_hours' => $treatment->getFrequencyHours(),
                 'start_date' => $treatment->getStartDate(),
-                'end_date' => $treatment->getEndDate(),
+                'days' => $treatment->getDays(),
             ]
         );
     }
@@ -56,9 +56,9 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
             itemId: $record->item->public_id,
             status: TreatmentStatus::from($record->status),
             dose: $record->dose,
-            frequencyUnit: $record->frequency_unit,
+            frequencyHours: $record->frequency_hours,
             startDate: $record->start_date,
-            endDate: $record->end_date,
+            days: $record->days,
             createdAt: $record->created_at,
         );
     }

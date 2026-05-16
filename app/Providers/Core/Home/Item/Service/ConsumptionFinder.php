@@ -9,6 +9,7 @@ use App\Core\Shared\Domain\OffsetResponse;
 use App\Models\ConsumptionModel;
 use App\Providers\Core\Home\Item\Detail\ConsumptionDetail;
 use App\Providers\Core\Home\Item\Resume\ItemResume;
+use App\Providers\Core\Home\Item\Resume\PlaceResume;
 use App\Providers\Core\Home\Item\Resume\ProductResume;
 use App\Providers\Core\Home\Item\View\ConsumptionView;
 use App\Providers\Core\InvalidCursor;
@@ -43,13 +44,18 @@ class ConsumptionFinder
                 )
             ),
             amount: $record->amount,
-            consumedAt: $record->consumed_at->toIso8601String(),
+            consumedAt: $record->consumed_at->toIso8601ZuluString('millisecond'),
         );
     }
 
     public function listByItemIdByOffset(string $itemId, OffsetRequest $request): OffsetResponse
     {
-        $result = ConsumptionModel::whereHas('item', fn($q) => $q->where('public_id', $itemId))
+        $result = ConsumptionModel::with([
+            'item' => fn($q) => $q->select('id', 'public_id', 'product_id', 'storage_id'),
+            'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+            'item.storage.place' => fn($q) => $q->select('id', 'public_id', 'name'),
+        ])
+            ->whereHas('item', fn($q) => $q->where('public_id', $itemId))
             ->orderBy('id')
             ->paginate(perPage: $request->size, page: $request->page);
 
@@ -68,8 +74,19 @@ class ConsumptionFinder
     {
         return new ConsumptionView(
             id: $consumptionModel->public_id,
+            item: new ItemResume(
+                id: $consumptionModel->item->public_id,
+                product: new ProductResume(
+                    id: $consumptionModel->item->product->public_id,
+                    name: $consumptionModel->item->product->name,
+                )
+            ),
+            place: new PlaceResume(
+                id: $consumptionModel->item->storage->place->public_id,
+                name: $consumptionModel->item->storage->place->name,
+            ),
             amount: $consumptionModel->amount,
-            consumedAt: $consumptionModel->consumed_at->toIso8601String(),
+            consumedAt: $consumptionModel->consumed_at->toIso8601ZuluString('millisecond'),
         );
     }
 
@@ -82,7 +99,12 @@ class ConsumptionFinder
         };
 
         return PaginationService::buildCursorQuery(
-            query: ConsumptionModel::whereHas('item', fn($q) => $q->where('public_id', $itemId))
+            query: ConsumptionModel::with([
+                'item' => fn($q) => $q->select('id', 'public_id', 'product_id', 'storage_id'),
+                'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+                'item.storage.place' => fn($q) => $q->select('id', 'public_id', 'name'),
+            ])
+                ->whereHas('item', fn($q) => $q->where('public_id', $itemId))
                 ->orderBy('id'),
             cursorName: 'id',
             cursor: $id,
@@ -93,7 +115,12 @@ class ConsumptionFinder
 
     public function listByTreatmentIdByOffset(string $treatmentId, OffsetRequest $request): OffsetResponse
     {
-        $result = ConsumptionModel::whereHas('treatment', fn($q) => $q->where('public_id', $treatmentId))
+        $result = ConsumptionModel::with([
+            'item' => fn($q) => $q->select('id', 'public_id', 'product_id', 'storage_id'),
+            'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+            'item.storage.place' => fn($q) => $q->select('id', 'public_id', 'name'),
+        ])
+            ->whereHas('treatment', fn($q) => $q->where('public_id', $treatmentId))
             ->orderBy('id')
             ->paginate(perPage: $request->size, page: $request->page);
 
@@ -117,7 +144,12 @@ class ConsumptionFinder
         };
 
         return PaginationService::buildCursorQuery(
-            query: ConsumptionModel::whereHas('treatment', fn($q) => $q->where('public_id', $treatmentId))
+            query: ConsumptionModel::with([
+                'item' => fn($q) => $q->select('id', 'public_id', 'product_id', 'storage_id'),
+                'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+                'item.storage.place' => fn($q) => $q->select('id', 'public_id', 'name'),
+            ])
+                ->whereHas('treatment', fn($q) => $q->where('public_id', $treatmentId))
                 ->orderBy('id'),
             cursorName: 'id',
             cursor: $id,

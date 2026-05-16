@@ -31,11 +31,11 @@ class TreatmentControllerTest extends TestCase
         $item = $this->createItem('continuous', 10, $this->actor);
         $this->actor->load('house');
 
-        $this->postJson("/api/profiles/{$profile->public_id}/treatments", [
+        $this->postJson("/api/profiles/$profile->public_id/treatments", [
             'itemId' => $item->public_id,
             'dose' => 1.5,
-            'frequencyUnit' => 'hours',
-            'startDate' => now()->toDateString(),
+            'frequencyHours' => 8,
+            'startDate' => now()->toIso8601String(),
         ], $this->authHeaders($this->actor))
             ->assertStatus(201)
             ->assertJsonFragment(['status' => 'active']);
@@ -118,11 +118,11 @@ class TreatmentControllerTest extends TestCase
         $this->postJson("/api/profiles/{$profile->public_id}/treatments", [
             'itemId' => $item->public_id,
             'dose' => 1.0,
-            'frequencyUnit' => 'hours',
+            'frequencyHours' => 8,
             'startDate' => now()->toDateString(),
         ], $this->authHeaders($this->actor))
             ->assertStatus(201)
-            ->assertJsonStructure(['id', 'status', 'dose', 'frequencyUnit', 'startDate', 'createdAt']);
+            ->assertJsonStructure(['id', 'status', 'dose', 'frequencyHours', 'startDate', 'createdAt']);
     }
 
     public function test_store_returns_401_without_auth(): void
@@ -138,7 +138,7 @@ class TreatmentControllerTest extends TestCase
         $this->postJson('/api/profiles/' . Str::uuid() . '/treatments', [
             'itemId' => $item->public_id,
             'dose' => 1.0,
-            'frequencyUnit' => 'hours',
+            'frequencyHours' => 8,
             'startDate' => now()->toDateString(),
         ], $this->authHeaders($this->actor))
             ->assertStatus(404);
@@ -177,9 +177,9 @@ class TreatmentControllerTest extends TestCase
             'item_id' => $item->id,
             'status' => $status,
             'dose' => 1.0,
-            'frequency_unit' => 'hours',
+            'frequency_hours' => 8,
             'start_date' => now()->toDateString(),
-            'end_date' => null,
+            'days' => null,
         ]);
     }
 
@@ -208,7 +208,7 @@ class TreatmentControllerTest extends TestCase
 
         $this->patchJson("/api/treatments/{$treatment->public_id}", [
             'dose' => 2.0,
-            'frequencyUnit' => 'days',
+            'frequencyHours' => 12,
             'status' => 'paused',
         ], $this->authHeaders($this->actor))
             ->assertStatus(200)
@@ -279,9 +279,9 @@ class TreatmentControllerTest extends TestCase
             'item_id' => $item->id,
             'status' => 'active',
             'dose' => 1.0,
-            'frequency_unit' => 'hours',
+            'frequency_hours' => 8,
             'start_date' => now()->toDateString(),
-            'end_date' => null,
+            'days' => null,
         ]);
 
         // Re-issue token so it includes the house_id claim set above
@@ -306,9 +306,9 @@ class TreatmentControllerTest extends TestCase
             'item_id' => $item->id,
             'status' => 'paused',
             'dose' => 1.0,
-            'frequency_unit' => 'hours',
+            'frequency_hours' => 8,
             'start_date' => now()->toDateString(),
-            'end_date' => null,
+            'days' => null,
         ]);
 
         $this->postJson("/api/treatments/{$treatment->public_id}/consumptions", [

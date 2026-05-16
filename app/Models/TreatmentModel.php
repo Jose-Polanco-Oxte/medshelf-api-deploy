@@ -19,17 +19,17 @@ use Illuminate\Support\Carbon;
  * @property int $item_id
  * @property string $status
  * @property float $dose
- * @property string $frequency_unit
+ * @property int $frequency_hours
  * @property Carbon $start_date
- * @property Carbon|null $end_date
+ * @property int $days
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
- * @property-read Collection<int, \App\Models\ConsumptionModel> $consumptions
+ * @property-read Collection<int, ConsumptionModel> $consumptions
  * @property-read int|null $consumptions_count
- * @property-read \App\Models\ItemModel $item
- * @property-read \App\Models\ProfileModel $profile
- * @method static \Database\Factories\TreatmentModelFactory factory($count = null, $state = [])
+ * @property-read ItemModel $item
+ * @property-read ProfileModel $profile
+ * @method static TreatmentModelFactory factory($count = null, $state = [])
  * @method static Builder<static>|TreatmentModel newModelQuery()
  * @method static Builder<static>|TreatmentModel newQuery()
  * @method static Builder<static>|TreatmentModel query()
@@ -37,7 +37,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|TreatmentModel whereDeletedAt($value)
  * @method static Builder<static>|TreatmentModel whereDose($value)
  * @method static Builder<static>|TreatmentModel whereEndDate($value)
- * @method static Builder<static>|TreatmentModel whereFrequencyUnit($value)
+ * @method static Builder<static>|TreatmentModel whereFrequencyHours($value)
  * @method static Builder<static>|TreatmentModel whereId($value)
  * @method static Builder<static>|TreatmentModel whereItemId($value)
  * @method static Builder<static>|TreatmentModel whereProfileId($value)
@@ -53,7 +53,7 @@ class TreatmentModel extends Model
 
     protected $table = 'treatments';
 
-    protected $fillable = ['public_id', 'profile_id', 'item_id', 'status', 'dose', 'frequency_unit', 'start_date', 'end_date'];
+    protected $fillable = ['public_id', 'profile_id', 'item_id', 'status', 'dose', 'frequency_hours', 'start_date', 'days'];
 
     public function profile(): BelongsTo
     {
@@ -74,8 +74,9 @@ class TreatmentModel extends Model
     {
         return [
             'dose' => 'float',
+            'frequency_hours' => 'integer',
             'start_date' => 'datetime',
-            'end_date' => 'datetime',
+            'days' => 'integer',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
             'deleted_at' => 'datetime',

@@ -17,7 +17,7 @@ class TreatmentUseCasesTest extends TestCase
 
     public function test_modify_changes_status_to_paused_and_saves(): void
     {
-        $treatment = $this->makeTreatment(TreatmentStatus::ACTIVE);
+        $treatment = $this->makeTreatment();
 
         $this->repository->method('findById')->willReturn($treatment);
         $this->repository->expects($this->once())->method('save');
@@ -29,17 +29,17 @@ class TreatmentUseCasesTest extends TestCase
         $this->assertEquals('paused', $response->status);
     }
 
-    private function makeTreatment(TreatmentStatus $status = TreatmentStatus::ACTIVE): Treatment
+    private function makeTreatment(): Treatment
     {
         return Treatment::load(
             id: 'treatment-uuid',
             profileId: 'profile-uuid',
             itemId: 'item-uuid',
-            status: $status,
+            status: TreatmentStatus::ACTIVE,
             dose: 1.0,
-            frequencyUnit: 'hours',
+            frequencyHours: 8,
             startDate: Carbon::today(),
-            endDate: null,
+            days: null,
             createdAt: Carbon::now(),
         );
     }
@@ -49,9 +49,9 @@ class TreatmentUseCasesTest extends TestCase
         return new UpdateTreatmentRequest(
             treatmentId: $overrides['treatmentId'] ?? 'treatment-uuid',
             dose: $overrides['dose'] ?? null,
-            frequencyUnit: $overrides['frequencyUnit'] ?? null,
+            frequencyHours: $overrides['frequencyHours'] ?? null,
             status: $overrides['status'] ?? 'active',
-            endDate: $overrides['endDate'] ?? null,
+            days: $overrides['endDate'] ?? null,
         );
     }
 
@@ -59,7 +59,7 @@ class TreatmentUseCasesTest extends TestCase
 
     public function test_modify_changes_dose_and_saves(): void
     {
-        $treatment = $this->makeTreatment(TreatmentStatus::ACTIVE);
+        $treatment = $this->makeTreatment();
 
         $this->repository->method('findById')->willReturn($treatment);
         $this->repository->expects($this->once())->method('save');
@@ -71,18 +71,18 @@ class TreatmentUseCasesTest extends TestCase
         $this->assertEquals(2.0, $response->dose);
     }
 
-    public function test_modify_changes_frequency_unit_and_saves(): void
+    public function test_modify_changes_frequency_hours_and_saves(): void
     {
-        $treatment = $this->makeTreatment(TreatmentStatus::ACTIVE);
+        $treatment = $this->makeTreatment();
 
         $this->repository->method('findById')->willReturn($treatment);
         $this->repository->expects($this->once())->method('save');
 
         $response = (new UpdateTreatment($this->repository))->execute(
-            $this->modifyRequest(['frequencyUnit' => 'days', 'status' => 'paused'])
+            $this->modifyRequest(['frequencyHours' => 12, 'status' => 'paused'])
         );
 
-        $this->assertEquals('days', $response->frequencyUnit);
+        $this->assertEquals(12, $response->frequencyHours);
     }
 
     public function test_modify_throws_when_treatment_not_found(): void

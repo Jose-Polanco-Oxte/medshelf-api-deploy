@@ -1,0 +1,24 @@
+{
+    # FrankenPHP como handler global
+    frankenphp
+    # Railway asigna el puerto via $PORT, pero usamos 8080 por defecto
+    http_port 8080
+    admin off
+}
+
+# Acepta cualquier host (Railway usa dominios dinámicos)
+:8080 {
+    root * /app/public
+
+    # Compresión
+    encode zstd br gzip
+
+    # PHP via FrankenPHP
+    php_server
+
+    # Logs estructurados
+    log {
+        output stdout
+        format json
+    }
+}

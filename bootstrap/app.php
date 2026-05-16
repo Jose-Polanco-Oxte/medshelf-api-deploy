@@ -31,7 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (DomainException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ], 400);
         });
 
@@ -39,21 +39,21 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (NotFoundException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ], 404);
         });
 
         $exceptions->renderable(function (InvalidCredentialsException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ], 401);
         });
 
         $exceptions->renderable(function (AppException $e, Request $request) {
             return response()->json([
                 'message' => $e->getMessage(),
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ], 409);
         });
 
@@ -61,7 +61,7 @@ return Application::configure(basePath: dirname(__DIR__))
             $payload = [
                 'message' => 'An unexpected error has occurred',
                 'details' => $e->getMessage(),
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ];
 
             if (config('app.debug')) {
@@ -75,21 +75,21 @@ return Application::configure(basePath: dirname(__DIR__))
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $e->errors(),
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ], 422);
         });
 
         $exceptions->renderable(function (AuthenticationException $e, Request $request) {
             return response()->json([
                 'message' => 'Authentication required',
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ], 401);
         });
 
         $exceptions->renderable(function (AuthorizationException $e, Request $request) {
             return response()->json([
                 'message' => 'Forbidden',
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ], 403);
         });
 
@@ -105,14 +105,14 @@ return Application::configure(basePath: dirname(__DIR__))
 
             return response()->json([
                 'message' => $message,
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ], $status);
         });
 
         $exceptions->render(function (Throwable $e, Request $request) {
             $payload = [
                 'message' => 'An unexpected error occurred',
-                'timestamp' => now()->toIso8601String(),
+                'timestamp' => now()->toIso8601ZuluString('millisecond'),
             ];
 
             if (config('app.debug')) {
