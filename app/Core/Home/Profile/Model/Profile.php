@@ -74,4 +74,22 @@ final class Profile
     {
         return $this->createdAt;
     }
+
+    /**
+     * Partially update the profile — only fields that are non-null are changed.
+     */
+    public function update(?string $name, ?string $relationship, ?array $allergies): void
+    {
+        if ($name !== null) {
+            $this->name = $name;
+        }
+
+        if ($relationship !== null) {
+            $this->relationship = $relationship;
+        }
+
+        if ($allergies !== null) {
+            $this->allergies = $allergies;
+        }
+    }
 }

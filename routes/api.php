@@ -24,12 +24,13 @@ Route::prefix('auth')->group(function () {
 Route::prefix('auth')->middleware([JwtCookieMiddleware::class, AuthenticateApi::class])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
-    Route::get('/me', [AuthController::class, 'me']);
+    Route::get('/account', [AuthController::class, 'account']);
+    Route::delete('/account', [AuthController::class, 'deleteAccount']);
+    Route::patch('/account', [AuthController::class, 'updateAccount']);
 });
 
 Route::group(['middleware' => [JwtCookieMiddleware::class, AuthenticateApi::class]], function () {
-    Route::get('/houses/me', [HouseController::class, 'myHouse']);
-    Route::get('/houses/{houseId}', [HouseController::class, 'show']);
+    Route::get('/houses/me', [HouseController::class, 'show']);
 
     // Places
     Route::get('/houses/{houseId}/places', [PlaceController::class, 'index']);
@@ -60,15 +61,17 @@ Route::group(['middleware' => [JwtCookieMiddleware::class, AuthenticateApi::clas
     Route::get('/profiles', [ProfileController::class, 'index']);
     Route::get('/profiles/{profileId}', [ProfileController::class, 'show']);
     Route::post('/profiles', [ProfileController::class, 'store']);
+    Route::patch('/profiles/{profileId}', [ProfileController::class, 'update']);
 
     // Treatments
     Route::post('/profiles/{profileId}/treatments', [TreatmentController::class, 'store']);
     Route::get('/profiles/{profileId}/treatments', [TreatmentController::class, 'index']);
     Route::get('/treatments/{treatmentId}', [TreatmentController::class, 'show']);
     Route::get('/treatments', [TreatmentController::class, 'indexAll']);
-    Route::patch('/treatments/{treatmentId}', [TreatmentController::class, 'patch']);
+    Route::patch('/treatments/{treatmentId}', [TreatmentController::class, 'update']);
     Route::post('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'storeDose']);
     Route::get('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'indexDoses']);
+    Route::get('/treatments/{treatmentId}/qr', [TreatmentController::class, 'qr']);
 
     // Active Ingredients
     Route::get('/active-ingredients', [ActiveIngredientController::class, 'index']);

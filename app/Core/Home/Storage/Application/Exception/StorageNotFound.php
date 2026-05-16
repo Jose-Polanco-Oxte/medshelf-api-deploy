@@ -2,9 +2,9 @@
 
 namespace App\Core\Home\Storage\Application\Exception;
 
-use App\Core\Shared\Application\AppException;
+use App\Core\Shared\Application\NotFoundException;
 
-class StorageNotFound extends AppException
+class StorageNotFound extends NotFoundException
 {
     public function __construct(string $placeId)
     {

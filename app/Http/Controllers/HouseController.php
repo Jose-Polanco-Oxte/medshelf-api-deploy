@@ -25,7 +25,7 @@ class HouseController extends Controller
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
-    public function myHouse(): JsonResponse
+    public function show(): JsonResponse
     {
         $user = Auth::user();
         $houseId = $this->getAuthHouseId();
@@ -41,24 +41,24 @@ class HouseController extends Controller
         ]);
     }
 
-    /**
-     * @OA\Get(
-     *     path="/houses/{houseId}",
-     *     tags={"Houses"},
-     *     summary="Get house details by ID",
-     *     security={{"bearerAuth": {}}},
-     *     @OA\Parameter(name="houseId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
-     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/HouseResponse")),
-     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
-     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
-     * )
-     */
-    public function show(string $houseId): JsonResponse
-    {
-        $house = $this->finder->findById($houseId);
-        if (!$house) {
-            return response()->json(['message' => 'House not found'], 404);
-        }
-        return response()->json($house);
-    }
+//    /**
+//     * @OA\Get(
+//     *     path="/houses/{houseId}",
+//     *     tags={"Houses"},
+//     *     summary="Get house details by ID",
+//     *     security={{"bearerAuth": {}}},
+//     *     @OA\Parameter(name="houseId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+//     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/HouseResponse")),
+//     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+//     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+//     * )
+//     */
+//    public function show(string $houseId): JsonResponse
+//    {
+//        $house = $this->finder->findById($houseId);
+//        if (!$house) {
+//            return response()->json(['message' => 'House not found'], 404);
+//        }
+//        return response()->json($house);
+//    }
 }

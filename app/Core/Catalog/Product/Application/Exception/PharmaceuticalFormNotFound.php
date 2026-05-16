@@ -2,9 +2,9 @@
 
 namespace App\Core\Catalog\Product\Application\Exception;
 
-use App\Core\Shared\Application\AppException;
+use App\Core\Shared\Application\NotFoundException;
 
-class PharmaceuticalFormNotFound extends AppException
+class PharmaceuticalFormNotFound extends NotFoundException
 {
     public function __construct(string $name)
     {

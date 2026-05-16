@@ -2,9 +2,9 @@
 
 namespace App\Core\Home\Profile\Application\Exception;
 
-use App\Core\Shared\Application\AppException;
+use App\Core\Shared\Application\NotFoundException;
 
-class ProfileNotFound extends AppException
+class ProfileNotFound extends NotFoundException
 {
     public function __construct(string $profileId)
     {

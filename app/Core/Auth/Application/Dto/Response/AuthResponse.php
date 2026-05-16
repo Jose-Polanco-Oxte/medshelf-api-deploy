@@ -8,8 +8,7 @@ readonly class AuthResponse
         public string $accessToken,
         public string $tokenType,
         public int    $expiresIn,
-        public array  $user,
-        public ?array $house,
+        public array  $user
     )
     {
     }
@@ -18,8 +17,7 @@ readonly class AuthResponse
     {
         return [
             'user' => $this->user,
-            'expiresIn' => $this->expiresIn,
-            'house' => $this->house,
+            'expiresIn' => $this->expiresIn
         ];
     }
 }
