@@ -34,7 +34,7 @@ class TreatmentUseCasesTest extends TestCase
         return Treatment::load(
             id: 'treatment-uuid',
             profileId: 'profile-uuid',
-            itemId: 'item-uuid',
+            productId: 'product-uuid',
             status: TreatmentStatus::ACTIVE,
             dose: 1.0,
             frequencyHours: 8,

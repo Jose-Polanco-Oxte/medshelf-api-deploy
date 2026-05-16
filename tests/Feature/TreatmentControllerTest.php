@@ -32,7 +32,7 @@ class TreatmentControllerTest extends TestCase
         $this->actor->load('house');
 
         $this->postJson("/api/profiles/$profile->public_id/treatments", [
-            'itemId' => $item->public_id,
+            'productId' => $item->product->public_id,
             'dose' => 1.5,
             'frequencyHours' => 8,
             'startDate' => now()->toIso8601String(),
@@ -116,13 +116,13 @@ class TreatmentControllerTest extends TestCase
         $this->actor->load('house');
 
         $this->postJson("/api/profiles/{$profile->public_id}/treatments", [
-            'itemId' => $item->public_id,
+            'productId' => $item->product->public_id,
             'dose' => 1.0,
             'frequencyHours' => 8,
             'startDate' => now()->toIso8601ZuluString('millisecond'),
         ], $this->authHeaders($this->actor))
             ->assertStatus(201)
-            ->assertJsonStructure(['id', 'status', 'dose', 'frequencyHours', 'startDate', 'createdAt']);
+            ->assertJsonStructure(['id', 'status', 'dose', 'frequencyHours', 'startDate', 'createdAt', 'product']);
     }
 
     public function test_store_returns_401_without_auth(): void
@@ -136,7 +136,7 @@ class TreatmentControllerTest extends TestCase
         $this->actor->load('house');
 
         $this->postJson('/api/profiles/' . Str::uuid() . '/treatments', [
-            'itemId' => $item->public_id,
+            'productId' => $item->product->public_id,
             'dose' => 1.0,
             'frequencyHours' => 8,
             'startDate' => now()->toIso8601ZuluString('millisecond'),
@@ -152,7 +152,7 @@ class TreatmentControllerTest extends TestCase
         $this->actor->load('house');
 
         $this->postJson('/api/profiles/' . Str::uuid() . '/treatments', [
-            'itemId' => 'not-a-uuid',
+            'productId' => 'not-a-uuid',
         ], $this->authHeaders($this->actor))
             ->assertStatus(422);
     }
@@ -174,7 +174,7 @@ class TreatmentControllerTest extends TestCase
         return TreatmentModel::create([
             'public_id' => Str::uuid(),
             'profile_id' => $profile->id,
-            'item_id' => $item->id,
+            'product_id' => $item->product_id,
             'status' => $status,
             'dose' => 1.0,
             'frequency_hours' => 8,
@@ -276,7 +276,7 @@ class TreatmentControllerTest extends TestCase
         $treatment = TreatmentModel::create([
             'public_id' => Str::uuid(),
             'profile_id' => $profile->id,
-            'item_id' => $item->id,
+            'product_id' => $item->product_id,
             'status' => 'active',
             'dose' => 1.0,
             'frequency_hours' => 8,
@@ -286,6 +286,7 @@ class TreatmentControllerTest extends TestCase
 
         // Re-issue token so it includes the house_id claim set above
         $this->postJson("/api/treatments/{$treatment->public_id}/consumptions", [
+            'itemId' => $item->public_id,
             'amount' => 1.5,
         ], $this->authHeaders($this->actor))
             ->assertStatus(201);
@@ -303,7 +304,7 @@ class TreatmentControllerTest extends TestCase
         $treatment = TreatmentModel::create([
             'public_id' => Str::uuid(),
             'profile_id' => $profile->id,
-            'item_id' => $item->id,
+            'product_id' => $item->product_id,
             'status' => 'paused',
             'dose' => 1.0,
             'frequency_hours' => 8,
@@ -312,6 +313,55 @@ class TreatmentControllerTest extends TestCase
         ]);
 
         $this->postJson("/api/treatments/{$treatment->public_id}/consumptions", [
+            'itemId' => $item->public_id,
+            'amount' => 1.5,
+        ], $this->authHeaders($this->actor))
+            ->assertStatus(400);
+    }
+
+    public function test_store_dose_returns_400_when_item_does_not_belong_to_product(): void
+    {
+        $profile = $this->createProfile();
+        $item = $this->createItem('continuous', 10, $this->actor);
+
+        $this->actor->load('house');
+
+        $treatment = TreatmentModel::create([
+            'public_id' => Str::uuid(),
+            'profile_id' => $profile->id,
+            'product_id' => $item->product_id,
+            'status' => 'active',
+            'dose' => 1.0,
+            'frequency_hours' => 8,
+            'start_date' => now()->toIso8601ZuluString('millisecond'),
+            'days' => null,
+        ]);
+
+        // Create a different product and an item in the SAME storage (same house)
+        // so findByIdAndHouseId succeeds but the product IDs differ → 400
+        $anotherPharmaForm = PharmaceuticalFormModel::create([
+            'name' => 'OtherForm ' . Str::random(4),
+            'consumption_type' => 'continuous',
+        ]);
+        $anotherProduct = ProductModel::create([
+            'public_id' => Str::uuid(),
+            'name' => 'OtherMed ' . Str::random(4),
+            'pharmaceutical_form_id' => $anotherPharmaForm->id,
+            'net_content_value' => 50,
+            'net_content_unit' => 'ml',
+            'total_quantity' => null,
+            'composition_reference_amount' => 50,
+        ]);
+        $otherItem = ItemModel::create([
+            'public_id' => Str::uuid(),
+            'product_id' => $anotherProduct->id,
+            'storage_id' => $item->storage_id,
+            'total_content' => 10,
+            'expiration_date' => now()->addYear(),
+        ]);
+
+        $this->postJson("/api/treatments/{$treatment->public_id}/consumptions", [
+            'itemId' => $otherItem->public_id,
             'amount' => 1.5,
         ], $this->authHeaders($this->actor))
             ->assertStatus(400);

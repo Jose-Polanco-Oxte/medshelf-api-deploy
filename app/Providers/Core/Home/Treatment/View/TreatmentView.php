@@ -3,7 +3,7 @@
 namespace App\Providers\Core\Home\Treatment\View;
 
 use App\Core\Shared\Domain\PaginableByCursor;
-use App\Providers\Core\Home\Item\Resume\ItemResume;
+use App\Providers\Core\Home\Item\Resume\ProductResume;
 use App\Providers\Core\Home\Treatment\Resume\ProfileResume;
 
 readonly class TreatmentView implements PaginableByCursor
@@ -11,7 +11,7 @@ readonly class TreatmentView implements PaginableByCursor
     public function __construct(
         public string        $id,
         public ProfileResume $profile,
-        public ItemResume    $item,
+        public ProductResume $product,
         public string        $status,
         public float         $dose,
         public int           $frequencyHours,

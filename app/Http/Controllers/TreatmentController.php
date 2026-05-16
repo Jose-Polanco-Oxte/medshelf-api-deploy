@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Core\Home\Item\Application\Exception\ItemNotFound;
 use App\Core\Home\Profile\Application\Exception\ProfileNotFound;
 use App\Core\Home\Treatment\Application\Dto\Request\CreateTreatmentRequest;
 use App\Core\Home\Treatment\Application\Dto\Request\RegisterDoseRequest;
@@ -133,8 +134,8 @@ class TreatmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"itemId","dose","frequencyHours","startDate"},
-     *             @OA\Property(property="itemId", type="string", format="uuid"),
+     *             required={"productId","dose","frequencyHours","startDate"},
+     *             @OA\Property(property="productId", type="string", format="uuid"),
      *             @OA\Property(property="dose", type="number", minimum=0.01, example=1.5),
      *             @OA\Property(property="frequencyHours", type="integer", minimum=1, example=8),
      *             @OA\Property(property="startDate", type="string", format="date-time"),
@@ -149,9 +150,8 @@ class TreatmentController extends Controller
      */
     public function store(Request $request, string $profileId): JsonResponse
     {
-        $houseId = $this->getAuthHouseId();
         $data = $request->validate([
-            'itemId' => 'required|uuid',
+            'productId' => 'required|uuid',
             'dose' => 'required|numeric:min:0.01',
             'frequencyHours' => 'required|integer|min:1',
             'startDate' => 'required|date',
@@ -161,8 +161,7 @@ class TreatmentController extends Controller
         try {
             $result = $this->addTreatment->execute(new CreateTreatmentRequest(
                 profileId: $profileId,
-                itemId: $data['itemId'],
-                houseId: $houseId,
+                productId: $data['productId'],
                 dose: $data['dose'],
                 frequencyHours: $data['frequencyHours'],
                 startDate: $data['startDate'],
@@ -177,8 +176,8 @@ class TreatmentController extends Controller
             'profile' => [
                 'id' => $result->profileId,
             ],
-            'item' => [
-                'id' => $result->itemId,
+            'product' => [
+                'id' => $result->productId,
             ],
             'status' => $result->status,
             'dose' => $result->dose,
@@ -259,8 +258,8 @@ class TreatmentController extends Controller
             'profile' => [
                 'id' => $result->profileId,
             ],
-            'item' => [
-                'id' => $result->itemId,
+            'product' => [
+                'id' => $result->productId,
             ],
             'status' => $result->status,
             'dose' => $result->dose,
@@ -281,13 +280,14 @@ class TreatmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"amount"},
+     *             required={"itemId","amount"},
+     *             @OA\Property(property="itemId", type="string", format="uuid"),
      *             @OA\Property(property="amount", type="number", minimum=0.01, example=1.0)
      *         )
      *     ),
      *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ConsumptionResponse")),
-     *     @OA\Response(response=400, description="Treatment is not active", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
-     *     @OA\Response(response=404, description="Treatment not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=400, description="Treatment not active, item does not belong to product, or insufficient stock", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=404, description="Treatment or item not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -296,15 +296,19 @@ class TreatmentController extends Controller
         $houseId = $this->getAuthHouseId();
 
         $data = $request->validate([
+            'itemId' => 'required|uuid',
             'amount' => 'required|numeric|min:0.01',
         ]);
         try {
             $result = $this->registerDose->execute(new RegisterDoseRequest(
                 treatmentId: $treatmentId,
+                itemId: $data['itemId'],
                 amount: $data['amount'],
                 houseId: $houseId,
             ));
         } catch (TreatmentNotFound $e) {
+            return response()->json(['message' => $e->getMessage()], 404);
+        } catch (ItemNotFound $e) {
             return response()->json(['message' => $e->getMessage()], 404);
         } catch (TreatmentException $e) {
             return response()->json(['message' => $e->getMessage()], 400);

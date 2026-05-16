@@ -16,7 +16,7 @@ final class TreatmentMapper
         return new TreatmentResponse(
             id: $treatment->getId(),
             profileId: $treatment->getProfileId(),
-            itemId: $treatment->getItemId(),
+            productId: $treatment->getProductId(),
             status: $treatment->getStatus()->value,
             dose: $treatment->getDose(),
             frequencyHours: $treatment->getFrequencyHours(),

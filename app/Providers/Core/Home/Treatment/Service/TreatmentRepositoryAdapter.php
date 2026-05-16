@@ -5,7 +5,7 @@ namespace App\Providers\Core\Home\Treatment\Service;
 use App\Core\Home\Treatment\Model\Repository\TreatmentRepository;
 use App\Core\Home\Treatment\Model\Treatment;
 use App\Core\Home\Treatment\Model\TreatmentStatus;
-use App\Models\ItemModel;
+use App\Models\ProductModel;
 use App\Models\ProfileModel;
 use App\Models\TreatmentModel;
 use App\Providers\Core\InfrastructureException;
@@ -17,14 +17,14 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
         $profileInternalId = ProfileModel::where('public_id', $treatment->getProfileId())->value('id')
             ?? throw new InfrastructureException(sprintf('Profile with id %s not found', $treatment->getProfileId()));
 
-        $itemInternalId = ItemModel::where('public_id', $treatment->getItemId())->value('id')
-            ?? throw new InfrastructureException(sprintf('Item with id %s not found', $treatment->getItemId()));
+        $productInternalId = ProductModel::where('public_id', $treatment->getProductId())->value('id')
+            ?? throw new InfrastructureException(sprintf('Product with id %s not found', $treatment->getProductId()));
 
         TreatmentModel::updateOrCreate(
             ['public_id' => $treatment->getId()],
             [
                 'profile_id' => $profileInternalId,
-                'item_id' => $itemInternalId,
+                'product_id' => $productInternalId,
                 'status' => $treatment->getStatus()->value,
                 'dose' => $treatment->getDose(),
                 'frequency_hours' => $treatment->getFrequencyHours(),
@@ -38,7 +38,7 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
     {
         $record = TreatmentModel::with([
             'profile' => fn($q) => $q->select('id', 'public_id'),
-            'item' => fn($q) => $q->select('id', 'public_id'),
+            'product' => fn($q) => $q->select('id', 'public_id'),
         ])
             ->where('public_id', $id)
             ->first();
@@ -53,7 +53,7 @@ class TreatmentRepositoryAdapter implements TreatmentRepository
         return Treatment::load(
             id: $record->public_id,
             profileId: $record->profile->public_id,
-            itemId: $record->item->public_id,
+            productId: $record->product->public_id,
             status: TreatmentStatus::from($record->status),
             dose: $record->dose,
             frequencyHours: $record->frequency_hours,
