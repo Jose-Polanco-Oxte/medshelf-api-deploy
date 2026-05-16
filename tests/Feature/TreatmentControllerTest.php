@@ -119,7 +119,7 @@ class TreatmentControllerTest extends TestCase
             'itemId' => $item->public_id,
             'dose' => 1.0,
             'frequencyHours' => 8,
-            'startDate' => now()->toDateString(),
+            'startDate' => now()->toIso8601ZuluString('millisecond'),
         ], $this->authHeaders($this->actor))
             ->assertStatus(201)
             ->assertJsonStructure(['id', 'status', 'dose', 'frequencyHours', 'startDate', 'createdAt']);
@@ -139,7 +139,7 @@ class TreatmentControllerTest extends TestCase
             'itemId' => $item->public_id,
             'dose' => 1.0,
             'frequencyHours' => 8,
-            'startDate' => now()->toDateString(),
+            'startDate' => now()->toIso8601ZuluString('millisecond'),
         ], $this->authHeaders($this->actor))
             ->assertStatus(404);
     }
@@ -178,7 +178,7 @@ class TreatmentControllerTest extends TestCase
             'status' => $status,
             'dose' => 1.0,
             'frequency_hours' => 8,
-            'start_date' => now()->toDateString(),
+            'start_date' => now()->toIso8601ZuluString('millisecond'),
             'days' => null,
         ]);
     }
@@ -280,7 +280,7 @@ class TreatmentControllerTest extends TestCase
             'status' => 'active',
             'dose' => 1.0,
             'frequency_hours' => 8,
-            'start_date' => now()->toDateString(),
+            'start_date' => now()->toIso8601ZuluString('millisecond'),
             'days' => null,
         ]);
 
@@ -307,7 +307,7 @@ class TreatmentControllerTest extends TestCase
             'status' => 'paused',
             'dose' => 1.0,
             'frequency_hours' => 8,
-            'start_date' => now()->toDateString(),
+            'start_date' => now()->toIso8601ZuluString('millisecond'),
             'days' => null,
         ]);
 

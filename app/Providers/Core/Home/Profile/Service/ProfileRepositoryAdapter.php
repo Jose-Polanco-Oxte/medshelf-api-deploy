@@ -25,7 +25,7 @@ class ProfileRepositoryAdapter implements ProfileRepository
                         'user_id' => $userInternalId,
                         'name' => $profile->getName(),
                         'relationship' => $profile->getRelationship(),
-                        'birthdate' => $profile->getBirthDate()->toDateString(),
+                        'birthdate' => $profile->getBirthDate()->toIso8601ZuluString('millisecond'),
                     ]
                 );
 
