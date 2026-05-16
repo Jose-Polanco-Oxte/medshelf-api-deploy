@@ -11,4 +11,6 @@ interface HouseRepository
     public function countPlaces(string $houseId): int;
 
     public function existsOtherPlaceWithSameNameInHouse(string $houseId, string $placeName, ?string $actual = null): bool;
+
+    public function existsById(string $houseId);
 }
