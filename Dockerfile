@@ -31,5 +31,3 @@ WORKDIR /var/www
 COPY . .
 
 RUN composer install --optimize-autoloader --no-scripts --no-interaction
-
-CMD ["php-fpm"]
