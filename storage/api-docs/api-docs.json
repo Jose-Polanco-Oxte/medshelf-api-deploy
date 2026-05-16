@@ -3128,6 +3128,26 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Treatment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "401": {
                         "description": "Unauthorized",
                         "content": {
@@ -3318,6 +3338,26 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ConsumptionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Treatment is not active",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Treatment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }

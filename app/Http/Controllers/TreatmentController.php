@@ -229,6 +229,8 @@ class TreatmentController extends Controller
      *         )
      *     ),
      *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
+     *     @OA\Response(response=400, description="Invalid status transition", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=404, description="Treatment not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -284,6 +286,8 @@ class TreatmentController extends Controller
      *         )
      *     ),
      *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ConsumptionResponse")),
+     *     @OA\Response(response=400, description="Treatment is not active", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=404, description="Treatment not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
