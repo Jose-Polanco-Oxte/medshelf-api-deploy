@@ -14,9 +14,9 @@ readonly class TreatmentView implements PaginableByCursor
         public ItemResume    $item,
         public string        $status,
         public float         $dose,
-        public string        $frequencyUnit,
+        public int           $frequencyHours,
         public string        $startDate,
-        public ?string       $endDate,
+        public ?int          $days,
     )
     {
     }

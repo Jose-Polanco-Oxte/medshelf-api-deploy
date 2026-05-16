@@ -49,9 +49,9 @@ class TreatmentFinder
             ),
             status: $record->status,
             dose: $record->dose,
-            frequencyUnit: $record->frequency_unit,
+            frequencyHours: $record->frequency_hours,
             startDate: $record->start_date,
-            endDate: $record->end_date,
+            days: $record->days,
             createdAt: $record->created_at,
         );
     }
@@ -95,9 +95,9 @@ class TreatmentFinder
             ),
             status: $record->status,
             dose: $record->dose,
-            frequencyUnit: $record->frequency_unit,
+            frequencyHours: $record->frequency_hours,
             startDate: $record->start_date->toDateString(),
-            endDate: $record->end_date?->toDateString(),
+            days: $record->days,
         );
     }
 

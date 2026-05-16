@@ -19,9 +19,9 @@ final class TreatmentMapper
             itemId: $treatment->getItemId(),
             status: $treatment->getStatus()->value,
             dose: $treatment->getDose(),
-            frequencyUnit: $treatment->getFrequencyUnit(),
+            frequencyHours: $treatment->getFrequencyHours(),
             startDate: $treatment->getStartDate(),
-            endDate: $treatment->getEndDate(),
+            days: $treatment->getDays(),
             createdAt: $treatment->getCreatedAt(),
         );
     }

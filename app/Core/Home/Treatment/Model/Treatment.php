@@ -14,9 +14,9 @@ final class Treatment
         protected string          $itemId,
         protected TreatmentStatus $status,
         protected float           $dose,
-        protected string          $frequencyUnit,
+        protected int             $frequencyHours,
         protected Carbon          $startDate,
-        protected ?Carbon         $endDate,
+        protected ?int            $days,
         protected Carbon          $createdAt,
     )
     {
@@ -26,9 +26,9 @@ final class Treatment
         string  $profileId,
         string  $itemId,
         float   $dose,
-        string  $frequencyUnit,
+        int     $frequencyHours,
         Carbon  $startDate,
-        ?Carbon $endDate,
+        ?int    $days,
     ): Treatment
     {
         return new self(
@@ -37,9 +37,9 @@ final class Treatment
             $itemId,
             TreatmentStatus::ACTIVE,
             $dose,
-            $frequencyUnit,
+            $frequencyHours,
             $startDate,
-            $endDate,
+            $days,
             Carbon::now(),
         );
     }
@@ -50,9 +50,9 @@ final class Treatment
         string          $itemId,
         TreatmentStatus $status,
         float           $dose,
-        string          $frequencyUnit,
+        int             $frequencyHours,
         Carbon          $startDate,
-        ?Carbon         $endDate,
+        ?int            $days,
         Carbon          $createdAt,
     ): Treatment
     {
@@ -62,9 +62,9 @@ final class Treatment
             $itemId,
             $status,
             $dose,
-            $frequencyUnit,
+            $frequencyHours,
             $startDate,
-            $endDate,
+            $days,
             $createdAt,
         );
     }
@@ -151,9 +151,9 @@ final class Treatment
         return $this->dose;
     }
 
-    public function getFrequencyUnit(): string
+    public function getFrequencyHours(): int
     {
-        return $this->frequencyUnit;
+        return $this->frequencyHours;
     }
 
     public function getStartDate(): Carbon
@@ -161,9 +161,9 @@ final class Treatment
         return $this->startDate;
     }
 
-    public function getEndDate(): ?Carbon
+    public function getDays(): ?int
     {
-        return $this->endDate;
+        return $this->days;
     }
 
     public function getCreatedAt(): Carbon
@@ -178,17 +178,17 @@ final class Treatment
         }
     }
 
-    public function changeFrequencyUnit(?string $frequencyUnit): void
+    public function changeFrequencyHours(?int $frequencyHours): void
     {
-        if ($frequencyUnit !== null) {
-            $this->frequencyUnit = $frequencyUnit;
+        if ($frequencyHours !== null) {
+            $this->frequencyHours = $frequencyHours;
         }
     }
 
-    public function changeEndDate(?Carbon $endDate): void
+    public function changeDays(?int $days): void
     {
-        if ($endDate !== null) {
-            $this->endDate = $endDate;
+        if ($days !== null) {
+            $this->days = $days;
         }
     }
 }

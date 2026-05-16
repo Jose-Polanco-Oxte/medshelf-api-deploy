@@ -34,7 +34,7 @@ class PlaceFinder
                 name: $house->name,
             ),
             name: $record->name,
-            createdAt: $record->created_at->toIso8601String(),
+            createdAt: $record->created_at->toIso8601ZuluString('millisecond'),
         );
     }
 

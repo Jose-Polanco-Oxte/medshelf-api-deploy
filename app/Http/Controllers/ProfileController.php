@@ -122,7 +122,7 @@ class ProfileController extends Controller
             'relationship' => $result->relationship,
             'birthDate' => $result->birthDate->toDateString(),
             'allergies' => $result->allergies,
-            'createdAt' => $result->createdAt->toIso8601String(),
+            'createdAt' => $result->createdAt->toIso8601ZuluString('millisecond'),
         ], 201);
     }
 
@@ -190,7 +190,7 @@ class ProfileController extends Controller
             'id' => $result->id,
             'name' => $result->name,
             'relationship' => $result->relationship,
-            'createdAt' => $result->createdAt->toIso8601String(),
+            'createdAt' => $result->createdAt->toIso8601ZuluString('millisecond'),
         ]);
     }
 }

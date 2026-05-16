@@ -16,9 +16,9 @@ class TreatmentTest extends TestCase
             profileId: 'profile-id',
             itemId: 'item-id',
             dose: 8,
-            frequencyUnit: 'hours',
+            frequencyHours: 8,
             startDate: Carbon::today(),
-            endDate: null,
+            days: null,
         );
 
         $this->assertEquals(TreatmentStatus::ACTIVE, $treatment->getStatus());
@@ -40,9 +40,9 @@ class TreatmentTest extends TestCase
             itemId: 'item-id',
             status: $status,
             dose: 8,
-            frequencyUnit: 'hours',
+            frequencyHours: 8,
             startDate: Carbon::today(),
-            endDate: null,
+            days: null,
             createdAt: Carbon::now(),
         );
     }

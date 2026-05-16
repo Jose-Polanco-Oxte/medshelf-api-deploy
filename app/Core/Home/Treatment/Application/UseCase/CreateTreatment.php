@@ -44,9 +44,9 @@ final readonly class CreateTreatment
             profileId: $profile->getId(),
             itemId: $request->itemId,
             dose: $request->dose,
-            frequencyUnit: $request->frequencyUnit,
+            frequencyHours: $request->frequencyHours,
             startDate: Carbon::parse($request->startDate),
-            endDate: $request->endDate ? Carbon::parse($request->endDate) : null,
+            days: $request->days,
         );
 
         $this->treatmentRepository->save($treatment);
