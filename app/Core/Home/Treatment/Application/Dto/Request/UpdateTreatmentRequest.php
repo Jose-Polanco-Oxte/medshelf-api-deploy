@@ -7,9 +7,9 @@ readonly class UpdateTreatmentRequest
     public function __construct(
         public string  $treatmentId,
         public ?int    $dose,
-        public ?string $frequencyUnit,
+        public ?int    $frequencyHours,
         public ?string $status,
-        public ?string $endDate,
+        public ?int    $days,
     )
     {
     }

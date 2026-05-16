@@ -274,6 +274,31 @@ use OpenApi\Annotations as OA;
  *     @OA\Property(property="consumedAt", type="string", format="date-time")
  * )
  * @OA\Schema(
+ *     schema="ConsumptionView",
+ *     type="object",
+ *     required={"id","item","amount","consumedAt"},
+ *     @OA\Property(property="id", type="string", format="uuid"),
+ *     @OA\Property(
+ *          property="item",
+ *          type="object",
+ *          @OA\Property(property="id", type="string", format="uuid"),
+ *          @OA\Property(
+ *                  property="product",
+ *                  type="object",
+ *                  @OA\Property(property="id", type="string", format="uuid"),
+ *                  @OA\Property(property="name", type="string")
+ *          ),
+ *          @OA\Property(
+ *                  property="place",
+ *                  type="object",
+ *                  @OA\Property(property="id", type="string", format="uuid"),
+ *                  @OA\Property(property="name", type="string")
+ *          )
+ *     ),
+ *     @OA\Property(property="amount", type="number"),
+ *     @OA\Property(property="consumedAt", type="string", format="date-time")
+ * )
+ * @OA\Schema(
  *     schema="ProfileResponse",
  *     type="object",
  *     required={"id","name","birthDate","createdAt"},
@@ -324,29 +349,29 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="TreatmentResponse",
  *     type="object",
- *     required={"id","profile","item","status","dose","frequencyUnit","startDate","createdAt"},
+ *     required={"id","profile","item","status","dose","frequencyHours","startDate","createdAt"},
  *     @OA\Property(property="id", type="string", format="uuid"),
  *     @OA\Property(property="profile", type="object", @OA\Property(property="id", type="string", format="uuid")),
  *     @OA\Property(property="item", type="object", @OA\Property(property="id", type="string", format="uuid")),
  *     @OA\Property(property="status", type="string", enum={"active","paused","completed","cancelled"}),
  *     @OA\Property(property="dose", type="number", minimum=0.01),
- *     @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
- *     @OA\Property(property="startDate", type="string", format="date", example="2026-05-11"),
- *     @OA\Property(property="endDate", type="string", format="date", nullable=true, example="2026-05-30"),
+ *     @OA\Property(property="frequencyHours", type="integer", minimum=1),
+ *     @OA\Property(property="startDate", type="string", format="date-time"),
+ *     @OA\Property(property="days", type="integer", nullable="true", description="Period of the treatment in days"),
  *     @OA\Property(property="createdAt", type="string", format="date-time")
  * )
  * @OA\Schema(
  *     schema="TreatmentView",
  *     type="object",
- *     required={"id","profile","item","status","dose","frequencyUnit","startDate"},
+ *     required={"id","profile","item","status","dose","frequencyHours","startDate"},
  *     @OA\Property(property="id", type="string", format="uuid"),
  *     @OA\Property(property="profile", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="name", type="string")),
  *     @OA\Property(property="item", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="product", type="object", @OA\Property(property="id", type="string", format="uuid"), @OA\Property(property="name", type="string"))),
  *     @OA\Property(property="status", type="string"),
  *     @OA\Property(property="dose", type="number"),
- *     @OA\Property(property="frequencyUnit", type="string"),
- *     @OA\Property(property="startDate", type="string", format="date"),
- *     @OA\Property(property="endDate", type="string", format="date", nullable=true),
+ *     @OA\Property(property="frequencyHours", type="integer"),
+ *     @OA\Property(property="startDate", type="string", format="date-time"),
+ *     @OA\Property(property="days", type="integer", nullable="true", description="Period of the treatment in days"),
  *     @OA\Property(property="createdAt", type="string", format="date-time")
  * )
  */

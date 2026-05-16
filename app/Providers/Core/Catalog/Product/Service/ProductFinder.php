@@ -47,7 +47,7 @@ class ProductFinder
                 name: $record->pharmaceuticalForm->name,
                 consumptionType: $record->pharmaceuticalForm->consumption_type,
             ),
-            createdAt: $record->created_at->toIso8601String(),
+            createdAt: $record->created_at->toIso8601ZuluString('millisecond'),
             composition: new Composition(
                 referenceAmount: $record->composition_reference_amount,
                 activeIngredients: $record->activeCompounds

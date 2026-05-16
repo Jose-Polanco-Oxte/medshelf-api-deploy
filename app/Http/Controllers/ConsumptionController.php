@@ -41,13 +41,13 @@ class ConsumptionController extends Controller
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","nextCursor"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionView")),
      *                 @OA\Property(property="nextCursor", type="string", nullable=true)
      *             ),
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","totalCount","page","size","hasMorePages"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionView")),
      *                 @OA\Property(property="totalCount", type="integer", minimum=0),
      *                 @OA\Property(property="page", type="integer", minimum=1),
      *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),

@@ -140,7 +140,7 @@ class ItemController extends Controller
         $houseId = $this->getAuthHouseId();
         $data = $request->validate([
             'productId' => 'required|uuid',
-            'expirationDate' => 'required|date_format:Y-m-d\TH:i:s.v\Z,Y-m-d\TH:i:s\Z',
+            'expirationDate' => 'required|date|after:now',
         ]);
         $result = $this->addItem->execute(
             new AddItemRequest(

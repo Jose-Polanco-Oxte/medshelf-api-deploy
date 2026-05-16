@@ -26,18 +26,25 @@ class AddTreatmentTest extends TestCase
     private ProductRepository $productRepository;
     private CreateTreatment $useCase;
 
-    protected function setUp(): void
+    public function test_execute_creates_active_treatment(): void
     {
-        $this->profileRepository   = $this->createMock(ProfileRepository::class);
-        $this->itemRepository      = $this->createMock(ItemRepository::class);
-        $this->treatmentRepository = $this->createMock(TreatmentRepository::class);
-        $this->productRepository   = $this->createMock(ProductRepository::class);
-        $this->useCase = new CreateTreatment(
-            $this->profileRepository,
-            $this->itemRepository,
-            $this->treatmentRepository,
-            $this->productRepository,
-        );
+        $this->setupRepositories();
+
+        $this->treatmentRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(fn(Treatment $t) => $t->getStatus() === TreatmentStatus::ACTIVE));
+
+        $response = $this->useCase->execute($this->makeRequest());
+
+        $this->assertEquals('active', $response->status);
+    }
+
+    private function setupRepositories(): void
+    {
+        $this->profileRepository->method('findById')->willReturn($this->makeProfile());
+        $this->itemRepository->method('findByIdAndHouseId')->willReturn($this->makeItem());
+        $this->productRepository->method('findById')->willReturn($this->makeProduct());
     }
 
     private function makeProfile(): Profile
@@ -79,44 +86,23 @@ class AddTreatmentTest extends TestCase
     {
         return new CreateTreatmentRequest(
             profileId: $overrides['profileId'] ?? 'profile-uuid',
-            itemId:    $overrides['itemId'] ?? 'item-uuid',
-            houseId:   $overrides['houseId'] ?? 'house-uuid',
-            dose:      $overrides['dose'] ?? 1.0,
-            frequencyUnit: $overrides['frequencyUnit'] ?? 'hours',
+            itemId: $overrides['itemId'] ?? 'item-uuid',
+            houseId: $overrides['houseId'] ?? 'house-uuid',
+            dose: $overrides['dose'] ?? 1.0,
+            frequencyHours: $overrides['frequencyHours'] ?? 8,
             startDate: $overrides['startDate'] ?? '2026-01-01',
-            endDate:   $overrides['endDate'] ?? null,
+            days: $overrides['days'] ?? 5,
         );
     }
 
-    private function setupRepositories(): void
-    {
-        $this->profileRepository->method('findById')->willReturn($this->makeProfile());
-        $this->itemRepository->method('findByIdAndHouseId')->willReturn($this->makeItem());
-        $this->productRepository->method('findById')->willReturn($this->makeProduct());
-    }
-
-    public function test_execute_creates_active_treatment(): void
-    {
-        $this->setupRepositories();
-
-        $this->treatmentRepository
-            ->expects($this->once())
-            ->method('save')
-            ->with($this->callback(fn(Treatment $t) => $t->getStatus() === TreatmentStatus::ACTIVE));
-
-        $response = $this->useCase->execute($this->makeRequest());
-
-        $this->assertEquals('active', $response->status);
-    }
-
-    public function test_execute_returns_response_with_correct_frequency_unit(): void
+    public function test_execute_returns_response_with_correct_frequency_hours(): void
     {
         $this->setupRepositories();
         $this->treatmentRepository->expects($this->once())->method('save');
 
-        $response = $this->useCase->execute($this->makeRequest(['frequencyUnit' => 'days']));
+        $response = $this->useCase->execute($this->makeRequest(['frequencyHours' => 12]));
 
-        $this->assertEquals('days', $response->frequencyUnit);
+        $this->assertEquals(12, $response->frequencyHours);
     }
 
     public function test_execute_throws_profile_not_found_when_profile_missing(): void
@@ -149,24 +135,18 @@ class AddTreatmentTest extends TestCase
         $this->assertEquals('item-uuid', $capturedTreatment->getItemId());
     }
 
-    public function test_execute_accepts_optional_end_date(): void
+    protected function setUp(): void
     {
-        $this->setupRepositories();
-        $this->treatmentRepository->expects($this->once())->method('save');
-
-        $response = $this->useCase->execute($this->makeRequest(['endDate' => '2026-12-31']));
-
-        $this->assertNotNull($response->endDate);
-    }
-
-    public function test_execute_without_end_date_leaves_it_null(): void
-    {
-        $this->setupRepositories();
-        $this->treatmentRepository->expects($this->once())->method('save');
-
-        $response = $this->useCase->execute($this->makeRequest(['endDate' => null]));
-
-        $this->assertNull($response->endDate);
+        $this->profileRepository = $this->createMock(ProfileRepository::class);
+        $this->itemRepository = $this->createMock(ItemRepository::class);
+        $this->treatmentRepository = $this->createMock(TreatmentRepository::class);
+        $this->productRepository = $this->createMock(ProductRepository::class);
+        $this->useCase = new CreateTreatment(
+            $this->profileRepository,
+            $this->itemRepository,
+            $this->treatmentRepository,
+            $this->productRepository,
+        );
     }
 }
 

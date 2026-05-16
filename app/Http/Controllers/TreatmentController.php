@@ -133,12 +133,12 @@ class TreatmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"itemId","dose","frequencyUnit","startDate"},
+     *             required={"itemId","dose","frequencyHours","startDate"},
      *             @OA\Property(property="itemId", type="string", format="uuid"),
      *             @OA\Property(property="dose", type="number", minimum=0.01, example=1.5),
-     *             @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
-     *             @OA\Property(property="startDate", type="string", format="date", example="2026-05-11"),
-     *             @OA\Property(property="endDate", type="string", format="date", example="2026-05-30")
+     *             @OA\Property(property="frequencyHours", type="integer", minimum=1, example=8),
+     *             @OA\Property(property="startDate", type="string", format="date-time"),
+     *             @OA\Property(property="days", type="integer", minimum=1, example=7, description="Period of treatment in days.")
      *         )
      *     ),
      *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
@@ -153,9 +153,9 @@ class TreatmentController extends Controller
         $data = $request->validate([
             'itemId' => 'required|uuid',
             'dose' => 'required|numeric:min:0.01',
-            'frequencyUnit' => 'required|string|in:hours,days,weeks',
-            'startDate' => 'required|date_format:Y-m-d',
-            'endDate' => 'nullable|date_format:Y-m-d',
+            'frequencyHours' => 'required|integer|min:1',
+            'startDate' => 'required|date',
+            'days' => 'nullable|integer|min:1',
         ]);
 
         try {
@@ -164,9 +164,9 @@ class TreatmentController extends Controller
                 itemId: $data['itemId'],
                 houseId: $houseId,
                 dose: $data['dose'],
-                frequencyUnit: $data['frequencyUnit'],
+                frequencyHours: $data['frequencyHours'],
                 startDate: $data['startDate'],
-                endDate: $data['endDate'] ?? null,
+                days: $data['days'] ?? null,
             ));
         } catch (ProfileNotFound $e) {
             return response()->json(['message' => $e->getMessage()], 404);
@@ -182,9 +182,9 @@ class TreatmentController extends Controller
             ],
             'status' => $result->status,
             'dose' => $result->dose,
-            'frequencyUnit' => $result->frequencyUnit,
+            'frequencyHours' => $result->frequencyHours,
             'startDate' => $result->startDate,
-            'endDate' => $result->endDate,
+            'days' => $result->days,
             'createdAt' => $result->createdAt,
         ], 201);
     }
@@ -223,9 +223,9 @@ class TreatmentController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="dose", type="number", minimum=0.01, example=1.5),
-     *             @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
+     *             @OA\Property(property="frequencyHours", type="integer", minimum=1),
      *             @OA\Property(property="status", type="string", enum={"active","paused","completed","cancelled"}),
-     *             @OA\Property(property="endDate", type="string", format="date")
+     *             @OA\Property(property="days", type="integer", minimum=1, example=7, description="Period of treatment in days.")
      *         )
      *     ),
      *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
@@ -238,17 +238,17 @@ class TreatmentController extends Controller
     {
         $data = $request->validate([
             'dose' => 'nullable|numeric|min:0.01',
-            'frequencyUnit' => 'nullable|string|in:hours,days,weeks',
+            'frequencyHours' => 'nullable|integer|min:1',
             'status' => 'nullable|string|in:active,paused,completed,cancelled',
-            'endDate' => 'nullable|date_format:Y-m-d',
+            'days' => 'nullable|integer|min:1',
         ]);
         try {
             $result = $this->updateTreatment->execute(new UpdateTreatmentRequest(
                 treatmentId: $treatmentId,
                 dose: $data['dose'] ?? null,
-                frequencyUnit: $data['frequencyUnit'] ?? null,
+                frequencyHours: $data['frequencyHours'] ?? null,
                 status: $data['status'] ?? null,
-                endDate: $data['endDate'] ?? null,
+                days: $data['days'] ?? null,
             ));
         } catch (TreatmentNotFound $e) {
             return response()->json(['message' => $e->getMessage()], 404);
@@ -264,9 +264,9 @@ class TreatmentController extends Controller
             ],
             'status' => $result->status,
             'dose' => $result->dose,
-            'frequencyUnit' => $result->frequencyUnit,
+            'frequencyHours' => $result->frequencyHours,
             'startDate' => $result->startDate,
-            'endDate' => $result->endDate,
+            'days' => $result->days,
             'createdAt' => $result->createdAt,
         ]);
     }
@@ -330,13 +330,13 @@ class TreatmentController extends Controller
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","nextCursor"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionView")),
      *                 @OA\Property(property="nextCursor", type="string", nullable=true)
      *             ),
      *             @OA\Schema(
      *                 type="object",
      *                 required={"items","totalCount","page","size","hasMorePages"},
-     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionResponse")),
+     *                 @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/ConsumptionView")),
      *                 @OA\Property(property="totalCount", type="integer", minimum=0),
      *                 @OA\Property(property="page", type="integer", minimum=1),
      *                 @OA\Property(property="size", type="integer", minimum=1, maximum=100),
@@ -365,8 +365,8 @@ class TreatmentController extends Controller
      *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
      *     @OA\Response(
      *         response=200,
-     *         description="PNG image of the QR code encoding the treatment summary",
-     *         @OA\MediaType(mediaType="image/png", @OA\Schema(type="string", format="binary"))
+     *         description="SVG image of the QR code encoding the treatment summary",
+     *         @OA\MediaType(mediaType="image/svg+xml", @OA\Schema(type="string", format="binary"))
      *     ),
      *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
@@ -384,9 +384,9 @@ class TreatmentController extends Controller
             'id' => $treatment->id,
             'status' => $treatment->status,
             'dose' => $treatment->dose,
-            'frequencyUnit' => $treatment->frequencyUnit,
+            'frequencyHours' => $treatment->frequencyHours,
             'startDate' => $treatment->startDate->toDateString(),
-            'endDate' => $treatment->endDate?->toDateString(),
+            'endDate' => $treatment->days?->toDateString(),
         ], JSON_THROW_ON_ERROR);
 
         $image = QrCode::format('svg')->size(300)->generate($payload);

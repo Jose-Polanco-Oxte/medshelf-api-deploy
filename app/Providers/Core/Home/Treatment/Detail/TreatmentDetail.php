@@ -14,9 +14,9 @@ readonly class TreatmentDetail
         public ItemResume    $item,
         public string        $status,
         public float         $dose,
-        public string        $frequencyUnit,
+        public int           $frequencyHours,
         public Carbon        $startDate,
-        public ?Carbon       $endDate,
+        public ?int          $days,
         public Carbon        $createdAt,
     )
     {

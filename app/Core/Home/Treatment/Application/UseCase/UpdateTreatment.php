@@ -24,8 +24,8 @@ final readonly class UpdateTreatment
             ?? throw new TreatmentNotFound($request->treatmentId);
 
         $treatment->changeDose($request->dose);
-        $treatment->changeFrequencyUnit($request->frequencyUnit);
-        $treatment->changeEndDate($request->endDate ? Carbon::parse($request->endDate) : null);
+        $treatment->changeFrequencyHours($request->frequencyHours);
+        $treatment->changeDays($request->days);
         $treatment->changeStatus(TreatmentStatus::from($request->status));
         $this->treatmentRepository->save($treatment);
         return TreatmentMapper::toResponse($treatment);

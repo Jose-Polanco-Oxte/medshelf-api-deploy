@@ -9,9 +9,9 @@ readonly class CreateTreatmentRequest
         public string  $itemId,
         public string  $houseId,
         public float   $dose,
-        public string  $frequencyUnit,
+        public int     $frequencyHours,
         public string  $startDate,
-        public ?string $endDate,
+        public ?int    $days,
     )
     {
     }
