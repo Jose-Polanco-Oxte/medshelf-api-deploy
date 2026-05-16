@@ -134,4 +134,49 @@ class AuthControllerTest extends TestCase
             ->assertStatus(200)
             ->assertJsonStructure(['user', 'expiresIn']);
     }
+
+    // ── DELETE /auth/account ──────────────────────────────────────────────
+
+    public function test_delete_account_soft_deletes_user_and_returns_200(): void
+    {
+        $user = User::factory()->create();
+
+        $this->deleteJson('/api/auth/account', [], $this->authHeaders($user))
+            ->assertStatus(200)
+            ->assertJsonFragment(['message' => 'Account deleted successfully']);
+
+        $this->assertSoftDeleted('users', ['id' => $user->id]);
+    }
+
+    public function test_delete_account_returns_401_without_auth(): void
+    {
+        $this->deleteJson('/api/auth/account')
+            ->assertStatus(401);
+    }
+
+    // ── X-Auth-Type: JWT (dual auth) ──────────────────────────────────────
+
+    public function test_jwt_auth_type_header_grants_access(): void
+    {
+        $user = User::factory()->create();
+
+        // Use X-Auth-Type: JWT so the middleware passes the Authorization header through directly
+        $this->getJson('/api/auth/me', $this->authHeaders($user, ['X-Auth-Type' => 'JWT']))
+            ->assertStatus(200)
+            ->assertJsonFragment(['email' => $user->email]);
+    }
+
+    public function test_cookie_auth_type_header_grants_access(): void
+    {
+        $user  = User::factory()->create();
+        $token = \Tymon\JWTAuth\Facades\JWTAuth::fromUser($user);
+
+        // Pass token via cookie with X-Auth-Type: Cookie (default behaviour).
+        // access_token is excluded from EncryptCookies, so we pass the raw JWT.
+        $this->call('GET', '/api/auth/me', [], ['access_token' => $token], [], [
+            'HTTP_X-Auth-Type'  => 'Cookie',
+            'HTTP_ACCEPT'       => 'application/json',
+        ])->assertStatus(200)
+          ->assertJsonFragment(['email' => $user->email]);
+    }
 }

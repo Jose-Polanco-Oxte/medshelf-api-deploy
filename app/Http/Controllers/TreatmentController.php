@@ -360,8 +360,8 @@ class TreatmentController extends Controller
             'frequencyValue' => $treatment->frequencyValue,
             'frequencyUnit'  => $treatment->frequencyUnit,
             'doseQuantity'   => $treatment->doseQuantity,
-            'startDate'      => $treatment->startDate?->toDateString(),
-            'endDate'        => $treatment->endDate?->toDateString(),
+            'startDate'      => $treatment->startDate,
+            'endDate'        => $treatment->endDate,
         ], JSON_THROW_ON_ERROR);
 
         $image = QrCode::format('png')->size(300)->generate($payload);

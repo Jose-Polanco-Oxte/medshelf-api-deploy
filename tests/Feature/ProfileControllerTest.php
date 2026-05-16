@@ -114,4 +114,62 @@ class ProfileControllerTest extends TestCase
         $this->getJson('/api/profiles/non-existent-id', $this->authHeaders($user))
             ->assertStatus(404);
     }
+
+    // ── PATCH /api/profiles/{id} ──────────────────────────────────────────
+
+    public function test_update_changes_name_and_returns_200(): void
+    {
+        $user    = User::factory()->create();
+        $profile = ProfileModel::factory()->create(['user_id' => $user->id, 'name' => 'Old']);
+
+        $this->patchJson("/api/profiles/{$profile->public_id}", [
+            'name' => 'New Name',
+        ], $this->authHeaders($user))
+            ->assertStatus(200)
+            ->assertJsonFragment(['name' => 'New Name']);
+    }
+
+    public function test_update_changes_relationship_only(): void
+    {
+        $user    = User::factory()->create();
+        $profile = ProfileModel::factory()->create([
+            'user_id'      => $user->id,
+            'name'         => 'Maria',
+            'relationship' => null,
+        ]);
+
+        $this->patchJson("/api/profiles/{$profile->public_id}", [
+            'relationship' => 'sibling',
+        ], $this->authHeaders($user))
+            ->assertStatus(200)
+            ->assertJsonFragment(['name' => 'Maria', 'relationship' => 'sibling']);
+    }
+
+    public function test_update_returns_404_when_profile_not_found(): void
+    {
+        $user = User::factory()->create();
+
+        $this->patchJson('/api/profiles/non-existent-uuid', [
+            'name' => 'Whatever',
+        ], $this->authHeaders($user))
+            ->assertStatus(404);
+    }
+
+    public function test_update_returns_401_without_auth(): void
+    {
+        $this->patchJson('/api/profiles/some-uuid', ['name' => 'X'])
+            ->assertStatus(401);
+    }
+
+    public function test_update_response_has_required_fields(): void
+    {
+        $user    = User::factory()->create();
+        $profile = ProfileModel::factory()->create(['user_id' => $user->id]);
+
+        $this->patchJson("/api/profiles/{$profile->public_id}", [
+            'name' => 'Updated',
+        ], $this->authHeaders($user))
+            ->assertStatus(200)
+            ->assertJsonStructure(['id', 'name', 'relationship', 'createdAt']);
+    }
 }

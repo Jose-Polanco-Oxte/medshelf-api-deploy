@@ -101,4 +101,64 @@ class ProfileTest extends TestCase
 
         $this->assertNotEquals($a->getId(), $b->getId());
     }
+
+    // ── update ────────────────────────────────────────────────────────────
+
+    public function test_update_changes_name_when_provided(): void
+    {
+        $profile = Profile::create(userId: 'user-id', name: 'Old Name', relationship: null);
+
+        $profile->update('New Name', null);
+
+        $this->assertEquals('New Name', $profile->getName());
+    }
+
+    public function test_update_changes_relationship_when_provided(): void
+    {
+        $profile = Profile::create(userId: 'user-id', name: 'Maria', relationship: null);
+
+        $profile->update(null, 'sibling');
+
+        $this->assertEquals('sibling', $profile->getRelationship());
+    }
+
+    public function test_update_does_not_change_name_when_null(): void
+    {
+        $profile = Profile::create(userId: 'user-id', name: 'Keep This', relationship: 'parent');
+
+        $profile->update(null, 'child');
+
+        $this->assertEquals('Keep This', $profile->getName());
+    }
+
+    public function test_update_does_not_change_relationship_when_null(): void
+    {
+        $profile = Profile::create(userId: 'user-id', name: 'Maria', relationship: 'parent');
+
+        $profile->update('Maria Updated', null);
+
+        $this->assertEquals('parent', $profile->getRelationship());
+    }
+
+    public function test_update_can_change_both_fields(): void
+    {
+        $profile = Profile::create(userId: 'user-id', name: 'Old', relationship: 'sibling');
+
+        $profile->update('New', 'parent');
+
+        $this->assertEquals('New', $profile->getName());
+        $this->assertEquals('parent', $profile->getRelationship());
+    }
+
+    public function test_update_does_not_modify_id_or_user_id(): void
+    {
+        $profile = Profile::create(userId: 'original-user', name: 'Name', relationship: null);
+        $originalId     = $profile->getId();
+        $originalUserId = $profile->getUserId();
+
+        $profile->update('Different Name', 'child');
+
+        $this->assertEquals($originalId, $profile->getId());
+        $this->assertEquals($originalUserId, $profile->getUserId());
+    }
 }

@@ -334,4 +334,35 @@ class TreatmentControllerTest extends TestCase
         $this->getJson("/api/treatments/{$treatment->public_id}/consumptions", $this->authHeaders($this->actor))
             ->assertStatus(200);
     }
+
+    // ── GET /api/treatments/{id}/qr ───────────────────────────────────────
+
+    public function test_qr_returns_png_image_for_existing_treatment(): void
+    {
+        $treatment = $this->createTreatment();
+
+        $response = $this->getJson(
+            "/api/treatments/{$treatment->public_id}/qr",
+            $this->authHeaders($this->actor)
+        );
+
+        // The endpoint returns image/png — Laravel's getJson still fires the request,
+        // but the content-type will be image/png, not application/json.
+        $response->assertStatus(200);
+        $this->assertStringContainsString('image/png', $response->headers->get('Content-Type'));
+    }
+
+    public function test_qr_returns_404_for_missing_treatment(): void
+    {
+        $this->getJson(
+            '/api/treatments/non-existent-uuid/qr',
+            $this->authHeaders($this->actor)
+        )->assertStatus(404);
+    }
+
+    public function test_qr_returns_401_without_auth(): void
+    {
+        $this->getJson('/api/treatments/some-uuid/qr')
+            ->assertStatus(401);
+    }
 }

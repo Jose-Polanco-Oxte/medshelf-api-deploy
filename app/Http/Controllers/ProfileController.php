@@ -167,7 +167,7 @@ class ProfileController extends Controller
             'id'           => $result->id,
             'name'         => $result->name,
             'relationship' => $result->relationship,
-            'createdAt'    => $result->createdAt->toIso8601String(),
+            'createdAt'    => $result->createdAt,
         ]);
     }
 }
