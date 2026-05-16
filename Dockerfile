@@ -29,9 +29,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-
 COPY . .
 
 RUN composer install \
@@ -39,12 +36,12 @@ RUN composer install \
     --no-interaction \
     --no-dev
 
-RUN php artisan l5-swagger:generate
-
 COPY start.sh /usr/local/bin/start.sh
+
+RUN sed -i 's/\r$//' /usr/local/bin/start.sh
 
 RUN chmod +x /usr/local/bin/start.sh
 
 EXPOSE 8080
 
-CMD ["sh", "/usr/local/bin/start.sh"]
+CMD ["/usr/local/bin/start.sh"]
