@@ -148,6 +148,10 @@ class ItemFinder
                 $request->filters['name'] ?? null,
                 fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
             )
+            ->when(
+                $request->filters['productId'] ?? null,
+                fn($q, $v) => $q->whereHas('product', fn($p) => $p->where('public_id', $v))
+            )
             ->withSum('consumptions', 'amount')
             ->orderBy('id')
             ->paginate(perPage: $request->size, page: $request->cursor);
@@ -178,6 +182,10 @@ class ItemFinder
                 ->when(
                     $request->filters['name'] ?? null,
                     fn($q, $v) => $q->whereHas('product', fn($p) => $p->whereLike('name', "%$v%"))
+                )
+                ->when(
+                    $request->filters['productId'] ?? null,
+                    fn($q, $v) => $q->whereHas('product', fn($p) => $p->where('public_id', $v))
                 )
                 ->withSum('consumptions', 'amount')
                 ->orderBy('id'),
