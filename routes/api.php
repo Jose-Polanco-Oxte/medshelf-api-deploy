@@ -25,6 +25,7 @@ Route::prefix('auth')->middleware([JwtCookieMiddleware::class,AuthenticateApi::c
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::delete('/account', [AuthController::class, 'deleteAccount']);
 });
 
 Route::group(['middleware' => [JwtCookieMiddleware::class, AuthenticateApi::class]], function () {
