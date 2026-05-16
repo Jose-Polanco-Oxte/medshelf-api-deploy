@@ -56,7 +56,7 @@ RUN apk add --no-cache \
 # ── Configuración PHP para producción ───────────────────────
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
-COPY docker/php/opcache.ini $PHP_INI_DIR/conf.d/opcache.ini
+COPY .docker/opcache.ini $PHP_INI_DIR/conf.d/opcache.ini
 
 # ── Directorio de trabajo ────────────────────────────────────
 WORKDIR /app
@@ -73,13 +73,13 @@ RUN mkdir -p storage/framework/{sessions,views,cache} \
     && chmod -R 775 storage bootstrap/cache
 
 # ── Caddyfile para Laravel ───────────────────────────────────
-COPY docker/caddy/Caddyfile /etc/caddy/Caddyfile
+COPY .docker/Caddyfile /etc/caddy/Caddyfile
 
 # ── Supervisor (web + queue worker) ─────────────────────────
-COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY .docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # ── Script de entrada ────────────────────────────────────────
-COPY docker/entrypoint.sh /entrypoint.sh
+COPY .docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 8080
