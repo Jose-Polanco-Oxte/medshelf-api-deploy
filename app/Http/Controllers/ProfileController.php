@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Core\Home\Profile\Application\Dto\Request\AddProfileRequest;
+use App\Core\Home\Profile\Application\Dto\Request\UpdateProfileRequest;
 use App\Core\Home\Profile\Application\UseCase\AddProfile;
+use App\Core\Home\Profile\Application\UseCase\UpdateProfile;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
 use App\Http\Requests\UuidListRequest;
@@ -16,8 +18,9 @@ use OpenApi\Annotations as OA;
 class ProfileController extends Controller
 {
     public function __construct(
-        protected ProfileFinder $finder,
-        protected AddProfile    $addProfile,
+        protected ProfileFinder   $finder,
+        protected AddProfile      $addProfile,
+        protected UpdateProfile   $updateProfile,
     )
     {
     }
@@ -130,5 +133,46 @@ class ProfileController extends Controller
         }
 
         return response()->json($profile);
+    }
+
+    /**
+     * @OA\Patch(
+     *     path="/profiles/{profileId}",
+     *     tags={"Profiles"},
+     *     summary="Partially update a profile",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="profileId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="name", type="string", maxLength=255, example="Maria"),
+     *             @OA\Property(property="relationship", type="string", maxLength=255, example="parent")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/ProfileResponse")),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=422, description="Validation error", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function update(Request $request, string $profileId): JsonResponse
+    {
+        $data = $request->validate([
+            'name'         => 'sometimes|string|max:255',
+            'relationship' => 'sometimes|nullable|string|max:255',
+        ]);
+
+        $result = $this->updateProfile->execute(new UpdateProfileRequest(
+            profileId: $profileId,
+            name: $data['name'] ?? null,
+            relationship: array_key_exists('relationship', $data) ? $data['relationship'] : null,
+        ));
+
+        return response()->json([
+            'id'           => $result->id,
+            'name'         => $result->name,
+            'relationship' => $result->relationship,
+            'createdAt'    => $result->createdAt->toIso8601String(),
+        ]);
     }
 }

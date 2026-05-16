@@ -60,6 +60,7 @@ Route::group(['middleware' => [JwtCookieMiddleware::class, AuthenticateApi::clas
     Route::get('/profiles', [ProfileController::class, 'index']);
     Route::get('/profiles/{profileId}', [ProfileController::class, 'show']);
     Route::post('/profiles', [ProfileController::class, 'store']);
+    Route::patch('/profiles/{profileId}', [ProfileController::class, 'update']);
 
     // Treatments
     Route::post('/treatments', [TreatmentController::class, 'store']);
