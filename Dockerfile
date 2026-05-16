@@ -1,4 +1,4 @@
-FROM php:8.4-fpm
+FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -28,8 +28,23 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
+
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+
 COPY . .
 
-RUN composer install --optimize-autoloader --no-scripts --no-interaction
+RUN composer install \
+    --optimize-autoloader \
+    --no-interaction \
+    --no-dev
 
-CMD ["sh", "-c", "php artisan migrate --force && php artisan l5-swagger:generate && php artisan config:cache && php artisan route:cache && php artisan event:cache && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
+RUN php artisan l5-swagger:generate
+
+COPY start.sh /usr/local/bin/start.sh
+
+RUN chmod +x /usr/local/bin/start.sh
+
+EXPOSE 8080
+
+CMD ["sh", "/usr/local/bin/start.sh"]
