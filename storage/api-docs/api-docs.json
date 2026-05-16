@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Medshelf API",
-        "description": "Documentacion OpenAPI para los endpoints de Medshelf.",
+        "description": "OpenAPI documentation for the Medshelf API.",
         "version": "1.0.0"
     },
     "servers": [
@@ -446,20 +446,110 @@
                 ]
             }
         },
-        "/auth/me": {
+        "/auth/account": {
             "get": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Get authenticated user data",
-                "operationId": "a9c495788506b114956e3f509e5d90a2",
+                "operationId": "ab8682111632f7538cfcb67754542c44",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/MeResponse"
+                                    "$ref": "#/components/schemas/AccountResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Soft-delete the authenticated user account",
+                "operationId": "216b89f1990208ec56b700309c8da86c",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MessageResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Update authenticated user data",
+                "operationId": "33306f46ecbce95c6cf80dc04ee2f91b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Maria"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "jose@gmail.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AccountResponse"
                                 }
                             }
                         }
@@ -748,7 +838,7 @@
                     "Houses"
                 ],
                 "summary": "Get my house details",
-                "operationId": "7766f485e02d4c522056880d33475857",
+                "operationId": "40958f1913c9d8b38de447c64124763d",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -756,63 +846,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/HouseResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/houses/{houseId}": {
-            "get": {
-                "tags": [
-                    "Houses"
-                ],
-                "summary": "Get house details by ID",
-                "operationId": "4ccb30b7c65e1251cefeb60d57e22016",
-                "parameters": [
-                    {
-                        "name": "houseId",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "format": "uuid"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HouseResponse"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not found",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -2515,6 +2548,103 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "patch": {
+                "tags": [
+                    "Profiles"
+                ],
+                "summary": "Partially update a profile",
+                "operationId": "0939cc35b2177eb224f97c0af3bc13a8",
+                "parameters": [
+                    {
+                        "name": "profileId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "Maria"
+                                    },
+                                    "relationship": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "parent"
+                                    },
+                                    "allergies": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "Penicillin",
+                                            "Pollen"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/profiles/{profileId}/treatments": {
@@ -2668,11 +2798,9 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "profileId",
                                     "itemId",
-                                    "frequencyValue",
+                                    "dose",
                                     "frequencyUnit",
-                                    "doseQuantity",
                                     "startDate"
                                 ],
                                 "properties": {
@@ -2939,7 +3067,7 @@
                     "Treatments"
                 ],
                 "summary": "Update treatment",
-                "operationId": "e8cfeeca9c63f6b69720647bb18f43ad",
+                "operationId": "a5845c603fa2c123ac6262bdb217d43c",
                 "parameters": [
                     {
                         "name": "treatmentId",
@@ -2996,6 +3124,26 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/TreatmentResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid status transition",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Treatment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -3194,6 +3342,84 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "Treatment is not active",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Treatment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/treatments/{treatmentId}/qr": {
+            "get": {
+                "tags": [
+                    "Treatments"
+                ],
+                "summary": "Generate QR code image for a treatment",
+                "operationId": "be6dff99f9e82416a0024fb81e39d286",
+                "parameters": [
+                    {
+                        "name": "treatmentId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PNG image of the QR code encoding the treatment summary",
+                        "content": {
+                            "image/png": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "401": {
                         "description": "Unauthorized",
                         "content": {
@@ -3217,11 +3443,16 @@
         "schemas": {
             "ErrorResponse": {
                 "required": [
-                    "message"
+                    "message",
+                    "timestamp"
                 ],
                 "properties": {
                     "message": {
                         "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -3258,26 +3489,15 @@
                                 "type": "string"
                             },
                             "email": {
-                                "type": "string"
+                                "type": "string",
+                                "format": "email"
                             }
                         },
                         "type": "object"
                     },
                     "expiresIn": {
+                        "description": "Token lifetime in seconds",
                         "type": "integer"
-                    },
-                    "house": {
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "format": "uuid"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        },
-                        "type": "object",
-                        "nullable": true
                     }
                 },
                 "type": "object"
@@ -3865,7 +4085,7 @@
                     },
                     "createdAt": {
                         "type": "string",
-                        "format": "date"
+                        "format": "date-time"
                     }
                 },
                 "type": "object"
@@ -4063,44 +4283,22 @@
                 },
                 "type": "object"
             },
-            "MeResponse": {
+            "AccountResponse": {
                 "required": [
-                    "user",
-                    "house"
+                    "id",
+                    "name",
+                    "email"
                 ],
                 "properties": {
-                    "user": {
-                        "required": [
-                            "id",
-                            "name",
-                            "email"
-                        ],
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "format": "uuid"
-                            },
-                            "name": {
-                                "type": "string"
-                            },
-                            "email": {
-                                "type": "string"
-                            }
-                        },
-                        "type": "object"
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
                     },
-                    "house": {
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "format": "uuid"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        },
-                        "type": "object",
-                        "nullable": true
+                    "name": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
                     }
                 },
                 "type": "object"
@@ -4204,8 +4402,8 @@
             "TreatmentResponse": {
                 "required": [
                     "id",
-                    "profileId",
-                    "itemId",
+                    "profile",
+                    "item",
                     "status",
                     "dose",
                     "frequencyUnit",
@@ -4236,21 +4434,35 @@
                         "type": "object"
                     },
                     "status": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "paused",
+                            "completed",
+                            "cancelled"
+                        ]
                     },
                     "dose": {
-                        "type": "number"
+                        "type": "number",
+                        "minimum": 0.01
                     },
                     "frequencyUnit": {
-                        "type": "string"
+                        "type": "string",
+                        "enum": [
+                            "hours",
+                            "days",
+                            "weeks"
+                        ]
                     },
                     "startDate": {
                         "type": "string",
-                        "format": "date"
+                        "format": "date",
+                        "example": "2026-05-11"
                     },
                     "endDate": {
                         "type": "string",
                         "format": "date",
+                        "example": "2026-05-30",
                         "nullable": true
                     },
                     "createdAt": {
@@ -4268,8 +4480,7 @@
                     "status",
                     "dose",
                     "frequencyUnit",
-                    "startDate",
-                    "createdAt"
+                    "startDate"
                 ],
                 "properties": {
                     "id": {

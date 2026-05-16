@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Core\Home\Profile\Application\Exception\ProfileNotFound;
 use App\Core\Home\Treatment\Application\Dto\Request\CreateTreatmentRequest;
-use App\Core\Home\Treatment\Application\Dto\Request\ModifyTreatmentRequest;
 use App\Core\Home\Treatment\Application\Dto\Request\RegisterDoseRequest;
+use App\Core\Home\Treatment\Application\Dto\Request\UpdateTreatmentRequest;
 use App\Core\Home\Treatment\Application\Exception\TreatmentNotFound;
 use App\Core\Home\Treatment\Application\UseCase\CreateTreatment;
-use App\Core\Home\Treatment\Application\UseCase\ModifyTreatment;
 use App\Core\Home\Treatment\Application\UseCase\RegisterDose;
+use App\Core\Home\Treatment\Application\UseCase\UpdateTreatment;
 use App\Core\Home\Treatment\Model\Exception\TreatmentException;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
@@ -19,7 +19,9 @@ use App\Providers\Core\Home\Treatment\Service\TreatmentFinder;
 use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use OpenApi\Annotations as OA;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class TreatmentController extends Controller
 {
@@ -27,7 +29,7 @@ class TreatmentController extends Controller
         protected TreatmentFinder   $treatmentFinder,
         protected ConsumptionFinder $consumptionFinder,
         protected CreateTreatment   $addTreatment,
-        protected ModifyTreatment   $modifyTreatment,
+        protected UpdateTreatment   $updateTreatment,
         protected RegisterDose      $registerDose,
     )
     {
@@ -131,7 +133,7 @@ class TreatmentController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"profileId","itemId","frequencyValue","frequencyUnit","doseQuantity","startDate"},
+     *             required={"itemId","dose","frequencyUnit","startDate"},
      *             @OA\Property(property="itemId", type="string", format="uuid"),
      *             @OA\Property(property="dose", type="number", minimum=0.01, example=1.5),
      *             @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
@@ -227,10 +229,12 @@ class TreatmentController extends Controller
      *         )
      *     ),
      *     @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/TreatmentResponse")),
+     *     @OA\Response(response=400, description="Invalid status transition", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=404, description="Treatment not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
-    public function patch(Request $request, string $treatmentId): JsonResponse
+    public function update(Request $request, string $treatmentId): JsonResponse
     {
         $data = $request->validate([
             'dose' => 'nullable|numeric|min:0.01',
@@ -239,7 +243,7 @@ class TreatmentController extends Controller
             'endDate' => 'nullable|date_format:Y-m-d',
         ]);
         try {
-            $result = $this->modifyTreatment->execute(new ModifyTreatmentRequest(
+            $result = $this->updateTreatment->execute(new UpdateTreatmentRequest(
                 treatmentId: $treatmentId,
                 dose: $data['dose'] ?? null,
                 frequencyUnit: $data['frequencyUnit'] ?? null,
@@ -282,6 +286,8 @@ class TreatmentController extends Controller
      *         )
      *     ),
      *     @OA\Response(response=201, description="Created", @OA\JsonContent(ref="#/components/schemas/ConsumptionResponse")),
+     *     @OA\Response(response=400, description="Treatment is not active", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=404, description="Treatment not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
      *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
      * )
      */
@@ -348,5 +354,43 @@ class TreatmentController extends Controller
             fn(CursorRequest $cursorRequest) => $this->consumptionFinder->listByTreatmentIdByCursor($treatmentId, $cursorRequest),
             fn(OffsetRequest $offsetRequest) => $this->consumptionFinder->listByTreatmentIdByOffset($treatmentId, $offsetRequest),
         );
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/treatments/{treatmentId}/qr",
+     *     tags={"Treatments"},
+     *     summary="Generate QR code image for a treatment",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Parameter(name="treatmentId", in="path", required=true, @OA\Schema(type="string", format="uuid")),
+     *     @OA\Response(
+     *         response=200,
+     *         description="PNG image of the QR code encoding the treatment summary",
+     *         @OA\MediaType(mediaType="image/png", @OA\Schema(type="string", format="binary"))
+     *     ),
+     *     @OA\Response(response=404, description="Not found", @OA\JsonContent(ref="#/components/schemas/ErrorResponse")),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function qr(string $treatmentId): Response|JsonResponse
+    {
+        $treatment = $this->treatmentFinder->findById($treatmentId);
+
+        if (!$treatment) {
+            return response()->json(['message' => 'Treatment not found'], 404);
+        }
+
+        $payload = json_encode([
+            'id' => $treatment->id,
+            'status' => $treatment->status,
+            'dose' => $treatment->dose,
+            'frequencyUnit' => $treatment->frequencyUnit,
+            'startDate' => $treatment->startDate->toDateString(),
+            'endDate' => $treatment->endDate?->toDateString(),
+        ], JSON_THROW_ON_ERROR);
+
+        $image = QrCode::format('svg')->size(300)->generate($payload);
+
+        return response($image, 200, ['Content-Type' => 'image/svg+xml']);
     }
 }

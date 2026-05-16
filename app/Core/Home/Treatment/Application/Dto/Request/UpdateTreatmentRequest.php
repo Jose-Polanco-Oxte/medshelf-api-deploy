@@ -2,7 +2,7 @@
 
 namespace App\Core\Home\Treatment\Application\Dto\Request;
 
-readonly class ModifyTreatmentRequest
+readonly class UpdateTreatmentRequest
 {
     public function __construct(
         public string  $treatmentId,
