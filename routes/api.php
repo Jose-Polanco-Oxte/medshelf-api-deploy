@@ -71,6 +71,7 @@ Route::group(['middleware' => [JwtCookieMiddleware::class, AuthenticateApi::clas
     Route::patch('/treatments/{treatmentId}', [TreatmentController::class, 'modify']);
     Route::post('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'storeDose']);
     Route::get('/treatments/{treatmentId}/consumptions', [TreatmentController::class, 'indexDoses']);
+    Route::get('/treatments/{treatmentId}/qr', [TreatmentController::class, 'qr']);
 
     // Active Ingredients
     Route::get('/active-ingredients', [ActiveIngredientController::class, 'index']);
