@@ -1,0 +1,5 @@
+[phases.setup]
+aptPkgs = ["libpng-dev", "libjpeg-dev", "libfreetype-dev"]
+
+[phases.build]
+cmds = ["install-php-extensions gd"]
