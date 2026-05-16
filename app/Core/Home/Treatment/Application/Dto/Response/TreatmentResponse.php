@@ -6,8 +6,8 @@ readonly class TreatmentResponse
 {
     public function __construct(
         public string  $id,
-        public string  $profileId,
-        public string  $itemId,
+        public array   $profile,
+        public array   $item,
         public string  $status,
         public int     $frequencyValue,
         public string  $frequencyUnit,

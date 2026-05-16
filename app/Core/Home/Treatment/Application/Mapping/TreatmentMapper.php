@@ -15,8 +15,8 @@ final class TreatmentMapper
     {
         return new TreatmentResponse(
             id: $treatment->getId(),
-            profileId: $treatment->getProfileId(),
-            itemId: $treatment->getItemId(),
+            profile: ['id' => $treatment->getProfileId()],
+            item: ['id' => $treatment->getItemId()],
             status: $treatment->getStatus()->value,
             frequencyValue: $treatment->getFrequencyValue(),
             frequencyUnit: $treatment->getFrequencyUnit(),

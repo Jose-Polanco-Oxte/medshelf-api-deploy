@@ -76,8 +76,8 @@ class TreatmentFinder
     {
         return new TreatmentView(
             id: $record->public_id,
-            profileId: $record->profile->public_id,
-            itemId: $record->item->public_id,
+            profile: ['id' => $record->profile->public_id],
+            item: ['id' => $record->item->public_id],
             status: $record->status,
             frequencyValue: $record->frequency_value,
             frequencyUnit: $record->frequency_unit,

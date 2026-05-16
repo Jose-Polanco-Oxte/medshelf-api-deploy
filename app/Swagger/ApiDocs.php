@@ -285,16 +285,16 @@ use OpenApi\Annotations as OA;
  * @OA\Schema(
  *     schema="TreatmentResponse",
  *     type="object",
- *     required={"id","profileId","itemId","status","frequencyValue","frequencyUnit","doseQuantity","startDate","createdAt"},
+ *     required={"id","profile","item","status","frequencyValue","frequencyUnit","doseQuantity","startDate","createdAt"},
  *     @OA\Property(property="id", type="string", format="uuid"),
- *     @OA\Property(property="profileId", type="string", format="uuid"),
- *     @OA\Property(property="itemId", type="string", format="uuid"),
- *     @OA\Property(property="status", type="string"),
- *     @OA\Property(property="frequencyValue", type="integer"),
- *     @OA\Property(property="frequencyUnit", type="string"),
- *     @OA\Property(property="doseQuantity", type="number"),
- *     @OA\Property(property="startDate", type="string", format="date"),
- *     @OA\Property(property="endDate", type="string", format="date", nullable=true),
+ *     @OA\Property(property="profile", type="object", required={"id"}, @OA\Property(property="id", type="string", format="uuid")),
+ *     @OA\Property(property="item", type="object", required={"id"}, @OA\Property(property="id", type="string", format="uuid")),
+ *     @OA\Property(property="status", type="string", enum={"active","paused","completed","cancelled"}),
+ *     @OA\Property(property="frequencyValue", type="integer", minimum=1),
+ *     @OA\Property(property="frequencyUnit", type="string", enum={"hours","days","weeks"}),
+ *     @OA\Property(property="doseQuantity", type="number", minimum=0.01),
+ *     @OA\Property(property="startDate", type="string", format="date", example="2026-05-11"),
+ *     @OA\Property(property="endDate", type="string", format="date", nullable=true, example="2026-05-30"),
  *     @OA\Property(property="createdAt", type="string", format="date-time")
  * )
  */
