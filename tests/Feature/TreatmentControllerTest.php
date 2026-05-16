@@ -15,11 +15,21 @@ use App\Models\TreatmentModel;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\Feature\Traits\WithJwtAuth;
 use Tests\TestCase;
 
 class TreatmentControllerTest extends TestCase
 {
     use RefreshDatabase;
+    use WithJwtAuth;
+
+    private User $actor;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actor = User::factory()->create();
+    }
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
@@ -35,9 +45,31 @@ class TreatmentControllerTest extends TestCase
             'frequencyUnit' => 'hours',
             'doseQuantity' => 1.5,
             'startDate' => now()->toDateString(),
-        ])
+        ], $this->authHeaders($this->actor))
             ->assertStatus(201)
             ->assertJsonFragment(['status' => 'active']);
+    }
+
+    public function test_store_response_has_required_fields(): void
+    {
+        $profile = $this->createProfile();
+        $item = $this->createItem();
+
+        $this->postJson('/api/treatments', [
+            'profileId' => $profile->public_id,
+            'itemId' => $item->public_id,
+            'frequencyValue' => 8,
+            'frequencyUnit' => 'hours',
+            'doseQuantity' => 1.0,
+            'startDate' => now()->toDateString(),
+        ], $this->authHeaders($this->actor))
+            ->assertStatus(201)
+            ->assertJsonStructure(['id', 'status', 'frequencyValue', 'frequencyUnit', 'doseQuantity', 'startDate', 'createdAt']);
+    }
+
+    public function test_store_returns_401_without_auth(): void
+    {
+        $this->postJson('/api/treatments', [])->assertStatus(401);
     }
 
     private function createProfile(): ProfileModel
@@ -52,7 +84,7 @@ class TreatmentControllerTest extends TestCase
      *
      * @param string $consumptionType 'continuous'|'discrete'
      */
-    private function createItem(string $consumptionType = 'continuous', int $totalContent = 10): ItemModel
+    private function createItem(string $consumptionType = 'continuous', int $totalContent = 10, ?User $houseOwner = null): ItemModel
     {
         $pharmaForm = PharmaceuticalFormModel::create([
             'name' => 'Tablet ' . Str::random(4),
@@ -77,7 +109,7 @@ class TreatmentControllerTest extends TestCase
             'strength_unit' => 'mg',
         ]);
 
-        $houseOwner = User::factory()->create();
+        $houseOwner ??= User::factory()->create();
 
         $house = HouseModel::create([
             'public_id' => Str::uuid(),
@@ -119,7 +151,7 @@ class TreatmentControllerTest extends TestCase
             'frequencyUnit' => 'hours',
             'doseQuantity' => 1.0,
             'startDate' => now()->toDateString(),
-        ])
+        ], $this->authHeaders($this->actor))
             ->assertStatus(404);
     }
 
@@ -127,7 +159,7 @@ class TreatmentControllerTest extends TestCase
     {
         $this->postJson('/api/treatments', [
             'profileId' => 'not-a-uuid',
-        ])
+        ], $this->authHeaders($this->actor))
             ->assertStatus(422);
     }
 
@@ -135,7 +167,7 @@ class TreatmentControllerTest extends TestCase
     {
         $treatment = $this->createTreatment();
 
-        $this->getJson("/api/treatments?profile_id={$treatment->profile->public_id}")
+        $this->getJson("/api/treatments?profile_id={$treatment->profile->public_id}", $this->authHeaders($this->actor))
             ->assertStatus(200)
             ->assertJsonFragment(['id' => $treatment->public_id]);
     }
@@ -166,14 +198,14 @@ class TreatmentControllerTest extends TestCase
     {
         $treatment = $this->createTreatment();
 
-        $this->getJson("/api/treatments/{$treatment->public_id}")
+        $this->getJson("/api/treatments/{$treatment->public_id}", $this->authHeaders($this->actor))
             ->assertStatus(200)
             ->assertJsonFragment(['id' => $treatment->public_id]);
     }
 
     public function test_show_returns_404_when_not_found(): void
     {
-        $this->getJson('/api/treatments/non-existent-id')
+        $this->getJson('/api/treatments/non-existent-id', $this->authHeaders($this->actor))
             ->assertStatus(404);
     }
 
@@ -186,59 +218,55 @@ class TreatmentControllerTest extends TestCase
         $this->putJson("/api/treatments/{$treatment->public_id}", [
             'frequencyValue' => 24,
             'frequencyUnit' => 'hours',
-        ])
+        ], $this->authHeaders($this->actor))
             ->assertStatus(200)
             ->assertJsonFragment(['frequencyValue' => 24]);
     }
 
     // ── POST /api/treatments/{id}/pause ───────────────────────────────────
 
-    public function test_pause_transitions_treatment_to_paused(): void
+    // ── PATCH /api/treatments/{id} (status transitions) ──────────────────────
+
+    public function test_patch_paused_transitions_active_treatment(): void
     {
         $treatment = $this->createTreatment('active');
 
-        $this->postJson("/api/treatments/{$treatment->public_id}/pause")
+        $this->patchJson("/api/treatments/{$treatment->public_id}", ['status' => 'paused'], $this->authHeaders($this->actor))
             ->assertStatus(200)
             ->assertJsonFragment(['status' => 'paused']);
     }
 
-    public function test_pause_returns_422_when_already_paused(): void
+    public function test_patch_paused_returns_400_when_already_paused(): void
     {
         $treatment = $this->createTreatment('paused');
 
-        $this->postJson("/api/treatments/{$treatment->public_id}/pause")
+        $this->patchJson("/api/treatments/{$treatment->public_id}", ['status' => 'paused'], $this->authHeaders($this->actor))
             ->assertStatus(400);
     }
 
-    // ── POST /api/treatments/{id}/resume ──────────────────────────────────
-
-    public function test_resume_transitions_paused_treatment_to_active(): void
+    public function test_patch_active_resumes_paused_treatment(): void
     {
         $treatment = $this->createTreatment('paused');
 
-        $this->postJson("/api/treatments/{$treatment->public_id}/resume")
+        $this->patchJson("/api/treatments/{$treatment->public_id}", ['status' => 'active'], $this->authHeaders($this->actor))
             ->assertStatus(200)
             ->assertJsonFragment(['status' => 'active']);
     }
 
-    // ── POST /api/treatments/{id}/cancel ──────────────────────────────────
-
-    public function test_cancel_cancels_active_treatment(): void
+    public function test_patch_cancelled_cancels_active_treatment(): void
     {
         $treatment = $this->createTreatment('active');
 
-        $this->postJson("/api/treatments/{$treatment->public_id}/cancel")
+        $this->patchJson("/api/treatments/{$treatment->public_id}", ['status' => 'cancelled'], $this->authHeaders($this->actor))
             ->assertStatus(200)
             ->assertJsonFragment(['status' => 'cancelled']);
     }
 
-    // ── POST /api/treatments/{id}/complete ────────────────────────────────
-
-    public function test_complete_completes_active_treatment(): void
+    public function test_patch_completed_completes_active_treatment(): void
     {
         $treatment = $this->createTreatment('active');
 
-        $this->postJson("/api/treatments/{$treatment->public_id}/complete")
+        $this->patchJson("/api/treatments/{$treatment->public_id}", ['status' => 'completed'], $this->authHeaders($this->actor))
             ->assertStatus(200)
             ->assertJsonFragment(['status' => 'completed']);
     }
@@ -247,51 +275,53 @@ class TreatmentControllerTest extends TestCase
 
     public function test_store_dose_registers_dose_and_returns_201(): void
     {
+        // The actor must own the house so their JWT token has the correct house_id claim
         $profile = $this->createProfile();
-        $item = $this->createItem('continuous', 10);
+        $item    = $this->createItem('continuous', 10, $this->actor);
+
+        $this->actor->load('house');
 
         $treatment = TreatmentModel::create([
-            'public_id' => Str::uuid(),
-            'profile_id' => $profile->id,
-            'item_id' => $item->id,
-            'status' => 'active',
+            'public_id'       => Str::uuid(),
+            'profile_id'      => $profile->id,
+            'item_id'         => $item->id,
+            'status'          => 'active',
             'frequency_value' => 8,
-            'frequency_unit' => 'hours',
-            'dose_quantity' => 1.0,
-            'start_date' => now()->toDateString(),
-            'end_date' => null,
+            'frequency_unit'  => 'hours',
+            'dose_quantity'   => 1.0,
+            'start_date'      => now()->toDateString(),
+            'end_date'        => null,
         ]);
 
-        $house = $item->storage->place->house;
-
+        // Re-issue token so it includes the house_id claim set above
         $this->postJson("/api/treatments/{$treatment->public_id}/consumptions", [
             'amount' => 1.5,
-        ], ['X-House-Id' => $house->public_id])
+        ], $this->authHeaders($this->actor))
             ->assertStatus(201);
     }
 
-    public function test_store_dose_returns_422_when_treatment_not_active(): void
+    public function test_store_dose_returns_400_when_treatment_not_active(): void
     {
         $profile = $this->createProfile();
-        $item = $this->createItem('continuous', 10);
+        $item    = $this->createItem('continuous', 10, $this->actor);
+
+        $this->actor->load('house');
 
         $treatment = TreatmentModel::create([
-            'public_id' => Str::uuid(),
-            'profile_id' => $profile->id,
-            'item_id' => $item->id,
-            'status' => 'paused',
+            'public_id'       => Str::uuid(),
+            'profile_id'      => $profile->id,
+            'item_id'         => $item->id,
+            'status'          => 'paused',
             'frequency_value' => 8,
-            'frequency_unit' => 'hours',
-            'dose_quantity' => 1.0,
-            'start_date' => now()->toDateString(),
-            'end_date' => null,
+            'frequency_unit'  => 'hours',
+            'dose_quantity'   => 1.0,
+            'start_date'      => now()->toDateString(),
+            'end_date'        => null,
         ]);
-
-        $house = $item->storage->place->house;
 
         $this->postJson("/api/treatments/{$treatment->public_id}/consumptions", [
             'amount' => 1.5,
-        ], ['X-House-Id' => $house->public_id])
+        ], $this->authHeaders($this->actor))
             ->assertStatus(400);
     }
 
@@ -301,7 +331,7 @@ class TreatmentControllerTest extends TestCase
     {
         $treatment = $this->createTreatment();
 
-        $this->getJson("/api/treatments/{$treatment->public_id}/consumptions")
+        $this->getJson("/api/treatments/{$treatment->public_id}/consumptions", $this->authHeaders($this->actor))
             ->assertStatus(200);
     }
 }
