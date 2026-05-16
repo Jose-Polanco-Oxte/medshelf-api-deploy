@@ -43,7 +43,7 @@ class ConsumptionFinder
                 )
             ),
             amount: $record->amount,
-            consumedAt: $record->consumed_at,
+            consumedAt: $record->consumed_at->toIso8601String(),
         );
     }
 
@@ -69,7 +69,7 @@ class ConsumptionFinder
         return new ConsumptionView(
             id: $consumptionModel->public_id,
             amount: $consumptionModel->amount,
-            consumedAt: $consumptionModel->consumed_at,
+            consumedAt: $consumptionModel->consumed_at->toIso8601String(),
         );
     }
 

@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Core\Shared\Application\EventPublisher;
 use App\Core\Shared\Application\TransactionManager;
 use App\Providers\Core\LaravelEventPublisher;
-use DB;
+use App\Providers\Core\LaravelTransactionManager;
 use Illuminate\Support\ServiceProvider;
 use URL;
 
@@ -17,14 +17,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(EventPublisher::class, LaravelEventPublisher::class);
-        $this->app->bind(TransactionManager::class, function () {
-            return new class implements TransactionManager {
-                public function run(callable $callback): mixed
-                {
-                    return DB::transaction($callback);
-                }
-            };
-        });
+        $this->app->bind(TransactionManager::class, LaravelTransactionManager::class);
     }
 
     /**

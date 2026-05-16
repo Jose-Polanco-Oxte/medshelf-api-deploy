@@ -22,10 +22,7 @@ final readonly class RefreshToken
                 'id' => $user->public_id,
                 'name' => $user->name,
                 'email' => $user->email,
-            ],
-            house: $user->house
-                ? ['id' => $user->house->public_id, 'name' => $user->house->name]
-                : null,
+            ]
         );
     }
 }

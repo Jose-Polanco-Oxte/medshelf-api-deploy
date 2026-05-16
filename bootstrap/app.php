@@ -1,6 +1,8 @@
 <?php
 
+use App\Core\Auth\Application\Exception\InvalidCredentialsException;
 use App\Core\Shared\Application\AppException;
+use App\Core\Shared\Application\NotFoundException;
 use App\Core\Shared\Domain\DomainException;
 use App\Http\Middleware\AuthenticateApi;
 use App\Providers\Core\InfrastructureException;
@@ -31,6 +33,21 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => $e->getMessage(),
                 'timestamp' => now()->toIso8601String(),
             ], 400);
+        });
+
+        // Must come before AppException (NotFoundException is a subtype of AppException)
+        $exceptions->renderable(function (NotFoundException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'timestamp' => now()->toIso8601String(),
+            ], 404);
+        });
+
+        $exceptions->renderable(function (InvalidCredentialsException $e, Request $request) {
+            return response()->json([
+                'message' => $e->getMessage(),
+                'timestamp' => now()->toIso8601String(),
+            ], 401);
         });
 
         $exceptions->renderable(function (AppException $e, Request $request) {

@@ -28,7 +28,7 @@ class HouseFinder
                 name: $owner->name,
             ),
             name: $record->name,
-            createdAt: $record->created_at,
+            createdAt: $record->created_at->toIso8601String(),
         );
     }
 }
