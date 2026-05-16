@@ -63,4 +63,13 @@ class TreatmentException extends DomainException
             $e->getMessage()
         ));
     }
+
+    public static function itemDoesNotBelongToProduct(string $itemId, string $productId): self
+    {
+        return new self(sprintf(
+            'Item %s does not belong to the product %s linked to this treatment.',
+            $itemId,
+            $productId
+        ));
+    }
 }

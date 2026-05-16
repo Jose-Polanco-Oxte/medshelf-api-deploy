@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\ItemModel;
+use App\Models\ProductModel;
 use App\Models\ProfileModel;
 use App\Models\TreatmentModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,7 +17,7 @@ class TreatmentModelFactory extends Factory
         return [
             'public_id' => fake()->unique()->uuid(),
             'profile_id' => ProfileModel::factory(),
-            'item_id' => ItemModel::factory(),
+            'product_id' => ProductModel::factory(),
             'status' => 'active',
             'dose' => 1.0,
             'frequency_hours' => 8,

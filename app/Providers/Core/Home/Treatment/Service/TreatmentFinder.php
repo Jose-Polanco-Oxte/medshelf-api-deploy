@@ -7,7 +7,6 @@ use App\Core\Shared\Domain\CursorResponse;
 use App\Core\Shared\Domain\OffsetRequest;
 use App\Core\Shared\Domain\OffsetResponse;
 use App\Models\TreatmentModel;
-use App\Providers\Core\Home\Item\Resume\ItemResume;
 use App\Providers\Core\Home\Item\Resume\ProductResume;
 use App\Providers\Core\Home\Treatment\Detail\TreatmentDetail;
 use App\Providers\Core\Home\Treatment\Resume\ProfileResume;
@@ -21,8 +20,7 @@ class TreatmentFinder
     {
         $record = TreatmentModel::with([
             'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
-            'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
-            'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+            'product' => fn($q) => $q->select('id', 'public_id', 'name'),
         ])
             ->where('public_id', $id)
             ->first();
@@ -40,12 +38,9 @@ class TreatmentFinder
                 id: $record->profile->public_id,
                 name: $record->profile->name,
             ),
-            item: new ItemResume(
-                id: $record->item->public_id,
-                product: new ProductResume(
-                    id: $record->item->public_id,
-                    name: $record->item->product->name,
-                )
+            product: new ProductResume(
+                id: $record->product->public_id,
+                name: $record->product->name,
             ),
             status: $record->status,
             dose: $record->dose,
@@ -60,8 +55,7 @@ class TreatmentFinder
     {
         $result = TreatmentModel::with([
             'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
-            'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
-            'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+            'product' => fn($q) => $q->select('id', 'public_id', 'name'),
         ])
             ->whereHas('profile', fn($q) => $q->where('public_id', $profileId))
             ->orderBy('id')
@@ -86,12 +80,9 @@ class TreatmentFinder
                 id: $record->profile->public_id,
                 name: $record->profile->name,
             ),
-            item: new ItemResume(
-                id: $record->item->public_id,
-                product: new ProductResume(
-                    $record->item->product->public_id,
-                    $record->item->product->name,
-                )
+            product: new ProductResume(
+                id: $record->product->public_id,
+                name: $record->product->name,
             ),
             status: $record->status,
             dose: $record->dose,
@@ -112,8 +103,7 @@ class TreatmentFinder
         return PaginationService::buildCursorQuery(
             query: TreatmentModel::with([
                 'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
-                'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
-                'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+                'product' => fn($q) => $q->select('id', 'public_id', 'name'),
             ])
                 ->whereHas('profile', fn($q) => $q->where('public_id', $profileId))
                 ->orderBy('id'),
@@ -135,8 +125,7 @@ class TreatmentFinder
         return PaginationService::buildCursorQuery(
             query: TreatmentModel::with([
                 'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
-                'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
-                'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+                'product' => fn($q) => $q->select('id', 'public_id', 'name'),
             ])
                 ->whereHas('profile.user', fn($q) => $q->where('public_id', $userId))
                 ->orderBy('id'),
@@ -151,8 +140,7 @@ class TreatmentFinder
     {
         $result = TreatmentModel::with([
             'profile' => fn($q) => $q->select('id', 'public_id', 'name'),
-            'item' => fn($q) => $q->select('id', 'public_id', 'product_id'),
-            'item.product' => fn($q) => $q->select('id', 'public_id', 'name'),
+            'product' => fn($q) => $q->select('id', 'public_id', 'name'),
         ])
             ->whereHas('profile.user', fn($q) => $q->where('public_id', $userId))
             ->orderBy('id')

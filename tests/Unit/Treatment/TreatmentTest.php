@@ -14,7 +14,7 @@ class TreatmentTest extends TestCase
     {
         $treatment = Treatment::create(
             profileId: 'profile-id',
-            itemId: 'item-id',
+            productId: 'product-id',
             dose: 8,
             frequencyHours: 8,
             startDate: Carbon::today(),
@@ -37,7 +37,7 @@ class TreatmentTest extends TestCase
         return Treatment::load(
             id: 'test-id',
             profileId: 'profile-id',
-            itemId: 'item-id',
+            productId: 'product-id',
             status: $status,
             dose: 8,
             frequencyHours: 8,

@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $public_id
  * @property int $profile_id
- * @property int $item_id
+ * @property int $product_id
  * @property string $status
  * @property float $dose
  * @property int $frequency_hours
@@ -27,7 +27,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $deleted_at
  * @property-read Collection<int, ConsumptionModel> $consumptions
  * @property-read int|null $consumptions_count
- * @property-read ItemModel $item
+ * @property-read ProductModel $product
  * @property-read ProfileModel $profile
  * @method static TreatmentModelFactory factory($count = null, $state = [])
  * @method static Builder<static>|TreatmentModel newModelQuery()
@@ -39,7 +39,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|TreatmentModel whereEndDate($value)
  * @method static Builder<static>|TreatmentModel whereFrequencyHours($value)
  * @method static Builder<static>|TreatmentModel whereId($value)
- * @method static Builder<static>|TreatmentModel whereItemId($value)
+ * @method static Builder<static>|TreatmentModel whereProductId($value)
  * @method static Builder<static>|TreatmentModel whereProfileId($value)
  * @method static Builder<static>|TreatmentModel wherePublicId($value)
  * @method static Builder<static>|TreatmentModel whereStartDate($value)
@@ -53,16 +53,16 @@ class TreatmentModel extends Model
 
     protected $table = 'treatments';
 
-    protected $fillable = ['public_id', 'profile_id', 'item_id', 'status', 'dose', 'frequency_hours', 'start_date', 'days'];
+    protected $fillable = ['public_id', 'profile_id', 'product_id', 'status', 'dose', 'frequency_hours', 'start_date', 'days'];
 
     public function profile(): BelongsTo
     {
         return $this->belongsTo(ProfileModel::class, 'profile_id');
     }
 
-    public function item(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(ItemModel::class, 'item_id');
+        return $this->belongsTo(ProductModel::class, 'product_id');
     }
 
     public function consumptions(): HasMany

@@ -2,9 +2,7 @@
 
 namespace App\Core\Home\Treatment\Application\UseCase;
 
-use App\Core\Home\Item\Application\Exception\ItemNotFound;
 use App\Core\Home\Item\Application\Exception\ProductNotFound;
-use App\Core\Home\Item\Model\Repository\ItemRepository;
 use App\Core\Home\Item\Model\Repository\ProductRepository;
 use App\Core\Home\Item\Model\ValueObject\ConsumptionType;
 use App\Core\Home\Profile\Application\Exception\ProfileNotFound;
@@ -21,7 +19,6 @@ final readonly class CreateTreatment
 {
     public function __construct(
         private ProfileRepository   $profileRepository,
-        private ItemRepository      $itemRepository,
         private TreatmentRepository $treatmentRepository,
         private ProductRepository   $productRepository,
     )
@@ -32,17 +29,15 @@ final readonly class CreateTreatment
     {
         $profile = $this->profileRepository->findById($request->profileId)
             ?? throw new ProfileNotFound($request->profileId);
-        $item = $this->itemRepository->findByIdAndHouseId($request->itemId, $request->houseId)
-            ?? throw new ItemNotFound($request->itemId);
-        $product = $this->productRepository->findById($item->getProductId())
-            ?? throw new ProductNotFound($item->getProductId());
+        $product = $this->productRepository->findById($request->productId)
+            ?? throw new ProductNotFound($request->productId);
 
         if ($product->consumptionType == ConsumptionType::DISCRETE && $request->dose != floor($request->dose)) {
             throw TreatmentException::discreteDoseMustBeInteger($request->dose);
         }
         $treatment = Treatment::create(
             profileId: $profile->getId(),
-            itemId: $request->itemId,
+            productId: $request->productId,
             dose: $request->dose,
             frequencyHours: $request->frequencyHours,
             startDate: Carbon::parse($request->startDate),

@@ -9,7 +9,7 @@ readonly class TreatmentResponse
     public function __construct(
         public string  $id,
         public string  $profileId,
-        public string  $itemId,
+        public string  $productId,
         public string  $status,
         public float   $dose,
         public int     $frequencyHours,

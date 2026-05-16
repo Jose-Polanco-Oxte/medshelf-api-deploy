@@ -11,7 +11,7 @@ final class Treatment
     private function __construct(
         protected string          $id,
         protected string          $profileId,
-        protected string          $itemId,
+        protected string          $productId,
         protected TreatmentStatus $status,
         protected float           $dose,
         protected int             $frequencyHours,
@@ -24,7 +24,7 @@ final class Treatment
 
     public static function create(
         string  $profileId,
-        string  $itemId,
+        string  $productId,
         float   $dose,
         int     $frequencyHours,
         Carbon  $startDate,
@@ -34,7 +34,7 @@ final class Treatment
         return new self(
             Utils::generateUUIDV4(),
             $profileId,
-            $itemId,
+            $productId,
             TreatmentStatus::ACTIVE,
             $dose,
             $frequencyHours,
@@ -47,7 +47,7 @@ final class Treatment
     public static function load(
         string          $id,
         string          $profileId,
-        string          $itemId,
+        string          $productId,
         TreatmentStatus $status,
         float           $dose,
         int             $frequencyHours,
@@ -59,7 +59,7 @@ final class Treatment
         return new self(
             $id,
             $profileId,
-            $itemId,
+            $productId,
             $status,
             $dose,
             $frequencyHours,
@@ -136,9 +136,9 @@ final class Treatment
         return $this->profileId;
     }
 
-    public function getItemId(): string
+    public function getProductId(): string
     {
-        return $this->itemId;
+        return $this->productId;
     }
 
     public function getStatus(): TreatmentStatus
