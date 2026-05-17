@@ -195,4 +195,24 @@ class ItemFinder
             mapper: fn($item) => $this->toView($item)
         );
     }
+
+    /**
+     * Returns all items belonging to the given house (no pagination), used for report generation.
+     *
+     * @return ItemView[]
+     */
+    public function listAllByHouseId(string $houseId): array
+    {
+        return ItemModel::with([
+            'product',
+            'product.pharmaceuticalForm',
+            'storage.place',
+        ])
+            ->whereHas('storage.place.house', fn($q) => $q->where('public_id', $houseId))
+            ->withSum('consumptions', 'amount')
+            ->orderBy('expiration_date')
+            ->get()
+            ->map(fn($item) => $this->toView($item))
+            ->toArray();
+    }
 }

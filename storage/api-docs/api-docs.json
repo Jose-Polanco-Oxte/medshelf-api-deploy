@@ -1120,6 +1120,16 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "filter[productId]",
+                        "in": "query",
+                        "description": "Filter items belonging to a specific product",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
                     }
                 ],
                 "responses": {
@@ -1281,6 +1291,44 @@
                 "responses": {
                     "204": {
                         "description": "No content"
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/items/report": {
+            "get": {
+                "tags": [
+                    "Items"
+                ],
+                "summary": "Download medicine cabinet report as PDF",
+                "description": "Generates and downloads a PDF report of all medicines in the authenticated user's house, ordered by expiration date.",
+                "operationId": "5bbd01a6827deb024491c146c8d41b96",
+                "responses": {
+                    "200": {
+                        "description": "PDF file download",
+                        "content": {
+                            "application/pdf": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized",
@@ -2798,13 +2846,13 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "itemId",
+                                    "productId",
                                     "dose",
                                     "frequencyHours",
                                     "startDate"
                                 ],
                                 "properties": {
-                                    "itemId": {
+                                    "productId": {
                                         "type": "string",
                                         "format": "uuid"
                                     },
@@ -3312,9 +3360,14 @@
                         "application/json": {
                             "schema": {
                                 "required": [
+                                    "itemId",
                                     "amount"
                                 ],
                                 "properties": {
+                                    "itemId": {
+                                        "type": "string",
+                                        "format": "uuid"
+                                    },
                                     "amount": {
                                         "type": "number",
                                         "minimum": 0.01,
@@ -3338,7 +3391,7 @@
                         }
                     },
                     "400": {
-                        "description": "Treatment is not active",
+                        "description": "Treatment not active, item does not belong to product, or insufficient stock",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3348,7 +3401,7 @@
                         }
                     },
                     "404": {
-                        "description": "Treatment not found",
+                        "description": "Treatment or item not found",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3395,9 +3448,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "PNG image of the QR code encoding the treatment summary",
+                        "description": "SVG image of the QR code encoding the treatment summary",
                         "content": {
-                            "image/png": {
+                            "image/svg+xml": {
                                 "schema": {
                                     "type": "string",
                                     "format": "binary"
@@ -4453,7 +4506,7 @@
                 "required": [
                     "id",
                     "profile",
-                    "item",
+                    "product",
                     "status",
                     "dose",
                     "frequencyHours",
@@ -4474,7 +4527,7 @@
                         },
                         "type": "object"
                     },
-                    "item": {
+                    "product": {
                         "properties": {
                             "id": {
                                 "type": "string",
@@ -4520,7 +4573,7 @@
                 "required": [
                     "id",
                     "profile",
-                    "item",
+                    "product",
                     "status",
                     "dose",
                     "frequencyHours",
@@ -4543,23 +4596,14 @@
                         },
                         "type": "object"
                     },
-                    "item": {
+                    "product": {
                         "properties": {
                             "id": {
                                 "type": "string",
                                 "format": "uuid"
                             },
-                            "product": {
-                                "properties": {
-                                    "id": {
-                                        "type": "string",
-                                        "format": "uuid"
-                                    },
-                                    "name": {
-                                        "type": "string"
-                                    }
-                                },
-                                "type": "object"
+                            "name": {
+                                "type": "string"
                             }
                         },
                         "type": "object"
