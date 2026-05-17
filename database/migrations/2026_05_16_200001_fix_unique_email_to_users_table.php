@@ -8,11 +8,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        // 1. Agregar columna para guardar el email de usuarios eliminados
         Schema::table('users', function (Blueprint $table) {
             $table->string('deleted_email')->nullable()->after('email');
         });
 
-        // Un solo UPDATE en lugar de iterar fila por fila
+        // 2. Quitar NOT NULL de email para poder setearlo en null
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('email')->nullable()->change();
+        });
+
+        // 3. Mover email → deleted_email en usuarios ya eliminados
         DB::table('users')
             ->whereNotNull('deleted_at')
             ->whereNotNull('email')
@@ -21,6 +27,7 @@ return new class extends Migration {
                 'email' => null,
             ]);
 
+        // 4. Restaurar el unique en email (NULL no cuenta como duplicado)
         Schema::table('users', function (Blueprint $table) {
             $table->unique('email');
         });
@@ -41,6 +48,7 @@ return new class extends Migration {
             ]);
 
         Schema::table('users', function (Blueprint $table) {
+            $table->string('email')->nullable(false)->change();
             $table->dropColumn('deleted_email');
         });
     }
