@@ -10,5 +10,5 @@ interface ProfileRepository
 
     public function findById(string $id): ?Profile;
 
-    public function remove(Profile $profile): void;
+    public function delete(Profile $profile): void;
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Core\Home\Profile\Application\Dto\Request\AddProfileRequest;
 use App\Core\Home\Profile\Application\Dto\Request\UpdateProfileRequest;
 use App\Core\Home\Profile\Application\UseCase\AddProfile;
+use App\Core\Home\Profile\Application\UseCase\DeleteProfile;
 use App\Core\Home\Profile\Application\UseCase\UpdateProfile;
 use App\Core\Shared\Domain\CursorRequest;
 use App\Core\Shared\Domain\OffsetRequest;
@@ -21,6 +22,7 @@ class ProfileController extends Controller
         protected ProfileFinder $finder,
         protected AddProfile    $addProfile,
         protected UpdateProfile $updateProfile,
+        protected DeleteProfile $deleteProfile,
     )
     {
     }
@@ -192,5 +194,11 @@ class ProfileController extends Controller
             'relationship' => $result->relationship,
             'createdAt' => $result->createdAt->toIso8601ZuluString('millisecond'),
         ]);
+    }
+
+    public function destroy(string $profileId): JsonResponse
+    {
+        $this->deleteProfile->execute($profileId);
+        return response()->json(null, 204);
     }
 }
