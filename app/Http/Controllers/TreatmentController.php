@@ -390,7 +390,7 @@ class TreatmentController extends Controller
             'dose' => $treatment->dose,
             'frequencyHours' => $treatment->frequencyHours,
             'startDate' => $treatment->startDate->toIso8601ZuluString('millisecond'),
-            'endDate' => $treatment->days?->toIso8601ZuluString('millisecond'),
+            'days' => $treatment->days,
         ], JSON_THROW_ON_ERROR);
 
         $image = QrCode::format('svg')->size(300)->generate($payload);
