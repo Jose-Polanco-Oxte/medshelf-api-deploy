@@ -13,9 +13,11 @@ use App\Http\Requests\UuidListRequest;
 use App\Providers\Core\Home\Item\Detail\ItemDetail;
 use App\Providers\Core\Home\Item\Service\ItemFinder;
 use App\Services\PaginationService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use OpenApi\Annotations as OA;
 
 class ItemController extends Controller
@@ -216,5 +218,58 @@ class ItemController extends Controller
             )
         );
         return response()->json(null, 204);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/items/report",
+     *     tags={"Items"},
+     *     summary="Download medicine cabinet report as PDF",
+     *     description="Generates and downloads a PDF report of all medicines in the authenticated user's house, ordered by expiration date.",
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="PDF file download",
+     *         @OA\MediaType(
+     *             mediaType="application/pdf",
+     *             @OA\Schema(type="string", format="binary")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthorized", @OA\JsonContent(ref="#/components/schemas/ErrorResponse"))
+     * )
+     */
+    public function downloadReport(): Response
+    {
+        $houseId = $this->getAuthHouseId();
+        $items   = $this->finder->listAllByHouseId($houseId);
+        $now     = Carbon::now();
+
+        $okCount      = 0;
+        $warningCount = 0;
+        $expiredCount = 0;
+
+        foreach ($items as $item) {
+            $expDate  = Carbon::parse($item->expirationDate);
+            $daysLeft = $now->diffInDays($expDate, false);
+            if ($daysLeft < 0) {
+                $expiredCount++;
+            } elseif ($daysLeft <= 30) {
+                $warningCount++;
+            } else {
+                $okCount++;
+            }
+        }
+
+        $pdf = Pdf::loadView('reports.items', [
+            'items'        => $items,
+            'generatedAt'  => $now->format('d/m/Y H:i'),
+            'okCount'      => $okCount,
+            'warningCount' => $warningCount,
+            'expiredCount' => $expiredCount,
+        ]);
+
+        $filename = 'medshelf-reporte-' . $now->format('Ymd-His') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

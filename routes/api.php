@@ -42,6 +42,7 @@ Route::group(['middleware' => [JwtCookieMiddleware::class, AuthenticateApi::clas
 
     // Items
     Route::get('/places/{placeId}/items', [ItemController::class, 'index']);
+    Route::get('/items/report', [ItemController::class, 'downloadReport']);
     Route::get('/items', [ItemController::class, 'indexAll']);
     Route::get('/items/{itemId}', [ItemController::class, 'show']);
     Route::post('/places/{placeId}/items', [ItemController::class, 'store']);
