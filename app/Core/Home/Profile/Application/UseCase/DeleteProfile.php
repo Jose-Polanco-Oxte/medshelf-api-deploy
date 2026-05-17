@@ -7,7 +7,7 @@ use App\Core\Home\Profile\Model\Repository\ProfileRepository;
 
 final readonly class DeleteProfile
 {
-    private function __construct(
+    public function __construct(
         private ProfileRepository $profileRepository,
     )
     {
