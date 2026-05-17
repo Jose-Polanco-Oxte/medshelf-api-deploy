@@ -8,6 +8,8 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\DatabaseNotification;
@@ -15,8 +17,6 @@ use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -28,12 +28,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Models\HouseModel|null $house
- * @property-read Collection<int, \App\Models\HouseModel> $houses
+ * @property-read HouseModel|null $house
+ * @property-read Collection<int, HouseModel> $houses
  * @property-read int|null $houses_count
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
+ * @method static UserFactory factory($count = null, $state = [])
  * @method static Builder<static>|User newModelQuery()
  * @method static Builder<static>|User newQuery()
  * @method static Builder<static>|User query()
@@ -59,17 +59,6 @@ class User extends Authenticatable implements JWTSubject
 
     protected $hidden = ['password', 'remember_token'];
 
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
-            'deleted_at' => 'datetime',
-        ];
-    }
-
     public function getJWTIdentifier(): mixed
     {
         return $this->getKey();
@@ -90,5 +79,34 @@ class User extends Authenticatable implements JWTSubject
     public function houses(): HasMany
     {
         return $this->hasMany(HouseModel::class, 'owner_id', 'id');
+    }
+
+    public function restore(): bool
+    {
+        $this->email = $this->deleted_email;
+        $this->deleted_email = null;
+        $this->save();
+
+        return parent::restore();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+            'deleted_at' => 'datetime',
+        ];
+    }
+
+    public function delete(): bool|null
+    {
+        $this->deleted_email = $this->email;
+        $this->email = null;
+        $this->save();
+
+        return parent::delete();
     }
 }
