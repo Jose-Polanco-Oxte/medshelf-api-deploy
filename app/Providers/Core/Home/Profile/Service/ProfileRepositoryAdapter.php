@@ -45,6 +45,11 @@ class ProfileRepositoryAdapter implements ProfileRepository
         }
     }
 
+    public function delete(Profile $profile): void
+    {
+        ProfileModel::where('public_id', $profile->getId())->delete();
+    }
+
     public function findById(string $id): ?Profile
     {
         $record = ProfileModel::with([
@@ -70,10 +75,5 @@ class ProfileRepositoryAdapter implements ProfileRepository
             allergies: $record->allergies->pluck('name')->toArray(),
             createdAt: $record->created_at,
         );
-    }
-
-    public function remove(Profile $profile): void
-    {
-        ProfileModel::where('public_id', $profile->getId())->delete();
     }
 }
